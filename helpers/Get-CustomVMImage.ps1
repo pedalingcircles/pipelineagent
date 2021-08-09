@@ -1,0 +1,1 @@
+az image list --resource-group msft-aware-imagegen-agent-ci --query "[?contains(name, 'packer-Ubuntu2004-20210302.2')].id | [0]" -o tsv

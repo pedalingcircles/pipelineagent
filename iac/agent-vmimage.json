@@ -1,0 +1,61 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vmName": {
+        "type": "string"
+      },
+      "vmSize": {
+        "type": "string",
+        "defaultValue": "Standard_D4s_v4"
+      },
+      "adminUserName": {
+        "type": "string"
+      },
+      "adminPassword": {
+        "type": "securestring"
+      },
+      "networkInterfaceId": {
+        "type": "string"
+      }
+    },
+    "resources": [
+      {
+        "name": "[parameters('vmName')]",
+        "type": "Microsoft.Compute/virtualMachines",
+        "location": "eastus",
+        "apiVersion": "2018-04-01",
+        "properties": {
+          "hardwareProfile": {
+            "vmSize": "[parameters('vmSize')]"
+          },
+          "storageProfile": {
+            "osDisk": {
+              "osType": "Linux",
+              "name": "23823-osDisk.8b3ea017-3c44-473c-8dc9-a4aee5a4c0ae.vhd",
+              "createOption": "FromImage",
+              "image": {
+                "uri": "https://contosopackerbuilder001.blob.core.windows.net/system/Microsoft.Compute/Images/images/23823-osDisk.8b3ea017-3c44-473c-8dc9-a4aee5a4c0ae.vhd"
+              },
+              "vhd": {
+                "uri": "https://contosopackerbuilder001.blob.core.windows.net/vmcontainer9473df9a-cd60-40db-bcb9-ed919122686e/osDisk.9473df9a-cd60-40db-bcb9-ed919122686e.vhd"
+              },
+              "caching": "ReadWrite"
+            }
+          },
+          "osProfile": {
+            "computerName": "[parameters('vmName')]",
+            "adminUsername": "[parameters('adminUsername')]",
+            "adminPassword": "[parameters('adminPassword')]"
+          },
+          "networkProfile": {"networkInterfaces":[{"id":"[parameters('networkInterfaceId')]"}]},
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": false
+            }
+          },
+          "provisioningState": 0
+        }
+      }
+    ]
+  }
