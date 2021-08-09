@@ -1,0 +1,761 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/galleries",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent",
+            "location": "eastus2",
+            "properties": {
+                "identifier": {}
+            }
+        },
+        {
+            "type": "Microsoft.ContainerRegistry/registries",
+            "apiVersion": "2020-11-01-preview",
+            "name": "acrcontosoadoagent",
+            "location": "eastus2",
+            "sku": {
+                "name": "Premium",
+                "tier": "Premium"
+            },
+            "properties": {
+                "adminUserEnabled": false,
+                "networkRuleSet": {
+                    "defaultAction": "Allow",
+                    "virtualNetworkRules": [],
+                    "ipRules": []
+                },
+                "policies": {
+                    "quarantinePolicy": {
+                        "status": "disabled"
+                    },
+                    "trustPolicy": {
+                        "type": "Notary",
+                        "status": "disabled"
+                    },
+                    "retentionPolicy": {
+                        "days": 7,
+                        "status": "disabled"
+                    }
+                },
+                "encryption": {
+                    "status": "disabled"
+                },
+                "dataEndpointEnabled": false,
+                "publicNetworkAccess": "Disabled",
+                "networkRuleBypassOptions": "AzureServices",
+                "zoneRedundancy": "Disabled",
+                "anonymousPullEnabled": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "name": "pe-agent.nic.ec216107-da29-4c40-be64-39e72ba7873d",
+            "location": "eastus2",
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "registry-registry_data_eastus2.privateEndpoint",
+                        "properties": {
+                            "privateIPAddress": "10.0.0.5",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/mijohns-deleteme-vmtest/providers/Microsoft.Network/virtualNetworks/mijohnsdeletemevmtestVNET/subnets/mijohnsdeletemevmtestSubnet"
+                            },
+                            "primary": true,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    },
+                    {
+                        "name": "registry-registry.privateEndpoint",
+                        "properties": {
+                            "privateIPAddress": "10.0.0.6",
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/mijohns-deleteme-vmtest/providers/Microsoft.Network/virtualNetworks/mijohnsdeletemevmtestVNET/subnets/mijohnsdeletemevmtestSubnet"
+                            },
+                            "primary": false,
+                            "privateIPAddressVersion": "IPv4"
+                        }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableAcceleratedNetworking": false,
+                "enableIPForwarding": false
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-11-01",
+            "name": "vnet-agent-sbx-eastus2-01",
+            "location": "eastus2",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "172.19.0.0/24"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "snet-acr",
+                        "properties": {
+                            "addressPrefix": "172.19.0.0/24",
+                            "delegations": [],
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled"
+                        }
+                    }
+                ],
+                "virtualNetworkPeerings": [],
+                "enableDdosProtection": false
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "name": "stcontosoagentimages",
+            "location": "eastus2",
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": false,
+                "allowSharedKeyAccess": true,
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                },
+                "accessTier": "Hot"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/disks",
+            "apiVersion": "2020-09-30",
+            "name": "packer-Ubuntu1604-20210504.2",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', 'stcontosoagentimages')]"
+            ],
+            "sku": {
+                "name": "Premium_LRS",
+                "tier": "Premium"
+            },
+            "properties": {
+                "creationData": {
+                    "createOption": "Import",
+                    "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts', 'stcontosoagentimages')]",
+                    "sourceUri": "https://stcontosoagentimages.blob.core.windows.net/system/Microsoft.Compute/Images/ci-packerimage-ubuntu1604-20210504-1/packer-osDisk.4601eb13-476e-4ec2-b460-f3ec8f3391ef.vhd"
+                },
+                "diskSizeGB": 86,
+                "diskIOPSReadWrite": 500,
+                "diskMBpsReadWrite": 100,
+                "encryption": {
+                    "type": "EncryptionAtRestWithPlatformKey"
+                },
+                "diskState": "Unattached",
+                "networkAccessPolicy": "AllowAll",
+                "tier": "P10"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Ubuntu1604",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]"
+            ],
+            "properties": {
+                "hyperVGeneration": "V1",
+                "osType": "Linux",
+                "osState": "Generalized",
+                "identifier": {
+                    "publisher": "JPS",
+                    "offer": "AgentPoolImage",
+                    "sku": "Ubuntu1604"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Ubuntu2004",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]"
+            ],
+            "properties": {
+                "hyperVGeneration": "V1",
+                "osType": "Linux",
+                "osState": "Generalized",
+                "identifier": {
+                    "publisher": "JPS",
+                    "offer": "AgentPoolImage",
+                    "sku": "Baseline"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Windows2019",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]"
+            ],
+            "properties": {
+                "hyperVGeneration": "V1",
+                "osType": "Windows",
+                "osState": "Generalized",
+                "identifier": {
+                    "publisher": "JPS",
+                    "offer": "AgentPoolImage",
+                    "sku": "Windows2019"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/images",
+            "apiVersion": "2021-03-01",
+            "name": "packer-Ubuntu1604-20210504.2",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/disks', 'packer-Ubuntu1604-20210504.2')]"
+            ],
+            "properties": {
+                "storageProfile": {
+                    "osDisk": {
+                        "osType": "Linux",
+                        "osState": "Generalized",
+                        "diskSizeGB": 86,
+                        "managedDisk": {
+                            "id": "[resourceId('Microsoft.Compute/disks', 'packer-Ubuntu1604-20210504.2')]"
+                        },
+                        "caching": "None",
+                        "storageAccountType": "Standard_LRS"
+                    },
+                    "dataDisks": []
+                },
+                "hyperVGeneration": "V1"
+            }
+        },
+        {
+            "type": "Microsoft.ContainerRegistry/registries/scopeMaps",
+            "apiVersion": "2020-11-01-preview",
+            "name": "acrcontosoadoagent/_repositories_admin",
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerRegistry/registries', 'acrcontosoadoagent')]"
+            ],
+            "properties": {
+                "description": "Can perform all read, write and delete operations on the registry",
+                "actions": [
+                    "repositories/*/metadata/read",
+                    "repositories/*/metadata/write",
+                    "repositories/*/content/read",
+                    "repositories/*/content/write",
+                    "repositories/*/content/delete"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.ContainerRegistry/registries/scopeMaps",
+            "apiVersion": "2020-11-01-preview",
+            "name": "acrcontosoadoagent/_repositories_pull",
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerRegistry/registries', 'acrcontosoadoagent')]"
+            ],
+            "properties": {
+                "description": "Can pull any repository of the registry",
+                "actions": [
+                    "repositories/*/content/read"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.ContainerRegistry/registries/scopeMaps",
+            "apiVersion": "2020-11-01-preview",
+            "name": "acrcontosoadoagent/_repositories_push",
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerRegistry/registries', 'acrcontosoadoagent')]"
+            ],
+            "properties": {
+                "description": "Can push to any repository of the registry",
+                "actions": [
+                    "repositories/*/content/read",
+                    "repositories/*/content/write"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints",
+            "apiVersion": "2020-11-01",
+            "name": "pe-agent",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerRegistry/registries', 'acrcontosoadoagent')]"
+            ],
+            "properties": {
+                "privateLinkServiceConnections": [
+                    {
+                        "name": "pe-agent",
+                        "properties": {
+                            "privateLinkServiceId": "[resourceId('Microsoft.ContainerRegistry/registries', 'acrcontosoadoagent')]",
+                            "groupIds": [
+                                "registry"
+                            ],
+                            "privateLinkServiceConnectionState": {
+                                "status": "Approved",
+                                "description": "Auto-Approved",
+                                "actionsRequired": "None"
+                            }
+                        }
+                    }
+                ],
+                "manualPrivateLinkServiceConnections": [],
+                "subnet": {
+                    "id": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/mijohns-deleteme-vmtest/providers/Microsoft.Network/virtualNetworks/mijohnsdeletemevmtestVNET/subnets/mijohnsdeletemevmtestSubnet"
+                },
+                "customDnsConfigs": []
+            }
+        },
+        {
+            "type": "Microsoft.Network/privateEndpoints/privateDnsZoneGroups",
+            "apiVersion": "2020-11-01",
+            "name": "pe-agent/default",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/privateEndpoints', 'pe-agent')]"
+            ],
+            "properties": {
+                "privateDnsZoneConfigs": [
+                    {
+                        "name": "privatelink-azurecr-io",
+                        "properties": {
+                            "privateDnsZoneId": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/mijohns-deleteme-vmtest/providers/Microsoft.Network/privateDnsZones/privatelink.azurecr.io"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks/subnets",
+            "apiVersion": "2020-11-01",
+            "name": "vnet-agent-sbx-eastus2-01/snet-acr",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', 'vnet-agent-sbx-eastus2-01')]"
+            ],
+            "properties": {
+                "addressPrefix": "172.19.0.0/24",
+                "delegations": [],
+                "privateEndpointNetworkPolicies": "Enabled",
+                "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices",
+            "apiVersion": "2021-04-01",
+            "name": "stcontosoagentimages/default",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', 'stcontosoagentimages')]"
+            ],
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                },
+                "deleteRetentionPolicy": {
+                    "enabled": false
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/fileServices",
+            "apiVersion": "2021-04-01",
+            "name": "stcontosoagentimages/default",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', 'stcontosoagentimages')]"
+            ],
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "Standard"
+            },
+            "properties": {
+                "protocolSettings": {
+                    "smb": {}
+                },
+                "cors": {
+                    "corsRules": []
+                },
+                "shareDeleteRetentionPolicy": {
+                    "enabled": true,
+                    "days": 7
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/queueServices",
+            "apiVersion": "2021-04-01",
+            "name": "stcontosoagentimages/default",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', 'stcontosoagentimages')]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/tableServices",
+            "apiVersion": "2021-04-01",
+            "name": "stcontosoagentimages/default",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', 'stcontosoagentimages')]"
+            ],
+            "properties": {
+                "cors": {
+                    "corsRules": []
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images/versions",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Ubuntu1604/1.1.63",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries/images', 'sig.contoso.agent', 'Ubuntu1604')]",
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]"
+            ],
+            "properties": {
+                "publishingProfile": {
+                    "targetRegions": [
+                        {
+                            "name": "East US 2",
+                            "regionalReplicaCount": 1,
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    ],
+                    "replicaCount": 1,
+                    "excludeFromLatest": false,
+                    "storageAccountType": "Standard_LRS"
+                },
+                "storageProfile": {
+                    "source": {
+                        "id": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/contoso-agentimages/providers/Microsoft.Compute/images/packer-Ubuntu1604-20210504.3"
+                    },
+                    "osDiskImage": {
+                        "hostCaching": "None",
+                        "source": {}
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images/versions",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Ubuntu2004/1.1.33",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries/images', 'sig.contoso.agent', 'Ubuntu2004')]",
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]"
+            ],
+            "properties": {
+                "publishingProfile": {
+                    "targetRegions": [
+                        {
+                            "name": "East US 2",
+                            "regionalReplicaCount": 1,
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    ],
+                    "replicaCount": 1,
+                    "excludeFromLatest": false,
+                    "storageAccountType": "Standard_LRS"
+                },
+                "storageProfile": {
+                    "source": {
+                        "id": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/contoso-agentimages/providers/Microsoft.Compute/images/packer-Ubuntu2004-20210304.3"
+                    },
+                    "osDiskImage": {
+                        "hostCaching": "None",
+                        "source": {}
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images/versions",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Ubuntu2004/1.1.41",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries/images', 'sig.contoso.agent', 'Ubuntu2004')]",
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]"
+            ],
+            "properties": {
+                "publishingProfile": {
+                    "targetRegions": [
+                        {
+                            "name": "East US 2",
+                            "regionalReplicaCount": 1,
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    ],
+                    "replicaCount": 1,
+                    "excludeFromLatest": false,
+                    "storageAccountType": "Standard_LRS"
+                },
+                "storageProfile": {
+                    "source": {
+                        "id": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/contoso-agentimages/providers/Microsoft.Compute/images/packer-Ubuntu2004-20210304.12"
+                    },
+                    "osDiskImage": {
+                        "hostCaching": "None",
+                        "source": {}
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images/versions",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Ubuntu2004/1.1.44",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries/images', 'sig.contoso.agent', 'Ubuntu2004')]",
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]"
+            ],
+            "properties": {
+                "publishingProfile": {
+                    "targetRegions": [
+                        {
+                            "name": "East US 2",
+                            "regionalReplicaCount": 1,
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    ],
+                    "replicaCount": 1,
+                    "excludeFromLatest": false,
+                    "storageAccountType": "Standard_LRS"
+                },
+                "storageProfile": {
+                    "source": {
+                        "id": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/contoso-agentimages/providers/Microsoft.Compute/images/packer-Ubuntu2004-20210304.15"
+                    },
+                    "osDiskImage": {
+                        "hostCaching": "None",
+                        "source": {}
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images/versions",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Ubuntu2004/1.1.47",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries/images', 'sig.contoso.agent', 'Ubuntu2004')]",
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]"
+            ],
+            "properties": {
+                "publishingProfile": {
+                    "targetRegions": [
+                        {
+                            "name": "East US 2",
+                            "regionalReplicaCount": 1,
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    ],
+                    "replicaCount": 1,
+                    "excludeFromLatest": false,
+                    "storageAccountType": "Standard_LRS"
+                },
+                "storageProfile": {
+                    "source": {
+                        "id": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/contoso-agentimages/providers/Microsoft.Compute/images/packer-Ubuntu2004-20210304.18"
+                    },
+                    "osDiskImage": {
+                        "hostCaching": "None",
+                        "source": {}
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images/versions",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Ubuntu2004/1.1.52",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries/images', 'sig.contoso.agent', 'Ubuntu2004')]",
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]"
+            ],
+            "properties": {
+                "publishingProfile": {
+                    "targetRegions": [
+                        {
+                            "name": "East US 2",
+                            "regionalReplicaCount": 1,
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    ],
+                    "replicaCount": 1,
+                    "excludeFromLatest": false,
+                    "storageAccountType": "Standard_LRS"
+                },
+                "storageProfile": {
+                    "source": {
+                        "id": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/contoso-agentimages/providers/Microsoft.Compute/images/packer-Ubuntu2004-20210308.3"
+                    },
+                    "osDiskImage": {
+                        "hostCaching": "None",
+                        "source": {}
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images/versions",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Windows2019/1.1.59",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries/images', 'sig.contoso.agent', 'Windows2019')]",
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]"
+            ],
+            "properties": {
+                "publishingProfile": {
+                    "targetRegions": [
+                        {
+                            "name": "East US 2",
+                            "regionalReplicaCount": 1,
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    ],
+                    "replicaCount": 1,
+                    "excludeFromLatest": false,
+                    "storageAccountType": "Standard_LRS"
+                },
+                "storageProfile": {
+                    "source": {
+                        "id": "/subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/contoso-agentimages/providers/Microsoft.Compute/images/packer-Windows2019-20210311.3"
+                    },
+                    "osDiskImage": {
+                        "hostCaching": "None",
+                        "source": {}
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.ContainerRegistry/registries/privateEndpointConnections",
+            "apiVersion": "2020-11-01-preview",
+            "name": "acrcontosoadoagent/acrcontosoadoagent.01c287678a6f47e59dbbdb9f419ed5b9",
+            "dependsOn": [
+                "[resourceId('Microsoft.ContainerRegistry/registries', 'acrcontosoadoagent')]",
+                "[resourceId('Microsoft.Network/privateEndpoints', 'pe-agent')]"
+            ],
+            "properties": {
+                "privateEndpoint": {
+                    "id": "[resourceId('Microsoft.Network/privateEndpoints', 'pe-agent')]"
+                },
+                "privateLinkServiceConnectionState": {
+                    "status": "Approved",
+                    "description": "Auto-Approved"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2021-04-01",
+            "name": "stcontosoagentimages/default/images",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', 'stcontosoagentimages', 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', 'stcontosoagentimages')]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+            "apiVersion": "2021-04-01",
+            "name": "stcontosoagentimages/default/system",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', 'stcontosoagentimages', 'default')]",
+                "[resourceId('Microsoft.Storage/storageAccounts', 'stcontosoagentimages')]"
+            ],
+            "properties": {
+                "defaultEncryptionScope": "$account-encryption-key",
+                "denyEncryptionScopeOverride": false,
+                "publicAccess": "None"
+            }
+        },
+        {
+            "type": "Microsoft.Compute/galleries/images/versions",
+            "apiVersion": "2020-09-30",
+            "name": "sig.contoso.agent/Ubuntu1604/1.1.62",
+            "location": "eastus2",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/galleries/images', 'sig.contoso.agent', 'Ubuntu1604')]",
+                "[resourceId('Microsoft.Compute/galleries', 'sig.contoso.agent')]",
+                "[resourceId('Microsoft.Compute/images', 'packer-Ubuntu1604-20210504.2')]"
+            ],
+            "properties": {
+                "publishingProfile": {
+                    "targetRegions": [
+                        {
+                            "name": "East US 2",
+                            "regionalReplicaCount": 1,
+                            "storageAccountType": "Standard_LRS"
+                        }
+                    ],
+                    "replicaCount": 1,
+                    "excludeFromLatest": false,
+                    "storageAccountType": "Standard_LRS"
+                },
+                "storageProfile": {
+                    "source": {
+                        "id": "[resourceId('Microsoft.Compute/images', 'packer-Ubuntu1604-20210504.2')]"
+                    },
+                    "osDiskImage": {
+                        "hostCaching": "None",
+                        "source": {}
+                    }
+                }
+            }
+        }
+    ]
+}
