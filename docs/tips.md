@@ -45,3 +45,11 @@ Parameter file
 ```azurecli
 az deployment group what-if --resource-group mijohns-vnet-sbx --subscription cbadc96b-2923-4459-bb2d-b237af7f84d6 --template-file iac/contoso-net-template.bicep --parameters iac/contoso-net-template.parameters.sbx.json
 ```
+
+## Git subtree
+
+This repo is dependent upon other repos. Mostly the Github Actions and Azure DevOps pipeline product team's repo actions/virtual-environments. 
+We use a Git subtree to pull in and reference this repo 
+
+`git subtree add --prefix .virtual-environments https://github.com/actions/virtual-environments.git main --squash`
+
