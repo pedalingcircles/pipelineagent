@@ -50,6 +50,9 @@ packer build    -var "capture_name_prefix=$ResourcesNamePrefix" `
                 -var "subscription_id=$SubscriptionId" `
                 -var "temp_resource_group_name=$TempResourceGroupName" `
                 -var "tenant_id=$TenantId" `
+                -var "virtual_network_name=$VirtualNetworkName" `
+                -var "virtual_network_resource_group_name=$VirtualNetworkRG" `
+                -var "virtual_network_subnet_name=$VirtualNetworkSubnet" `
                 -var "run_validation_diskspace=$env:RUN_VALIDATION_FLAG" `
                 -var "allowed_inbound_ip_addresses=$AgentIp" `
                 $TemplatePath `
