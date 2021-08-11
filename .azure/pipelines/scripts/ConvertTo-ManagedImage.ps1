@@ -116,7 +116,7 @@ $osType = $blobInfo.metadata.MicrosoftAzureCompute_OSType
 # A managed disk must be created from the VHD. After the managed disk is created
 # then we can create a managed image. Note: Packer in it's current state and implementation
 # does not create a managed disk or imaged. Just a VHD file. Packer is capabile of directly creating
-# managed disk, however, we are leveraging the ADO team has done to create VM images.
+# managed disk, however, we are leveraging what the ADO team has done to create VM images.
 $imageName = "{0}-{1}-{2}.{3}" -f "packer", "ubuntu1804", "$DateVersion", "$DateVersionCounter"
 
 # This is an intermediate resource (Azure Managed Disk) that's used

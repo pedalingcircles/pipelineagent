@@ -3,6 +3,11 @@
 @maxLength(24)
 param storageAccountName string
 
+@description('The Shared Image Gallery name used to store VM images used for self-hosted ADO agents.')
+@minLength(1)
+@maxLength(80)
+param sharedImageGalleryName string
+
 @description('Virtual Network settings.')
 param vNetSettings object = {
   name: 'vnet'
@@ -108,3 +113,16 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   }
 }
 
+resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' = {
+  name: sharedImageGalleryName
+  location: location
+  tags: {
+    envtype: 'sbx'
+    envuse: 'packer'
+  }
+  properties: {
+    description: 'Shared Image Gallery used to store virtual machine images used for creating self-hosted Azure DevOps Agents.'
+  }
+
+
+}
