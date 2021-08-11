@@ -1,6 +1,3 @@
-see: https://wwpss.visualstudio.com/Aware/_git/pipelineagent?path=%2F.pipelines%2Fci-baselineimage.yml&version=GBmijohns%2Fhardenimageandclean&line=166&lineEnd=167&lineStartColumn=1&lineEndColumn=1&lineStyle=plain&_a=contents
-
-
 #Requires -Version 5.1
 <#
 .Synopsis
@@ -83,48 +80,60 @@ param(
   [string][Parameter(Mandatory=$false)]$Prefix,
   [string][Parameter(Mandatory=$false)]$ResourceGroupName,
   [string][Parameter(Mandatory=$false)]$StorageAccountName,
-  [string][Parameter(Mandatory=$false)]$Tags
+  [string][Parameter(Mandatory=$false)]$ImageType,
+  [string][Parameter(Mandatory=$false)]$Tags,
+  [switch]$Clean
 )
 
 # Finding the specific blob (.vhd file) in storage based on prefix. 
-$vhdName = az storage blob list --auth-mode login --container-name $ContainerName --account-name $StorageAccountName --prefix $Prefix --query "[?contains(name, '.vhd')].name | [0]" -o tsv
-if ([string]::IsNullOrEmpty($vhdName)) {
-    Write-Host "##vso[task.logissue type=error]VHD blob with prefix:'$Prefix' not found in container:'$ContainerName'"
-    exit 1
+[array]$vhdName = az storage blob list --auth-mode login --container-name $ContainerName --account-name $StorageAccountName --prefix $Prefix --query "[?contains(name, '.vhd')].name"  -o tsv
+if ($vhdName.length -ne 1) {
+    Write-Host "##vso[task.logissue type=error]VHD blob with prefix:'$Prefix' not found in container:'$ContainerName' or more than one blob exists with the same prefix."
+    exit 1 
 }
+Write-Host "Found existing vhd file blob..."
 Write-Host "vhdName=$vhdName"
 
 # Getting the blob details
 try {
     $blobInfo = az storage blob show --auth-mode login --container-name $ContainerName --name $vhdName --account-name $StorageAccountName | ConvertFrom-Json
+    if ($null -eq $blobInfo) {
+        throw "Blob info result was null when retieving information from container:$ContainerName name:$vhdName and account name:$StorageAccountName"
+    }
 } catch {
-    Write-Verbose $_
+    Write-Host $_
     Write-Host "##vso[task.logissue type=error]Error in retrieving blob information"
     exit 1
 }
+Write-Host "Retrieved blob information..."
+Write-Host $blobInfo
 
 # Creating a URL for the blob. This is needed for creating a managed disk
 $blobUrl = az storage blob url --auth-mode login --container-name $ContainerName --name $vhdName --account-name $StorageAccountName
 if ([string]::IsNullOrEmpty($blobUrl)) {
-    Write-Host "##vso[task.logissue type=error]Cloud not create a URL for the blob"
+    Write-Host "##vso[task.logissue type=error]Could not create a URL for the blob"
     exit 1
 }
-Write-Host "vhdName=$vhdName"
+Write-Host "Created URL for existing vhd blob..."
+Write-Host "blobUrl=$blobUrl"
 
 # Set metadata
-$capturedVMKey = $blobInfo.metadata.MicrosoftAzureCompute_CapturedVMKey
 $osType = $blobInfo.metadata.MicrosoftAzureCompute_OSType
 
 # A managed disk must be created from the VHD. After the managed disk is created
 # then we can create a managed image. Note: Packer in it's current state and implementation
 # does not create a managed disk or imaged. Just a VHD file. Packer is capabile of directly creating
 # managed disk, however, we are leveraging what the ADO team has done to create VM images.
-$imageName = "{0}-{1}-{2}.{3}" -f "packer", "ubuntu1804", "$DateVersion", "$DateVersionCounter"
+$imageName = "{0}-{1}-{2}.{3}" -f "packer", $ImageType, "$DateVersion", "$DateVersionCounter"
+Write-Host "Creating new Azure managed disk with image name:$imageName"
 
 # This is an intermediate resource (Azure Managed Disk) that's used
 # to ultimatly create an Azure Managed Image. This resource will therefore
 # be deleted after the Azure Managed Image is created.
-$diskCreateResult = az disk create `
+# Wrapping both disk and image creation in try block so 
+# we can clean up if one or both fail in finally.
+try {
+    $diskCreateResult = az disk create `
     --resource-group $ResourceGroupName `
     --location $Location `
     --name $imageName `
@@ -132,9 +141,10 @@ $diskCreateResult = az disk create `
     --os-type $osType `
     --tags envtype=sbx envuse=agents prefix=$Prefix
     | ConvertFrom-Json
-Write-Verbose ($diskCreateResult | Format-List | Out-String)
+    Write-Host "Created new managed disk..."
+    Write-Host ($diskCreateResult | Format-List | Out-String)
 
-$imageCreateResult = az image create `
+    $imageCreateResult = az image create `
     --name $imageName `
     --resource-group $ResourceGroupName `
     --source $diskCreateResult.id `
@@ -144,7 +154,33 @@ $imageCreateResult = az image create `
     --os-type Linux `
     --tags envtype=sbx envuse=agents prefix=$Prefix `
     | ConvertFrom-Json
-Write-Verbose ($imageCreateResult | Format-List | Out-String)
-Write-Host 'Completed creating the managed disk: $imageName'
+    Write-Host "Created new managed image..."
+    Write-Host ($imageCreateResult | Format-List | Out-String)
+} catch {
+    Write-Host "##vso[task.logissue type=error]There was an error creating the managed disk and or managed image"
+    Write-Host $_
+    Write-Host "Attempting to clean up resources..."
+} finally {
+    Write-Host "Cleaning up and removing the managed disk"
+    if ($diskCreateResult.provisioningState -eq "Succeeded" -and $Clean) {
+        az disk delete --ids $diskCreateResult.id --yes
+    } else {
+        Write-Host "##vso[task.logissue type=warning]Could not clean up the managed disk. This could be due to errors during creation or the 'Clean' switch wasn't set."
+    }
+
+    # Only clean original blobs in the storage container  if we know the managed image was created.
+    if ($imageCreateResult.provisioningState -eq "Succeeded" -and $Clean) {
+        # Cleaning up blobs directly related to the image creation
+        az storage blob delete-batch --source $ContainerName --auth-mode login --account-name $StorageAccountName --pattern '24000*' #  $Prefix
+
+        # Cleaning up blobs associated with working vm images. These are throw away and only needed while Packer is building an image
+        $modifiedDate = (Get-Date -AsUTC -Date ((Get-Date).AddDays(-7)) -Format s) + "Z"
+        Write-Host "Cleaning up all blobs in the 'images' container since $modifiedDate"
+        az storage blob delete-batch --source images --auth-mode login --pattern *.vhd --account-name $StorageAccountName --if-unmodified-since $modifiedDate
+    } else {
+        Write-Host "##vso[task.logissue type=warning]Could not clean up the working vhd blobs in the 'images' container. This could be due errors in access or the 'Clean' switch wasn't set."
+    }
+}
+
 
 
