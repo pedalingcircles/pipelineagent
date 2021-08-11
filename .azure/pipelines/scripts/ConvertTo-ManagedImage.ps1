@@ -1,3 +1,5 @@
+see: https://wwpss.visualstudio.com/Aware/_git/pipelineagent?path=%2F.pipelines%2Fci-baselineimage.yml&version=GBmijohns%2Fhardenimageandclean&line=166&lineEnd=167&lineStartColumn=1&lineEndColumn=1&lineStyle=plain&_a=contents
+
 
 #Requires -Version 5.1
 <#
@@ -144,3 +146,5 @@ $imageCreateResult = az image create `
     | ConvertFrom-Json
 Write-Verbose ($imageCreateResult | Format-List | Out-String)
 Write-Host 'Completed creating the managed disk: $imageName'
+
+
