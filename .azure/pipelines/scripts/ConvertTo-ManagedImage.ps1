@@ -37,6 +37,11 @@
 .PARAMETER StorageAccountName
     The storage account name that the VHD blob is located in.
 
+.PARAMETER ImageType
+    This value comes from building the original image from Packer. This is usually
+    the baseline image name from a Packer/Azure Image Builder template name. 
+    e.g. ubuntu1804, ubuntu2004, windows2016, windows2019
+
 .PARAMETER Tags
     The tags to apply to the blob, Azure Managed Disk and Azure Managed Image. 
     Recommended tags should include the following categories:
@@ -181,6 +186,3 @@ try {
         Write-Host "##vso[task.logissue type=warning]Could not clean up the working vhd blobs in the 'images' container. This could be due errors in access or the 'Clean' switch wasn't set."
     }
 }
-
-
-
