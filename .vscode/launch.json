@@ -33,7 +33,7 @@
             "request": "launch",
             "script": "${workspaceFolder}/.azure/pipelines/scripts/ConvertTo-ManagedImage.ps1",
             "cwd": "${file}",
-            "args": ["-ContainerName system", "-DateVersion 20210811", "-DateVersionCounter 01", "-Location eastus2", "-ImageType ubuntu2004", "-Prefix Microsoft.Compute/Images/images/24000", "-ResourceGroupName rg-mijohns-images-sbx-eastus2-001", "-StorageAccountName stmijohnsimages001", "-Clean"]
+            "args": ["-ContainerName system", "-DateVersion 20210811", "-DateVersionCounter 01", "-Location eastus2", "-ImageType ubuntu2004", "-Tags @(\"a=b\",\"c=d\")", "-Prefix Microsoft.Compute/Images/images/24000", "-ResourceGroupName rg-mijohns-images-sbx-eastus2-001", "-StorageAccountName stmijohnsimages001", "-Clean"]
         },
         {
             "name": "Remove-IntermediateImageResources.ps1",

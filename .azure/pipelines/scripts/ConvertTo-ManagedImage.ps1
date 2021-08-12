@@ -57,6 +57,9 @@
     Tags are name value pairs seperated by a single white space
     example:key1=value1 key2=value2 key3=value3
 
+    In this PowerShell script we pass tags in as an array of strings
+    ex: $Tags=@("a=b","c=d")
+
 .NOTES
     This script uses Azure CLI.
 
@@ -79,19 +82,19 @@
 [CmdletBinding()]
 param(
   [string][Parameter(Mandatory=$true)]$ContainerName,
-  [string][Parameter(Mandatory=$false)]$DateVersion,
-  [string][Parameter(Mandatory=$false)]$DateVersionCounter,
-  [string][Parameter(Mandatory=$false)]$Location,
-  [string][Parameter(Mandatory=$false)]$Prefix,
-  [string][Parameter(Mandatory=$false)]$ResourceGroupName,
-  [string][Parameter(Mandatory=$false)]$StorageAccountName,
-  [string][Parameter(Mandatory=$false)]$ImageType,
-  [string][Parameter(Mandatory=$false)]$Tags,
+  [string][Parameter(Mandatory=$true)]$DateVersion,
+  [string][Parameter(Mandatory=$true)]$DateVersionCounter,
+  [string][Parameter(Mandatory=$true)]$Location,
+  [string][Parameter(Mandatory=$true)]$Prefix,
+  [string][Parameter(Mandatory=$true)]$ResourceGroupName,
+  [string][Parameter(Mandatory=$true)]$StorageAccountName,
+  [string][Parameter(Mandatory=$true)]$ImageType,
+  [array][Parameter(Mandatory=$false)]$Tags,
   [switch]$Clean
 )
 
 # Finding the specific blob (.vhd file) in storage based on prefix. 
-[array]$vhdName = az storage blob list --auth-mode login --container-name $ContainerName --account-name $StorageAccountName --prefix $Prefix --query "[?contains(name, '.vhd')].name"  -o tsv
+[array]$vhdName = $(az storage blob list --auth-mode login --container-name $ContainerName --account-name $StorageAccountName --prefix $Prefix --query "[?contains(name, '.vhd')].name"  -o tsv)
 if ($vhdName.length -ne 1) {
     Write-Host "##vso[task.logissue type=error]VHD blob with prefix:'$Prefix' not found in container:'$ContainerName' or more than one blob exists with the same prefix."
     exit 1 
@@ -101,7 +104,7 @@ Write-Host "vhdName=$vhdName"
 
 # Getting the blob details
 try {
-    $blobInfo = az storage blob show --auth-mode login --container-name $ContainerName --name $vhdName --account-name $StorageAccountName | ConvertFrom-Json
+    $blobInfo = $(az storage blob show --auth-mode login --container-name $ContainerName --name $vhdName --account-name $StorageAccountName) | ConvertFrom-Json
     if ($null -eq $blobInfo) {
         throw "Blob info result was null when retieving information from container:$ContainerName name:$vhdName and account name:$StorageAccountName"
     }
@@ -114,7 +117,7 @@ Write-Host "Retrieved blob information..."
 Write-Host $blobInfo
 
 # Creating a URL for the blob. This is needed for creating a managed disk
-$blobUrl = az storage blob url --auth-mode login --container-name $ContainerName --name $vhdName --account-name $StorageAccountName
+$blobUrl = $(az storage blob url --auth-mode login --container-name $ContainerName --name $vhdName --account-name $StorageAccountName --output tsv)
 if ([string]::IsNullOrEmpty($blobUrl)) {
     Write-Host "##vso[task.logissue type=error]Could not create a URL for the blob"
     exit 1
@@ -138,18 +141,18 @@ Write-Host "Creating new Azure managed disk with image name:$imageName"
 # Wrapping both disk and image creation in try block so 
 # we can clean up if one or both fail in finally.
 try {
-    $diskCreateResult = az disk create `
+    $diskCreateResult = $(az disk create `
     --resource-group $ResourceGroupName `
     --location $Location `
     --name $imageName `
     --source $blobUrl `
     --os-type $osType `
-    --tags envtype=sbx envuse=agents prefix=$Prefix
+    --tags ${Tags}) `
     | ConvertFrom-Json
     Write-Host "Created new managed disk..."
     Write-Host ($diskCreateResult | Format-List | Out-String)
 
-    $imageCreateResult = az image create `
+    $imageCreateResult = $(az image create `
     --name $imageName `
     --resource-group $ResourceGroupName `
     --source $diskCreateResult.id `
@@ -157,7 +160,7 @@ try {
     --location $Location `
     --os-type $osType `
     --os-type Linux `
-    --tags envtype=sbx envuse=agents prefix=$Prefix `
+    --tags ${Tags}) `
     | ConvertFrom-Json
     Write-Host "Created new managed image..."
     Write-Host ($imageCreateResult | Format-List | Out-String)
@@ -176,7 +179,7 @@ try {
     # Only clean original blobs in the storage container  if we know the managed image was created.
     if ($imageCreateResult.provisioningState -eq "Succeeded" -and $Clean) {
         # Cleaning up blobs directly related to the image creation
-        az storage blob delete-batch --source $ContainerName --auth-mode login --account-name $StorageAccountName --pattern '24000*' #  $Prefix
+        az storage blob delete-batch --source $ContainerName --auth-mode login --account-name $StorageAccountName --pattern '$Prefix*'
 
         # Cleaning up blobs associated with working vm images. These are throw away and only needed while Packer is building an image
         $modifiedDate = (Get-Date -AsUTC -Date ((Get-Date).AddDays(-7)) -Format s) + "Z"
