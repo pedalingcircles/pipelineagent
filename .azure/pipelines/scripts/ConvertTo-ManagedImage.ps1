@@ -180,7 +180,20 @@ try {
     Write-Host "Attempting to clean up resources..."
 } finally {
     Write-Host "Cleaning up and removing the managed disk"
-    if ($diskCreateResult.provisioningState -eq "Succeeded" -and $Clean) {
+
+    Write-Host "provisioningState=($diskCreateResult.provisioningState)"
+    Write-Host "Clean=$Clean"
+    if (($diskCreateResult.provisioningState) -eq "Succeeded") {
+        Write-Host "Succeeded"
+    }
+    if ($Clean) {
+        Write-Host "Clean"
+    }
+
+
+
+
+    if (($diskCreateResult.provisioningState) -eq "Succeeded" -and $Clean) {
         az disk delete --ids $diskCreateResult.id --yes
     } else {
         Write-Host "##vso[task.logissue type=warning]Could not clean up the managed disk. This could be due to errors during creation or the 'Clean' switch wasn't set."
