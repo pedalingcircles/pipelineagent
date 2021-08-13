@@ -126,9 +126,17 @@ if ([string]::IsNullOrEmpty($blobUrl)) {
 }
 Write-Host "Created URL for existing vhd blob..."
 Write-Host "blobUrl=$blobUrl"
+Write-Host "##vso[task.setvariable variable=blobUrl]$blobUrl"
 
 # Set metadata
+$capturedVmKey = $blobInfo.metadata.MicrosoftAzureCompute_CapturedVMKey
+Write-Host "##vso[task.setvariable variable=capturedVmKey]$capturedVmKey"
+$imageType = $blobInfo.metadata.MicrosoftAzureCompute_ImageType
+Write-Host "##vso[task.setvariable variable=imageType]$imageType"
+$osState = $blobInfo.metadata.MicrosoftAzureCompute_OSState
+Write-Host "##vso[task.setvariable variable=osState]$osState"
 $osType = $blobInfo.metadata.MicrosoftAzureCompute_OSType
+Write-Host "##vso[task.setvariable variable=osType]$osType"
 
 # A managed disk must be created from the VHD. After the managed disk is created
 # then we can create a managed image. Note: Packer in it's current state and implementation

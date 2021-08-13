@@ -16,7 +16,8 @@
     The Shared Image Gallery name.
 
 .PARAMETER ImageDefinitionName
-    The image definition name.
+    The image definition name. This values usually comes from the Packer image that was created.
+    e.g. ubuntu1804, windows2019
 
 .PARAMETER ImagePublisher
     The publisher of the image.
