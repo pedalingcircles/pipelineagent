@@ -5,14 +5,11 @@
 
 .DESCRIPTION
     This script is intented to be run as part of a pipeline that generates Azure managed images using
-    Packer. Packer, as implemented, just creates a vhd file. This file must be converted to a managed
-    disk, then converted to a managed image. This script handles the conversation. 
-
-    In addition, after conversion, this script cleans up resources after the migration. This 
-    includes the original VHD file, but also the managed disk and managed image.
+    Packer. Packer, as implemented, just creates a VHD blob. This blob must be converted to a managed
+    disk, then converted to a managed image. This script handles the conversation and then optionally cleans up resources.
 
 .PARAMETER ContainerName
-    The storage account container name that contains the targeted vhd blob.
+    The storage account container name that contains the targeted VHD blob.
 
 .PARAMETER DateVersion
     A version of the image based on date. The recommended format is: yyyymmdd
@@ -22,14 +19,15 @@
     DateVersion is updated.
 
 .PARAMETER Location
-    The Azure region that the vhd blob is in. This is a requirement and the 
+    The Azure region that the VHD blob is in. This is a requirement and the 
     Azure managed disk and image must be in the same region. 
 
 .PARAMETER Prefix
-    This is the full path of the vhd blob inside the container. 
-    This value comes from and is set by the Packer via
+    This is a container prefix the VHD blob inside the container. 
+    It includes directories if they exist.
+    This value comes from and is set by Packer via
     the capture_name_prefix Packer variable.
-    example: "Microsoft.Compute/Images/images/23792".
+    e.g.: "Microsoft.Compute/Images/images/23792".
 
 .PARAMETER ResourceGroupName
     The resource group name that the managed disk and image will be created in.
@@ -60,6 +58,9 @@
     In this PowerShell script we pass tags in as an array of strings
     ex: $Tags=@("a=b","c=d")
 
+.PARAMETER Clean
+    Switch to determine if intermediate resources are cleaned up during conversion.
+
 .NOTES
     This script uses Azure CLI.
 
@@ -89,7 +90,8 @@ param(
   [string][Parameter(Mandatory=$true)]$ResourceGroupName,
   [string][Parameter(Mandatory=$true)]$StorageAccountName,
   [string][Parameter(Mandatory=$true)]$ImageType,
-  [array][Parameter(Mandatory=$false)]$Tags,
+  [array][Parameter(Mandatory=$true)]$Tags,
+  [int][Parameter(Mandatory=$false)]$CleanBlobsDaysOld = 7,
   [switch]$Clean
 )
 
@@ -182,7 +184,7 @@ try {
         az storage blob delete-batch --source $ContainerName --auth-mode login --account-name $StorageAccountName --pattern '$Prefix*'
 
         # Cleaning up blobs associated with working vm images. These are throw away and only needed while Packer is building an image
-        $modifiedDate = (Get-Date -AsUTC -Date ((Get-Date).AddDays(-7)) -Format s) + "Z"
+        $modifiedDate = (Get-Date -AsUTC -Date ((Get-Date).AddDays(-$CleanBlobsDaysOld)) -Format s) + "Z"
         Write-Host "Cleaning up all blobs in the 'images' container since $modifiedDate"
         az storage blob delete-batch --source images --auth-mode login --pattern *.vhd --account-name $StorageAccountName --if-unmodified-since $modifiedDate
     } else {

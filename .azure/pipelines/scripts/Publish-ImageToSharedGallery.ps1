@@ -2,11 +2,11 @@
 #Requires -Version 5.1
 <#
 .Synopsis
-    Publishes an image to the Shared Image Gallery.
+    Publishes an image to an Azure Shared Image Gallery.
 
 .DESCRIPTION
-    Creates and image definition and an image version to a Shared Image Gallery. If the 
-    image definition already exists, nothing happends, if not then it creates one. An 
+    Creates an image definition and an image version to a Shared Image Gallery. If the 
+    image definition already exists, nothing happens, if not, then it creates one. An 
     image version should always be associated with an image definition. 
 
 .PARAMETER ResourceGroupName
@@ -19,7 +19,7 @@
     The image definition name.
 
 .PARAMETER ImagePublisher
-    The publisher of the images.
+    The publisher of the image.
 
 .PARAMETER ImageOffer
     The offer of the images. These can typically by used by enterprise structure such
@@ -41,6 +41,35 @@
 .PARAMETER ImageName
     The name of the managed image as a source image.
 
+.PARAMETER EndOfLifeDate
+    The end of life date of the image version.
+
+.PARAMETER ImageVersionTags
+    The tags to apply to the image version
+    Recommended tags should include the following categories:
+    - Buid Id
+    - Build run
+    - Environment type (e.g. dev, sbx, prod, nonprod)
+    - Pool name
+    - Team name 
+    - Portfolio name
+
+    Tags are name value pairs seperated by a single white space
+    example:key1=value1 key2=value2 key3=value3
+
+.PARAMETER ImageDefinitionTags
+    The tags to apply to the image definition.
+    Recommended tags should include the following categories:
+    - Buid Id
+    - Build run
+    - Environment type (e.g. dev, sbx, prod, nonprod)
+    - Pool name
+    - Team name 
+    - Portfolio name
+
+    Tags are name value pairs seperated by a single white space
+    example:key1=value1 key2=value2 key3=value3
+
 .NOTES
     This script uses Azure CLI.
 
@@ -54,34 +83,71 @@ param(
     [String] [Parameter (Mandatory=$true)] $ResourceGroupName,
     [String] [Parameter (Mandatory=$true)] $SharedImageGalleryName,
     [String] [Parameter (Mandatory=$true)] $ImageDefinitionName,
+    [String] [Parameter (Mandatory=$true)] $ImageDefinitionDescription,
+    [String] [Parameter (Mandatory=$true)] $Location,
     [String] [Parameter (Mandatory=$true)] $ImagePublisher,
     [String] [Parameter (Mandatory=$true)] $ImageOffer,
     [String] [Parameter (Mandatory=$true)] $ImageSku,
     [String] [Parameter (Mandatory=$true)] $OsType,
     [String] [Parameter (Mandatory=$true)] $ImageVersion,
-    [String] [Parameter (Mandatory=$true)] $ImageName
+    [String] [Parameter (Mandatory=$true)] $ImageName,
+    [String] [Parameter (Mandatory=$true)] $EndOfLifeDate,
+    [array][Parameter(Mandatory=$true)]$ImageVersionTags,
+    [array][Parameter(Mandatory=$true)]$ImageDefinitionTags,
+    [switch]$Clean
 )
 
-az sig image-definition create `
-    --resource-group $ResourceGroupName `
-    --gallery-name $SharedImageGalleryName `
-    --gallery-image-definition $ImageDefinitionName `
-    --publisher $ImagePublisher `
-    --offer $ImageOffer `
-    --sku $ImageSku `
-    --os-type $OsType `
-    --os-state Generalized
+try {
+    $endOfLiveDateTime = [DateTime] $EndOfLifeDate
+    $endOfLiveDateIso = (Get-Date -AsUTC -Date (   (Get-Date $endOfLiveDateTime).AddDays(-7)) -Format s) + "Z"
 
-$imageId = az image list --resource-group $ResourceGroupName --query "[?contains(name, '$ImageName')].id | [0]" -o tsv
-Write-Host "imageId=$imageId"
+    $imageDefinitionResult = $(az sig image-definition create `
+        --resource-group $ResourceGroupName `
+        --gallery-name $SharedImageGalleryName `
+        --gallery-image-definition $ImageDefinitionName `
+        --publisher $ImagePublisher `
+        --hyper-v-generation V2 `
+        --offer $ImageOffer `
+        --sku $ImageSku `
+        --os-type $OsType `
+        --os-state Generalized `
+        --description $ImageDefinitionDescription `
+        --tags ${ImageDefinitionTags}) `
+        | ConvertFrom-Json
 
-az sig image-version create `
-    --resource-group $ResourceGroupName `
-    --gallery-name $SharedImageGalleryName `
-    --gallery-image-definition $ImageDefinitionName `
-    --gallery-image-version $ImageVersion `
-    --managed-image $imageId
+    if ($imageDefinitionResult.provisioningState -ne "Succeeded") {
+        throw "Error while creating the image definition. Provisioning did not succeed:" + ($imageDefinitionResult | Format-List | Out-String)
+    }
+    Write-Host "Created image definition"
 
-# If gallery image version is created, delete the managed image, it's no longer needed
-az image delete --ids $imageId
-Write-Host "Managed image deleted $imageId"
+    $imageId = $(az image list --resource-group $ResourceGroupName --query "[?contains(name, '$ImageName')].id | [0]" -o tsv)
+    Write-Host "imageId=$imageId"
+
+    $imageVersionResult = $(az sig image-version create `
+        --resource-group $ResourceGroupName `
+        --gallery-name $SharedImageGalleryName `
+        --gallery-image-definition $ImageDefinitionName `
+        --gallery-image-version $ImageVersion `
+        --location $Location `
+        --managed-image $imageId `
+        --end-of-life-date $endOfLiveDateIso `
+        --tags ${ImageVersionTags}) `
+        | ConvertFrom-Json
+
+    if ($imageVersionResult.provisioningState -ne "Succeeded") {
+        throw "Error while creating the image version. Provisioning did not succeed:" + ($imageDefinitionResult | Format-List | Out-String)
+    }
+    Write-Host "Created image version"
+
+} catch {
+    Write-Host "##vso[task.logissue type=error]There was an error creating the image definition and or the image version"
+    Write-Host $_
+} finally {
+    if ($imageVersionResult.provisioningState -eq "Succeeded" -and $Clean) {
+        Write-Host "Deleting manged image..."
+        $deleteResult = $(az image delete --ids $imageId)
+        Write-Host $deleteResult
+    } else {
+        Write-Host "##vso[task.logissue type=warning]Could not clean up the managed image. This could be due errors in access or the 'Clean' switch wasn't set."
+    }
+}
