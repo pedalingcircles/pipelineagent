@@ -135,7 +135,6 @@ $osType = $blobInfo.metadata.MicrosoftAzureCompute_OSType
 # does not create a managed disk or imaged. Just a VHD file. Packer is capabile of directly creating
 # managed disk, however, we are leveraging what the ADO team has done to create VM images.
 $imageName = "{0}-{1}-{2}.{3}" -f "packer", $ImageType, "$DateVersion", "$DateVersionCounter"
-Write-Host "Creating new Azure managed disk with image name:$imageName"
 
 # This is an intermediate resource (Azure Managed Disk) that's used
 # to ultimatly create an Azure Managed Image. This resource will therefore
@@ -191,4 +190,7 @@ try {
     } else {
         Write-Host "##vso[task.logissue type=warning]Could not clean up the working vhd blobs in the 'images' container. This could be due errors in access or the 'Clean' switch wasn't set."
     }
+
+    Write-Host "Setting imageName variable to: '$imageName'"
+    Write-Host "##vso[task.setvariable variable=imageName]$imageName"
 }

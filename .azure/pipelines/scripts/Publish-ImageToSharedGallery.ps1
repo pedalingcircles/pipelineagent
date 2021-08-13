@@ -51,7 +51,7 @@
     - Build run
     - Environment type (e.g. dev, sbx, prod, nonprod)
     - Pool name
-    - Team name 
+    - Team name
     - Portfolio name
 
     Tags are name value pairs seperated by a single white space
