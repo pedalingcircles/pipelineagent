@@ -101,7 +101,11 @@ param(
 try {
     $endOfLiveDateTime = [DateTime] $EndOfLifeDate
     $endOfLiveDateIso = (Get-Date -AsUTC -Date (   (Get-Date $endOfLiveDateTime).AddDays(-7)) -Format s) + "Z"
+    Write-Host "endOfLiveDateIso=$endOfLiveDateIso"
+    $imageId = $(az image list --resource-group $ResourceGroupName --query "[?contains(name, '$ImageName')].id | [0]" -o tsv)
+    Write-Host "imageId=$imageId"
 
+    Write-Host "Creating new image definition: '$ImageDefinitionName'"
     $imageDefinitionResult = $(az sig image-definition create `
         --resource-group $ResourceGroupName `
         --gallery-name $SharedImageGalleryName `
@@ -115,15 +119,12 @@ try {
         --description $ImageDefinitionDescription `
         --tags ${ImageDefinitionTags}) `
         | ConvertFrom-Json
-
     if ($imageDefinitionResult.provisioningState -ne "Succeeded") {
         throw "Error while creating the image definition. Provisioning did not succeed:" + ($imageDefinitionResult | Format-List | Out-String)
     }
-    Write-Host "Created image definition"
+    Write-Host ($imageDefinitionResult | Format-List | Out-String)
 
-    $imageId = $(az image list --resource-group $ResourceGroupName --query "[?contains(name, '$ImageName')].id | [0]" -o tsv)
-    Write-Host "imageId=$imageId"
-
+    Write-Host "Creating new Azure managed image with image name: '$imageName'"
     $imageVersionResult = $(az sig image-version create `
         --resource-group $ResourceGroupName `
         --gallery-name $SharedImageGalleryName `
@@ -134,11 +135,10 @@ try {
         --end-of-life-date $endOfLiveDateIso `
         --tags ${ImageVersionTags}) `
         | ConvertFrom-Json
-
     if ($imageVersionResult.provisioningState -ne "Succeeded") {
         throw "Error while creating the image version. Provisioning did not succeed:" + ($imageDefinitionResult | Format-List | Out-String)
     }
-    Write-Host "Created image version"
+    Write-Host ($imageVersionResult | Format-List | Out-String)
 
 } catch {
     Write-Host "##vso[task.logissue type=error]There was an error creating the image definition and or the image version"

@@ -152,26 +152,26 @@ $imageName = "{0}-{1}-{2}.{3}" -f "packer", $ImageType, "$DateVersion", "$DateVe
 try {
     Write-Host "Creating new Azure managed disk with image name:$imageName"
     $diskCreateResult = $(az disk create `
-    --resource-group $ResourceGroupName `
-    --location $Location `
-    --name $imageName `
-    --source $blobUrl `
-    --hyper-v-generation V2 `
-    --os-type $osType `
-    --tags ${Tags}) `
-    | ConvertFrom-Json
+        --resource-group $ResourceGroupName `
+        --location $Location `
+        --name $imageName `
+        --source $blobUrl `
+        --hyper-v-generation V2 `
+        --os-type $osType `
+        --tags ${Tags}) `
+        | ConvertFrom-Json
     Write-Host ($diskCreateResult | Format-List | Out-String)
 
     Write-Host "Creating new Azure managed image with image name:$imageName"
     $imageCreateResult = $(az image create `
-    --name $imageName `
-    --resource-group $ResourceGroupName `
-    --source $diskCreateResult.id `
-    --hyper-v-generation V2 `
-    --location $Location `
-    --os-type $osType `
-    --os-type Linux `
-    --tags ${Tags}) `
+        --name $imageName `
+        --resource-group $ResourceGroupName `
+        --source $diskCreateResult.id `
+        --hyper-v-generation V2 `
+        --location $Location `
+        --os-type $osType `
+        --os-type Linux `
+        --tags ${Tags}) `
     | ConvertFrom-Json
     Write-Host ($imageCreateResult | Format-List | Out-String)
 } catch {
