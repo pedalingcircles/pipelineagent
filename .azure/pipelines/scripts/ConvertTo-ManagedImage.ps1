@@ -143,17 +143,19 @@ Write-Host "Creating new Azure managed disk with image name:$imageName"
 # Wrapping both disk and image creation in try block so 
 # we can clean up if one or both fail in finally.
 try {
+    Write-Host "Creating new Azure managed disk with image name:$imageName"
     $diskCreateResult = $(az disk create `
     --resource-group $ResourceGroupName `
     --location $Location `
     --name $imageName `
     --source $blobUrl `
+    --hyper-v-generation V2 `
     --os-type $osType `
     --tags ${Tags}) `
     | ConvertFrom-Json
-    Write-Host "Created new managed disk..."
     Write-Host ($diskCreateResult | Format-List | Out-String)
 
+    Write-Host "Creating new Azure managed image with image name:$imageName"
     $imageCreateResult = $(az image create `
     --name $imageName `
     --resource-group $ResourceGroupName `
@@ -164,7 +166,6 @@ try {
     --os-type Linux `
     --tags ${Tags}) `
     | ConvertFrom-Json
-    Write-Host "Created new managed image..."
     Write-Host ($imageCreateResult | Format-List | Out-String)
 } catch {
     Write-Host "##vso[task.logissue type=error]There was an error creating the managed disk and or managed image"
