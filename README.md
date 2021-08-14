@@ -19,5 +19,11 @@ Docuemntations, tutorials, and guides will be found here.
 
 ## Bootstrapping
 
-Some tasks requires some boostrapping actions to be setup for items that are run the very first time. This is especially important when setting up agents. You can deploy in the first place, if there are no agents. As a general rule we can first leverage the Azure Hosted agents
-to initially automate the creation of other agents, but once those are in place then we can turn to using only self hosted agents. 
+Some tasks requires some bootstrapping actions to be setup for items that are run the very first time. This is especially important when setting up agents. Take a look at the [bootstrapping docs](docs/bootstrapping.md)
+
+# Subtree
+
+There are currently two Git subtrees in this repo.
+
+- [.AzureDevOps-agents](./.virtual-environments)
+- [.virtual-environments](./.AzureDevOps-agents)
