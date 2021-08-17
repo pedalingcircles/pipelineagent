@@ -19,6 +19,12 @@
     The image definition name. This values usually comes from the Packer image that was created.
     e.g. ubuntu1804, windows2019
 
+.PARAMETER ImageDefinitionDescription
+    The description of the gallery image definition.
+
+.PARAMETER Location
+    The Azure region to publish the image in.
+
 .PARAMETER ImagePublisher
     The publisher of the image.
 
