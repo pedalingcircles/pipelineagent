@@ -17,6 +17,8 @@
 
 .PARAMETER ImageDefinitionName
     The image definition name. This values usually comes from the Packer image that was created.
+    Image definition name must contain only English letters, numbers, underscores, hyphens, and periods. 
+    The name cannot begin or end with underscores, hyphens, or periods.
     e.g. ubuntu1804, windows2019
 
 .PARAMETER ImageDefinitionDescription
