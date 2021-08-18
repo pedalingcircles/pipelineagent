@@ -129,20 +129,20 @@ Write-Host "blobUrl=$blobUrl"
 Write-Host "##vso[task.setvariable variable=blobUrl]$blobUrl"
 
 # Set metadata
-$capturedVmKey = $blobInfo.metadata.MicrosoftAzureCompute_CapturedVMKey
-Write-Host "##vso[task.setvariable variable=capturedVmKey]$capturedVmKey"
-$imageType = $blobInfo.metadata.MicrosoftAzureCompute_ImageType
-Write-Host "##vso[task.setvariable variable=imageType]$imageType"
-$osState = $blobInfo.metadata.MicrosoftAzureCompute_OSState
-Write-Host "##vso[task.setvariable variable=osState]$osState"
-$osType = $blobInfo.metadata.MicrosoftAzureCompute_OSType
-Write-Host "##vso[task.setvariable variable=osType]$osType"
+$blobMetadataCapturedVmKey = $blobInfo.metadata.MicrosoftAzureCompute_CapturedVMKey
+Write-Host "##vso[task.setvariable variable=blobMetadataCapturedVmKey]$blobMetadataCapturedVmKey"
+$blobMetadataImageType = $blobInfo.metadata.MicrosoftAzureCompute_ImageType
+Write-Host "##vso[task.setvariable variable=blobMetadataImageType]$blobMetadataImageType"
+$blobMetadataoOState = $blobInfo.metadata.MicrosoftAzureCompute_OSState
+Write-Host "##vso[task.setvariable variable=blobMetadataoOState]$blobMetadataoOState"
+$blobMetadataOSType = $blobInfo.metadata.MicrosoftAzureCompute_OSType
+Write-Host "##vso[task.setvariable variable=blobMetadataOSType]$blobMetadataOSType"
 
 # A managed disk must be created from the VHD. After the managed disk is created
 # then we can create a managed image. Note: Packer in it's current state and implementation
 # does not create a managed disk or imaged. Just a VHD file. Packer is capabile of directly creating
 # managed disk, however, we are leveraging what the ADO team has done to create VM images.
-$imageName = "{0}-{1}-{2}.{3}" -f "packer", $ImageType, "$DateVersion", "$DateVersionCounter"
+$imageName = "{0}-{1}-{2}-{3}.{4}" -f "packer", $blobMetadataOSType, $ImageType, "$DateVersion", "$DateVersionCounter"
 
 # This is an intermediate resource (Azure Managed Disk) that's used
 # to ultimatly create an Azure Managed Image. This resource will therefore

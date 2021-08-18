@@ -3,7 +3,7 @@
 @maxLength(24)
 param storageAccountName string
 
-@description('The Shared Image Gallery name used to store VM images used for self-hosted ADO agents.')
+@description('The Shared Image Gallery name for publishing images to.')
 @minLength(1)
 @maxLength(80)
 param sharedImageGalleryName string
@@ -123,3 +123,4 @@ resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' = {
     description: 'Shared Image Gallery used to store virtual machine images used for creating self-hosted Azure DevOps Agents.'
   }
 }
+
