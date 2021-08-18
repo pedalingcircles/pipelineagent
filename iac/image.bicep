@@ -75,7 +75,6 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   }
   sku: {
     name: 'Standard_LRS'
-    tier: 'Standard'
   }
   kind: 'StorageV2'
   properties: {
@@ -123,6 +122,4 @@ resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' = {
   properties: {
     description: 'Shared Image Gallery used to store virtual machine images used for creating self-hosted Azure DevOps Agents.'
   }
-
-
 }
