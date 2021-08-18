@@ -6,6 +6,6 @@ az group create --name $resourceGroupName --location $location
 
 az deployment group create `
     --resource-group $resourceGroupName `
-    --template-file image.bicep `
-    --parameters image.parameters.sbx.json
+    --template-file images.bicep `
+    --parameters images.parameters.sbx.json
     
