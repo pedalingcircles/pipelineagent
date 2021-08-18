@@ -157,7 +157,7 @@ try {
         --name $imageName `
         --source $blobUrl `
         --hyper-v-generation V2 `
-        --os-type $osType `
+        --os-type $blobMetadataOSType `
         --tags ${Tags}) `
         | ConvertFrom-Json
     Write-Host ($diskCreateResult | Format-List | Out-String)
@@ -169,8 +169,7 @@ try {
         --source $diskCreateResult.id `
         --hyper-v-generation V2 `
         --location $Location `
-        --os-type $osType `
-        --os-type Linux `
+        --os-type $blobMetadataOSType `
         --tags ${Tags}) `
     | ConvertFrom-Json
     Write-Host ($imageCreateResult | Format-List | Out-String)
