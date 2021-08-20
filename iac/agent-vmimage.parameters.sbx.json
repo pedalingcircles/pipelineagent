@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmNameAffix": {
+      "value": "mijohnslinuxtest"
+    },
+    "nicNameAffix": {
+      "value": "mijohnslinuxtest"
+    },
+    "vmCountStart": {
+      "value": 10
+    },
+    "vmCountEnd": {
+      "value": 11
+    },
+    "osType": {
+      "value": "Linux"
+    },
+    "existingVnetName": {
+      "value": "vnet-agents"
+    },    
+    "existingShareImageGalleryName": {
+      "value": "sig.agentimages"
+    },    
+    "existingImagesResourceGroupName": {
+      "value": "rg-mijohns-images-sbx-eastus2-001"
+    },    
+    "imageDefinitionName": {
+      "value": "ubuntu2004"
+    },
+    "adminPublicKey": {
+      "value": "publickeygoeshere"
+    }
+  }
+}

@@ -1,21 +1,44 @@
 // Azure resource names cannot contain special characters \/""[]:|<>+=;,?*@&, whitespace, or begin with '_' or end with '.' or '-'
 // Linux VM names may only contain letters, numbers, '.', and '-'.
-// vm
-// agent
-// linux or windows
-//ubuntu2004
-vm-team-product/workload/templatename-0001
-param vmName string
+param vmNameAffix string
+
+// example nic-<##>-<nicNameAffix>-<###>
+@description('The network interface name.')
+@minLength(2)
+@maxLength(64)
+param nicNameAffix string
 param vmSize string = 'Standard_D4s_v4'
 param storageAccountType string = 'StandardSSD_LRS'
-param vmCountStart int = 0
-param vmCountEnd int = 10
+param vmCountStart int
+param vmCountEnd int
 param location string = resourceGroup().location
+
+@description('Specifies the SSH rsa public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
+param adminPublicKey string
+
+@allowed([
+  'Linux'
+  'Windows'
+])
 param osType string
+
+
 param adminUserName string = 'azureuser'
-param existingVnet string
+param existingVnetName string
 param existingShareImageGalleryName string 
 param existingImagesResourceGroupName string
+param imageDefinitionName string
+
+var nicName = 'nic-${nicNameAffix}'
+var vmName = 'vm${vmNameAffix}'
+var osSettings = {
+  Linux: {
+    diskSize: 86
+  }
+  Windows: {
+    diskSize: 256
+  }
+}
 
 resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = {
   name: existingShareImageGalleryName
@@ -23,12 +46,11 @@ resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = 
 }
 
 resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
-  name: existingVnet
+  name: existingVnetName
 }
 
-
-resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range (vmCountStart, vmCountEnd): {
-  name: '${vmName}${padLeft(i, 3, '0')}'
+resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(0,2):  {
+  name: '${vmName}${i}'
   location: location
   tags: {
     foo: 'bar'
@@ -40,31 +62,30 @@ resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
     }
     storageProfile: {
       imageReference: {
-        id: '${sharedImageGallery.id}/images/ubuntu2004'
+        id: '${sharedImageGallery.id}/images/${imageDefinitionName}'
       }
       osDisk: {
         osType: osType
-        name: '${vmName}${padLeft(i, 3, '0')}_OsDisk_1_${uniqueString(resourceGroup().id)}'
+        name: '${vmName}${i}_OsDisk_1_${uniqueString(resourceGroup().id)}'
         createOption: 'FromImage'
         caching: 'None'
         managedDisk: {
           storageAccountType: storageAccountType
-          id: resourceId('Microsoft.Compute/disks', '${vmName}${padLeft(i, 3, '0')}_OsDisk_1_${uniqueString(resourceGroup().id)}')
         }
-        diskSizeGB: 86
+        diskSizeGB: osSettings[osType].diskSize
       }
       dataDisks: []
     }
     osProfile: {
-      computerName: '${vmName}${padLeft(i, 3, '0')}'
+      computerName: vmName
       adminUsername: adminUserName
       linuxConfiguration: {
         disablePasswordAuthentication: true
         ssh: {
           publicKeys: [
             {
-              path: '/home/azureuser/.ssh/authorized_keys'
-              keyData: 'ssh-rsa notakey= generated-by-azure\r\n'
+              path: '/home/${adminUserName}/.ssh/authorized_keys'
+              keyData: adminPublicKey
             }
           ]
         }
@@ -76,34 +97,42 @@ resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
       }
       secrets: []
       allowExtensionOperations: true
-      requireGuestProvisionSignal: true
     }
     networkProfile: {
-      networkInterfaceConfigurations: [
+      networkInterfaces: [
         {
-          name: 'nic-${vmName}${padLeft(i, 3, '0')}'
-          properties: {
-            ipConfigurations: [
-              {
-                name: 'ipconfig1'
-                properties: {
-                  privateIPAllocationMethod: 'Dynamic'
-                  subnet: {
-                    id: vnet.properties.subnets[0].id
-                  }
-                  primary: true
-                  privateIPAddressVersion: 'IPv4'
-                }
-              }
-            ]
-            dnsSettings: {
-              dnsServers: []
-            }
-            enableAcceleratedNetworking: false
-            enableIPForwarding: false
+          id: networkInterface[i].id
+        }
+      ]
+    }
+  }
+}]
+
+resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(0,2):  {
+  name: '${nicName}${i}'
+  location: location
+  tags: {
+    foo: 'bar'
+    bang: 'buzz'
+  }
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: vnet.properties.subnets[0].id
+          }
+          primary: true
+          privateIPAddressVersion: 'IPv4'
         }
       }
     ]
+    dnsSettings: {
+      dnsServers: []
     }
+    enableAcceleratedNetworking: false
+    enableIPForwarding: false
   }
 }]
