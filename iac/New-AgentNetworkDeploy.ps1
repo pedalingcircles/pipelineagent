@@ -6,6 +6,6 @@ az group create --name $resourceGroupName --location $location
 
 az deployment group create `
     --resource-group $resourceGroupName `
-    --template-file agent-network.bicep `
-    --parameters agent-network.parameters.sbx.json
+    --template-file agents-network.bicep `
+    --parameters agents-network.parameters.sbx.json
     

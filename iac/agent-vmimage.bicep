@@ -1,49 +1,138 @@
-param vmName string
+// Azure resource names cannot contain special characters \/""[]:|<>+=;,?*@&, whitespace, or begin with '_' or end with '.' or '-'
+// Linux VM names may only contain letters, numbers, '.', and '-'.
+param vmNameAffix string
+
+// example nic-<##>-<nicNameAffix>-<###>
+@description('The network interface name.')
+@minLength(2)
+@maxLength(64)
+param nicNameAffix string
 param vmSize string = 'Standard_D4s_v4'
-param adminUserName string
+param storageAccountType string = 'StandardSSD_LRS'
+param vmCountStart int
+param vmCountEnd int
+param location string = resourceGroup().location
 
-@secure()
-param adminPassword string
-param networkInterfaceId string
+@description('Specifies the SSH rsa public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
+param adminPublicKey string
 
-resource vmName_resource 'Microsoft.Compute/virtualMachines@2018-04-01' = {
-  name: vmName
-  location: 'eastus'
+@allowed([
+  'Linux'
+  'Windows'
+])
+param osType string
+
+
+param adminUserName string = 'azureuser'
+param existingVnetName string
+param existingShareImageGalleryName string 
+param existingImagesResourceGroupName string
+param imageDefinitionName string
+
+var nicName = 'nic-${nicNameAffix}'
+var vmName = 'vm${vmNameAffix}'
+var osSettings = {
+  Linux: {
+    diskSize: 86
+  }
+  Windows: {
+    diskSize: 256
+  }
+}
+
+resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = {
+  name: existingShareImageGalleryName
+  scope: resourceGroup(existingImagesResourceGroupName)
+}
+
+resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
+  name: existingVnetName
+}
+
+resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(0,2):  {
+  name: '${vmName}${i}'
+  location: location
+  tags: {
+    foo: 'bar'
+    bang: 'buzz'
+  }
   properties: {
     hardwareProfile: {
       vmSize: vmSize
     }
     storageProfile: {
-      osDisk: {
-        osType: 'Linux'
-        name: '23823-osDisk.8b3ea017-3c44-473c-8dc9-a4aee5a4c0ae.vhd'
-        createOption: 'FromImage'
-        image: {
-          uri: 'https://contosopackerbuilder001.blob.core.windows.net/system/Microsoft.Compute/Images/images/23823-osDisk.8b3ea017-3c44-473c-8dc9-a4aee5a4c0ae.vhd'
-        }
-        vhd: {
-          uri: 'https://contosopackerbuilder001.blob.core.windows.net/vmcontainer9473df9a-cd60-40db-bcb9-ed919122686e/osDisk.9473df9a-cd60-40db-bcb9-ed919122686e.vhd'
-        }
-        caching: 'ReadWrite'
+      imageReference: {
+        id: '${sharedImageGallery.id}/images/${imageDefinitionName}'
       }
+      osDisk: {
+        osType: osType
+        name: '${vmName}${i}_OsDisk_1_${uniqueString(resourceGroup().id)}'
+        createOption: 'FromImage'
+        caching: 'None'
+        managedDisk: {
+          storageAccountType: storageAccountType
+        }
+        diskSizeGB: osSettings[osType].diskSize
+      }
+      dataDisks: []
     }
     osProfile: {
       computerName: vmName
       adminUsername: adminUserName
-      adminPassword: adminPassword
+      linuxConfiguration: {
+        disablePasswordAuthentication: true
+        ssh: {
+          publicKeys: [
+            {
+              path: '/home/${adminUserName}/.ssh/authorized_keys'
+              keyData: adminPublicKey
+            }
+          ]
+        }
+        provisionVMAgent: true
+        patchSettings: {
+          patchMode: 'ImageDefault'
+          assessmentMode: 'ImageDefault'
+        }
+      }
+      secrets: []
+      allowExtensionOperations: true
     }
     networkProfile: {
       networkInterfaces: [
         {
-          id: networkInterfaceId
+          id: networkInterface[i].id
         }
       ]
     }
-    diagnosticsProfile: {
-      bootDiagnostics: {
-        enabled: false
-      }
-    }
-    provisioningState: 0
   }
-}
+}]
+
+resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(0,2):  {
+  name: '${nicName}${i}'
+  location: location
+  tags: {
+    foo: 'bar'
+    bang: 'buzz'
+  }
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: vnet.properties.subnets[0].id
+          }
+          primary: true
+          privateIPAddressVersion: 'IPv4'
+        }
+      }
+    ]
+    dnsSettings: {
+      dnsServers: []
+    }
+    enableAcceleratedNetworking: false
+    enableIPForwarding: false
+  }
+}]
