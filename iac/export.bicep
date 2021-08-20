@@ -16,7 +16,7 @@ resource sshPublicKeys_vm_agent_mijohns_001_key_name_resource 'Microsoft.Compute
     bang: 'buzz'
   }
   properties: {
-    publicKey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDU7umcmBF5A5J14ov8vRMPG3gs\r\n0RA8EH+SZ1LB3zhkAaHZZ4p+FcTozl/P1slqBft0FQF8p3fAOHbxO2AwjcZTiCDA\r\n1nq5Nw+UlTzZ+ZNo82CY3GNUofKwjrKNrrrd5RSOSPzrxYc2X658w2MAn+bnomhT\r\n81inURttWKZ3ApZ2a7+OgZVpYQ3Stedymq/Gyo/TVHXZQZBljBwJxc/D5DgZq2xi\r\npknWEcpYx6q/MQs9JKsFi0h1beIjap6M9/X+sEeRTbsybU6XAaPOlZhWLBY97BzV\r\nQBjLh8U6ZJzcHpuETpQTSHGtdDKQpbtFsl9Gfj565z6Agqka41DS1ydYM9be13j+\r\niHLkBuXMqRP78kN3peqlYxhg5uMnlHLb3TimWxW3Sd/qQspuY0/vScG4oPT6vm+a\r\nAzTG3k1tGlsZg3BkFD5oDbWJGAwfuz/T8QvMREwxK3OufuyuiPcuS/QSbLkgmyXH\r\nj8kbTxOzY1tCyRl2lX9t7oWCD7WAmI8UvZKzY/k= generated-by-azure\r\n'
+    publicKey: ''
   }
 }
 
