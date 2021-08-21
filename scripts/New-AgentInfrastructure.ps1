@@ -1,4 +1,3 @@
-
 [CmdletBinding()]
 param(
     [String] [Parameter (Mandatory=$true)] $ResourceGroupName,
@@ -12,5 +11,5 @@ az group create --name $ResourceGroupName --location $Location
 az deployment group create `
     --resource-group $ResourceGroupName `
     --template-file $TemplateFilePath `
-    --parameters $TemplateParameterFilePath `
-    --no-prompt
+    --parameters $TemplateParameterFilePath
+    
