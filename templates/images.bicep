@@ -1,4 +1,4 @@
-@description('The storage account name used by Packer to store VM images.')
+@description('The storage account name used by Packer to store VM images')
 @minLength(3)
 @maxLength(24)
 param storageAccountName string

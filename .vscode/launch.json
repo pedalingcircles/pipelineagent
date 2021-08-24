@@ -12,6 +12,22 @@
             "cwd": "${file}"
         },
         {
+            "name": "New-ImagesInfrastructure.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/scripts/New-ImagesInfrastructure.ps1",
+            "cwd": "${workspaceFolder}/scripts/New-ImagesInfrastructure.ps1",
+            "args": ["-ResourceGroupName rg-contoso-images", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/templates/images.bicep", "-TemplateParameterFilePath ${workspaceFolder}/templates/images.parameters.sbx.json"]
+        },
+        {
+            "name": "New-AgentInfrastructure.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/scripts/New-AgentInfrastructure.ps1",
+            "cwd": "${workspaceFolder}/scripts/New-AgentInfrastructure.ps1",
+            "args": ["-ResourceGroupName rg-contoso-agents", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/templates/agents.bicep", "-TemplateParameterFilePath ${workspaceFolder}/templates/agents.parameters.sbx.json"]
+        },
+        {
             "name": "New-Image.ps1 Windows",
             "type": "PowerShell",
             "request": "launch",

@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "storageAccountName": {
-      "value": "stcontosovmimages001"
+      "value": "stcontosoimages"
     },
     "sharedImageGalleryName": {
       "value": "sig.contoso.images"

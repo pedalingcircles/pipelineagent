@@ -49,7 +49,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
   name: existingVnetName
 }
 
-resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(0,2):  {
+resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(vmCountStart,vmCountEnd):  {
   name: '${vmName}${i}'
   location: location
   tags: {
@@ -108,7 +108,7 @@ resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
   }
 }]
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(0,2):  {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(vmCountStart,vmCountEnd):  {
   name: '${nicName}${i}'
   location: location
   tags: {
