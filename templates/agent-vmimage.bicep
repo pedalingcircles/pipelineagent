@@ -109,11 +109,11 @@ resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
 }]
 
 var scriptExtensionFileUris = [
-  ''
+  'https://raw.githubusercontent.com/pedalingcircles/pipelineagent/scriptextension/helpers/scriptextensionlinux.sh'
 ]
 
 resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = {
-  name: 'foo'
+  name: 'agent-configure'
   location: location
   tags: {
     foo: 'bar'
@@ -127,9 +127,7 @@ resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01
     settings: {
     }
     protectedSettings: {
-      commandToExecute: '[concat("sudo sh config-music.sh ",variables('musicStoreSqlName'), ' ', parameters('adminUsername'), ' ', parameters('sqlAdminPassword'))]'
-      storageAccountName: '<storage-account-name>'
-      storageAccountKey: '<storage-account-key>'
+      commandToExecute: '[concat("sudo sh scriptextensionlinux.sh ",  "AGENT_USER, " ", "AGENT_POOL", " ", "AGENT_TOKEN", " ", "ADO_URL")]'
       fileUris: scriptExtensionFileUris
     }
   }
