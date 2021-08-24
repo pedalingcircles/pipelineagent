@@ -9,10 +9,10 @@
       "value": "mijohnslinuxtest"
     },
     "vmCountStart": {
-      "value": 10
+      "value": 0
     },
     "vmCountEnd": {
-      "value": 11
+      "value": 2
     },
     "osType": {
       "value": "Linux"
@@ -28,9 +28,6 @@
     },    
     "imageDefinitionName": {
       "value": "ubuntu2004"
-    },
-    "adminPublicKey": {
-      "value": "publickeygoeshere"
     }
   }
 }
