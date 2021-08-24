@@ -108,6 +108,33 @@ resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
   }
 }]
 
+var scriptExtensionFileUris = [
+  ''
+]
+
+resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = {
+  name: 'foo'
+  location: location
+  tags: {
+    foo: 'bar'
+    bang: 'buzz'
+  }
+  properties: {
+    publisher: 'Microsoft.Azure.Extensions'
+    type: 'CustomScript'
+    typeHandlerVersion: '2.1'
+    autoUpgradeMinorVersion: true
+    settings: {
+    }
+    protectedSettings: {
+      commandToExecute: '[concat("sudo sh config-music.sh ",variables('musicStoreSqlName'), ' ', parameters('adminUsername'), ' ', parameters('sqlAdminPassword'))]'
+      storageAccountName: '<storage-account-name>'
+      storageAccountKey: '<storage-account-key>'
+      fileUris: scriptExtensionFileUris
+    }
+  }
+}
+
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(vmCountStart,vmCountEnd):  {
   name: '${nicName}${i}'
   location: location
