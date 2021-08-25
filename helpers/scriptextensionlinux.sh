@@ -35,30 +35,44 @@ if [ -z "$AGENT_VERSION" ]; then
 fi
 
 # download ADO agent
-mkdir -p /opt/azp && cd /opt/azp
+#chown -R $agentuser /opt/azp
 
+echo "Create dir"
+mkdir -p /opt/azp && cd /opt/azp
+chown -R $AZP_AGENT_NAME /opt/azp
+echo "Changed owner"
+
+chmod -R 755 /opt/azp
 AZP_TOKEN_FILE=/opt/azp/.token
 touch $AZP_TOKEN_FILE
 echo -n $AZP_TOKEN > "$AZP_TOKEN_FILE"
 unset AZP_TOKEN
 
-curl -LsS https://vstsagentpackage.azureedge.net/agent/${AGENT_VERSION}/vsts-agent-linux-x64-${AGENT_VERSION}.tar.gz | tar -xz
+#curl -LsS https://vstsagentpackage.azureedge.net/agent/${AGENT_VERSION}/vsts-agent-linux-x64-${AGENT_VERSION}.tar.gz | tar -xz
 
 # Let the agent ignore the token env variables
 export VSO_AGENT_IGNORE=AZP_TOKEN,AZP_TOKEN_FILE
 
 source ./env.sh
 
+
+
+ls -a
 echo "Configure agent..."
-./config.sh --unattended \
-  --agent "${AZP_AGENT_NAME:-$(hostname)}" \
-  --url "$AZP_URL" \
-  --auth PAT \
-  --token $(cat "$AZP_TOKEN_FILE") \
-  --pool "${AZP_URL:-Default}" \
-  --work "${AZP_WORK:-_work}" \
-  --replace \
-  --acceptTeeEula & wait $!
+runuser -l $AZP_AGENT_NAME -c "/opt/azp/config.sh --unattended --url $AZP_URL --auth PAT --token $(cat "$AZP_TOKEN_FILE") --pool $AZP_POOL --acceptTeeEula" & wait $!
+
+
+
+
+# ./config.sh --unattended \
+#   --agent "${AZP_AGENT_NAME:-$(hostname)}" \
+#   --url "$AZP_URL" \
+#   --auth PAT \
+#   --token $(cat "$AZP_TOKEN_FILE") \
+#   --pool "${AZP_URL:-Default}" \
+#   --work "${AZP_WORK:-_work}" \
+#   --replace \
+#   --acceptTeeEula & wait $!
 
 
 
