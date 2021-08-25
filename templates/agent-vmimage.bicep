@@ -109,11 +109,11 @@ resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
 }]
 
 var scriptExtensionFileUris = [
-  'https://raw.githubusercontent.com/pedalingcircles/pipelineagent/scriptextension/helpers/scriptextensionlinux.sh'
+  'https://raw.githubusercontent.com/pedalingcircles/pipelineagent/scriptextension/helpers/echo.sh'
 ]
 
-resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = {
-  name: 'agent-configure'
+resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(vmCountStart,vmCountEnd):  {
+  name: '${virtualmachine[i].name}/agentextension'
   location: location
   tags: {
     foo: 'bar'
@@ -127,11 +127,11 @@ resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01
     settings: {
     }
     protectedSettings: {
-      commandToExecute: '[concat("sudo sh scriptextensionlinux.sh ",  "AGENT_USER, " ", "AGENT_POOL", " ", "AGENT_TOKEN", " ", "ADO_URL")]'
+      commandToExecute: 'sudo sh echo.sh'
       fileUris: scriptExtensionFileUris
     }
   }
-}
+}]
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(vmCountStart,vmCountEnd):  {
   name: '${nicName}${i}'
