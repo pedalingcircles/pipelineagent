@@ -13,6 +13,12 @@ param vmCountStart int
 param vmCountEnd int
 param location string = resourceGroup().location
 
+param agentUser string
+param agentPool string
+param agentVersion string
+param agentToken string
+param adoUrl string
+
 @description('Specifies the SSH rsa public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
 param adminPublicKey string
 
@@ -22,7 +28,11 @@ param adminPublicKey string
 ])
 param osType string
 
-
+@allowed([
+  'b'
+  'g'
+])
+param blueGreen string = 'b'
 param adminUserName string = 'azureuser'
 param existingVnetName string
 param existingShareImageGalleryName string 
@@ -30,7 +40,7 @@ param existingImagesResourceGroupName string
 param imageDefinitionName string
 
 var nicName = 'nic-${nicNameAffix}'
-var vmName = 'vm${vmNameAffix}'
+var vmName = 'vm${vmNameAffix}${blueGreen}'
 var osSettings = {
   Linux: {
     diskSize: 86
@@ -104,6 +114,32 @@ resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
           id: networkInterface[i].id
         }
       ]
+    }
+  }
+}]
+
+var scriptExtensionFileUris = [
+  'https://raw.githubusercontent.com/pedalingcircles/pipelineagent/scriptextension/helpers/scriptextensionlinux.sh'
+]
+
+resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(vmCountStart,vmCountEnd):  {
+  name: '${virtualmachine[i].name}/agentextension'
+  location: location
+  tags: {
+    foo: 'bar'
+    bang: 'buzz'
+  }
+  properties: {
+    publisher: 'Microsoft.Azure.Extensions'
+    type: 'CustomScript'
+    typeHandlerVersion: '2.1'
+    autoUpgradeMinorVersion: true
+    settings: {
+    }
+    protectedSettings: {
+      //commandToExecute: 'sudo sh echo.sh'
+      commandToExecute: 'sudo ./scriptextensionlinux.sh ${agentUser} ${agentPool} ${agentToken} ${adoUrl} ${agentVersion}'
+      fileUris: scriptExtensionFileUris
     }
   }
 }]

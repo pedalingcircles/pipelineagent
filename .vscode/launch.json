@@ -28,6 +28,14 @@
             "args": ["-ResourceGroupName rg-contoso-agents", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/templates/agents.bicep", "-TemplateParameterFilePath ${workspaceFolder}/templates/agents.parameters.sbx.json"]
         },
         {
+            "name": "New-VMImageDeploy.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/scripts/New-VMImageDeploy.ps1",
+            "cwd": "${workspaceFolder}/scripts/New-VMImageDeploy.ps1",
+            "args": ["-ResourceGroupName rg-contoso-agents", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/templates/agent-vmimage.bicep", "-TemplateParameterFilePath ${workspaceFolder}/templates/agent-vmimage.parameters.sbx.json"]
+        },
+        {
             "name": "New-Image.ps1 Windows",
             "type": "PowerShell",
             "request": "launch",
