@@ -13,10 +13,11 @@ param vmCountStart int
 param vmCountEnd int
 param location string = resourceGroup().location
 
-param agentUser string = 'azureuser'
-param agentPool string = 'ContosoTestPool'
+param agentUser string
+param agentPool string
+param agentVersion string
 param agentToken string
-param adoUrl string = 'https://wwpss.visualstudio.com/'
+param adoUrl string
 
 @description('Specifies the SSH rsa public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
 param adminPublicKey string
@@ -137,7 +138,7 @@ resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01
     }
     protectedSettings: {
       //commandToExecute: 'sudo sh echo.sh'
-      commandToExecute: 'sudo ./scriptextensionlinux.sh ${agentUser} ${agentPool} ${agentToken} ${adoUrl}'
+      commandToExecute: 'sudo ./scriptextensionlinux.sh ${agentUser} ${agentPool} ${agentToken} ${adoUrl} ${agentVersion}'
       fileUris: scriptExtensionFileUris
     }
   }
