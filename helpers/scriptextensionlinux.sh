@@ -35,66 +35,28 @@ if [ -z "$AGENT_VERSION" ]; then
 fi
 
 # download ADO agent
-#chown -R $agentuser /opt/azp
-
-echo "Create dir"
 mkdir -p /opt/azp && cd /opt/azp
-chown -R $AZP_AGENT_NAME /opt/azp
-echo "Changed owner"
 
-chmod -R 755 /opt/azp
 AZP_TOKEN_FILE=/opt/azp/.token
 touch $AZP_TOKEN_FILE
 echo -n $AZP_TOKEN > "$AZP_TOKEN_FILE"
 unset AZP_TOKEN
 
-#curl -LsS https://vstsagentpackage.azureedge.net/agent/${AGENT_VERSION}/vsts-agent-linux-x64-${AGENT_VERSION}.tar.gz | tar -xz
+curl -LsS https://vstsagentpackage.azureedge.net/agent/${AGENT_VERSION}/vsts-agent-linux-x64-${AGENT_VERSION}.tar.gz | tar -xz
 
-# Let the agent ignore the token env variables
-export VSO_AGENT_IGNORE=AZP_TOKEN,AZP_TOKEN_FILE
+chown -R $AZP_AGENT_NAME /opt/azp
 
-source ./env.sh
+#runuser -l $AZP_AGENT_NAME -c "/opt/azp/config.sh \
+runuser $AZP_AGENT_NAME -c "/opt/azp/config.sh \
+    --unattended \
+    --url $AZP_URL \
+    --auth PAT \
+    --token $(cat "$AZP_TOKEN_FILE") \
+    --pool $AZP_POOL \
+    --acceptTeeEula" & wait $!
 
-
-
-ls -a
-echo "Configure agent..."
-runuser -l $AZP_AGENT_NAME -c "/opt/azp/config.sh --unattended --url $AZP_URL --auth PAT --token $(cat "$AZP_TOKEN_FILE") --pool $AZP_POOL --acceptTeeEula" & wait $!
-
-
-
-
-# ./config.sh --unattended \
-#   --agent "${AZP_AGENT_NAME:-$(hostname)}" \
-#   --url "$AZP_URL" \
-#   --auth PAT \
-#   --token $(cat "$AZP_TOKEN_FILE") \
-#   --pool "${AZP_URL:-Default}" \
-#   --work "${AZP_WORK:-_work}" \
-#   --replace \
-#   --acceptTeeEula & wait $!
-
-
-
-
-
-
-
-
-
-
-
-#curl -o adoagent.tar.gz https://vstsagentpackage.azureedge.net/agent/${AGENT_VERSION}/vsts-agent-linux-x64-${AGENT_VERSION}.tar.gz
-#tar xzvf adoagent.tar.gz
-#rm -f adoagent.tar.gz
-
-# configure as adouser
-#chown -R $agentuser /opt/azp
-#chmod -R 755 /opt/azp
-#runuser -l $agentuser -c "/opt/azp/config.sh --unattended --url $adourl --auth pat --token $pat --pool $pool --acceptTeeEula" & wait $!
-
-# install and start the service
-# ./svc.sh install
-# ./svc.sh start
+# # install and start the service
+./svc.sh install $AZP_AGENT_NAME
+./svc.sh start $AZP_AGENT_NAME
 
 exit 0
