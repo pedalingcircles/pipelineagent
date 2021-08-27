@@ -32,8 +32,6 @@ param osType string
   'g'
 ])
 param blueGreen string = 'b'
-
-
 param adminUserName string = 'azureuser'
 param existingVnetName string
 param existingShareImageGalleryName string 
@@ -139,7 +137,7 @@ resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01
     }
     protectedSettings: {
       //commandToExecute: 'sudo sh echo.sh'
-      commandToExecute: './scriptextensionlinux.sh ${agentUser} ${agentPool} ${agentToken} ${adoUrl}'
+      commandToExecute: 'sudo ./scriptextensionlinux.sh ${agentUser} ${agentPool} ${agentToken} ${adoUrl}'
       fileUris: scriptExtensionFileUris
     }
   }
