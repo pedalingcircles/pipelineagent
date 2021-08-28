@@ -21,7 +21,7 @@ Documentation, tutorials, and guides will be found here.
 
 Some tasks requires some bootstrapping actions to be setup for items that are run the very first time. This is especially important when setting up agents. Take a look at the [bootstrapping docs](docs/bootstrapping.md)
 
-# Subtree
+## Subtree
 
 There are currently two Git subtrees in this repo.
 
