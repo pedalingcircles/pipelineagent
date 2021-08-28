@@ -2,20 +2,20 @@
 
 ## Overview
 
-Pipeline Agents is intended to support Azure DevOps agent automation. This repository includes all the documentation and tools to get started. This repo specifically targets Agent Pools that support VM scale sets. As this automation matures, more agent types will be included.
+Pipeline Agents is intended to support Azure DevOps agent automation. This repository includes all the documentation and tools to get started. Please note that it is a work in progress so consider changes here *.0 releases. This repo specifically targets Agent Pools that support stand-along VMs, VM Scale Sets, and Container Agents. As this automation matures, more agent types will be included.
 
 ## Build Statuses
 
-*TBD*
+All builds are done internally.
 
 ## Getting Started
 
 There are two major parts to getting started.
 
-1. Setting up automation for building VM images
+1. Setting up automation for building VM and container images
 2. Provisioning agent infrastructure and setting up Azure Devops Agent pools
 
-Docuemntations, tutorials, and guides will be found here.
+Documentation, tutorials, and guides will be found here.
 
 ## Bootstrapping
 
