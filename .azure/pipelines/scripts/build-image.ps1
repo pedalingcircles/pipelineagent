@@ -5,6 +5,7 @@ param(
     [String] [Parameter (Mandatory=$true)] $ResourcesNamePrefix,
     [String] [Parameter (Mandatory=$true)] $Location,
     [String] [Parameter (Mandatory=$true)] $ResourceGroup,
+    [String] [Parameter (Mandatory=$true)] $VmSize,
     [String] [Parameter (Mandatory=$true)] $StorageAccount,
     [String] [Parameter (Mandatory=$true)] $SubscriptionId,
     [String] [Parameter (Mandatory=$true)] $TenantId,
@@ -52,6 +53,7 @@ packer build    -var "capture_name_prefix=$ResourcesNamePrefix" `
                 -var "tenant_id=$TenantId" `
                 -var "run_validation_diskspace=$env:RUN_VALIDATION_FLAG" `
                 -var "allowed_inbound_ip_addresses=$AgentIp" `
+                -var "vm_size=$VmSize" `
                 $TemplatePath `
         | Where-Object {
             #Filter sensitive data from Packer logs
