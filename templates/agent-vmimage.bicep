@@ -4,33 +4,48 @@ param vmNameAffix string
 @description('The network interface name.')
 param nicNameAffix string
 
-param vmSize string = 'Standard_D4s_v4'
+@description('Virtual machine size.')
+param vmSize string
 
+@description('The storage account type.')
+@allowed([
+  'Premium_LRS'
+  'Premium_ZRS'
+  'StandardSSD_LRS'
+  'StandardSSD_ZRS'
+  'Standard_LRS'
+  'UltraSSD_LRS'
+])
 param storageAccountType string = 'StandardSSD_LRS'
 
-param vmCountStart int
+@description('The start index of how many VMs to provision.')
+param vmCountStart int = 0
+@description('The number of VMs to provision.')
+param vmCount int = 1
 
-param vmCountEnd int
-
+@description('Azure region to create resources in.')
 param location string = resourceGroup().location
 
+@description('VM local account to configure and run the agent.')
 param agentUser string
 
+@description('The Azure DevOps agent pool.')
 param agentPool string
 
+@description('The agent version to install.')
 param agentVersion string
 
+@description('The Personal Access Token.')
 param agentToken string
 
+@description('The Azure DevOps organization URL.')
 param adoUrl string
 
 @description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
 param adminPublicKey string
 
-param tags object = {
-  foo: 'bar'
-  bang: 'buzz'
-}
+@description('The set of key valure paris of tags to apply to resources.')
+param tags object = {}
 
 @allowed([
   'Linux'
@@ -38,12 +53,14 @@ param tags object = {
 ])
 param osType string
 
+@description('Blue/Gree decorator to support Blue Green.')
 @allowed([
   'b'
   'g'
 ])
 param blueGreen string = 'b'
 
+@description('The admin user account created when provisioning the VM.')
 param adminUserName string = 'azureuser'
 
 param existingVnetName string
@@ -74,7 +91,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
   name: existingVnetName
 }
 
-resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(vmCountStart,vmCountEnd):  {
+resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(vmCountStart,vmCount):  {
   name: '${vmName}${i}'
   location: location
   tags: tags
