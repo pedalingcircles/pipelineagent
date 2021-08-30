@@ -1,26 +1,36 @@
-// Azure resource names cannot contain special characters \/""[]:|<>+=;,?*@&, whitespace, or begin with '_' or end with '.' or '-'
-// Linux VM names may only contain letters, numbers, '.', and '-'.
+@description('The virtual machine name. There will likely be a prefix and suffix attached to this affix.')
 param vmNameAffix string
 
-// example nic-<##>-<nicNameAffix>-<###>
 @description('The network interface name.')
-@minLength(2)
-@maxLength(64)
 param nicNameAffix string
+
 param vmSize string = 'Standard_D4s_v4'
+
 param storageAccountType string = 'StandardSSD_LRS'
+
 param vmCountStart int
+
 param vmCountEnd int
+
 param location string = resourceGroup().location
 
 param agentUser string
+
 param agentPool string
+
 param agentVersion string
+
 param agentToken string
+
 param adoUrl string
 
-@description('Specifies the SSH rsa public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
+@description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
 param adminPublicKey string
+
+param tags object = {
+  foo: 'bar'
+  bang: 'buzz'
+}
 
 @allowed([
   'Linux'
@@ -33,10 +43,15 @@ param osType string
   'g'
 ])
 param blueGreen string = 'b'
+
 param adminUserName string = 'azureuser'
+
 param existingVnetName string
+
 param existingShareImageGalleryName string 
+
 param existingImagesResourceGroupName string
+
 param imageDefinitionName string
 
 var nicName = 'nic-${nicNameAffix}'
@@ -62,10 +77,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
 resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(vmCountStart,vmCountEnd):  {
   name: '${vmName}${i}'
   location: location
-  tags: {
-    foo: 'bar'
-    bang: 'buzz'
-  }
+  tags: tags
   properties: {
     hardwareProfile: {
       vmSize: vmSize
@@ -125,10 +137,7 @@ var scriptExtensionFileUris = [
 resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(vmCountStart,vmCountEnd):  {
   name: '${virtualmachine[i].name}/agentextension'
   location: location
-  tags: {
-    foo: 'bar'
-    bang: 'buzz'
-  }
+  tags: tags
   properties: {
     publisher: 'Microsoft.Azure.Extensions'
     type: 'CustomScript'
@@ -147,10 +156,7 @@ resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(vmCountStart,vmCountEnd):  {
   name: '${nicName}${i}'
   location: location
-  tags: {
-    foo: 'bar'
-    bang: 'buzz'
-  }
+  tags: tags
   properties: {
     ipConfigurations: [
       {
