@@ -52,9 +52,7 @@ if [ -z "$AGENT_VERSION" ]; then
   exit 1
 fi
 
-# download ADO agent
 mkdir -p /opt/azp && cd /opt/azp
-
 AZP_TOKEN_FILE=/opt/azp/.token
 touch $AZP_TOKEN_FILE
 echo -n $AZP_TOKEN > "$AZP_TOKEN_FILE"
@@ -64,7 +62,6 @@ curl -LsS https://vstsagentpackage.azureedge.net/agent/${AGENT_VERSION}/vsts-age
 
 chown -R $AZP_AGENT_NAME /opt/azp
 
-#runuser -l $AZP_AGENT_NAME -c "/opt/azp/config.sh \
 runuser $AZP_AGENT_NAME -c "/opt/azp/config.sh \
     --unattended \
     --url $AZP_URL \
@@ -73,7 +70,7 @@ runuser $AZP_AGENT_NAME -c "/opt/azp/config.sh \
     --pool $AZP_POOL \
     --acceptTeeEula" & wait $!
 
-# # install and start the service
+# install and start the service
 ./svc.sh install $AZP_AGENT_NAME
 ./svc.sh start $AZP_AGENT_NAME
 
