@@ -131,7 +131,7 @@ resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
 }]
 
 var scriptExtensionFileUris = [
-  'https://raw.githubusercontent.com/pedalingcircles/pipelineagent/scriptextension/helpers/scriptextensionlinux.sh'
+  'https://raw.githubusercontent.com/pedalingcircles/pipelineagent/vmscaleset/scripts/installer-agent-extension.sh'
 ]
 
 resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(vmCountStart,vmCountEnd):  {
