@@ -33,7 +33,7 @@
             "request": "launch",
             "script": "${workspaceFolder}/scripts/New-VMImageDeploy.ps1",
             "cwd": "${workspaceFolder}/scripts/New-VMImageDeploy.ps1",
-            "args": ["-ResourceGroupName rg-contoso-agents", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/templates/agent-vmimage.bicep", "-TemplateParameterFilePath ${workspaceFolder}/templates/agent-vmimage.parameters.sbx.json"]
+            "args": ["-ResourceGroupName rg-contoso-agents", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/templates/agents-vmimage.bicep", "-TemplateParameterFilePath ${workspaceFolder}/templates/agents-vmimage.parameters.sbx.json"]
         },
         {
             "name": "New-Image.ps1 Windows",
