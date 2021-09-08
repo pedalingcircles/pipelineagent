@@ -151,7 +151,7 @@ var scriptExtensionFileUris = [
   'https://raw.githubusercontent.com/pedalingcircles/pipelineagent/vmscaleset/scripts/installer-agent-extension.sh'
 ]
 
-resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(vmCountStart,vmCountEnd):  {
+resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(vmCountStart,vmCount):  {
   name: '${virtualmachine[i].name}/agentextension'
   location: location
   tags: tags
@@ -170,7 +170,7 @@ resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01
   }
 }]
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(vmCountStart,vmCountEnd):  {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(vmCountStart,vmCount):  {
   name: '${nicName}${i}'
   location: location
   tags: tags
