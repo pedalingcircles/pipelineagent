@@ -48,8 +48,8 @@ param location string = resourceGroup().location
 var bastionSubnetName = 'AzureBastionSubnet'
 
 resource vNet 'Microsoft.Network/virtualNetworks@2020-11-01' = {
-  location: location
   name: vNetSettings.name
+  location: location
   properties: {
     addressSpace: {
       addressPrefixes: [
