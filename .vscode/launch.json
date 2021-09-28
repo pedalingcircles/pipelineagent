@@ -5,11 +5,27 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "bashdb",
+            "request": "launch",
+            "name": "Bash-Debug (select script from list of sh files)",
+            "cwd": "${workspaceFolder}",
+            "program": "${command:SelectScriptName}",
+            "args": []
+        },
+        {
             "name": "PowerShell Launch Current File",
             "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
             "cwd": "${file}"
+        },
+        {
+            "name": "New-ServicePrincipal.ps1",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${workspaceFolder}/helpers/New-ServicePrincipal.ps1",
+            "cwd": "${workspaceFolder}/helpers/New-ServicePrincipal.ps1",
+            "args": ["-Subscription $subscription", "-Tenant $tenant", "-DisplayName agent-contoso-agentmgmt-sbx", "-DistinguishedName $distinguishedName", "-KeyFriendlyName agent-contoso-agentmgmt-sbx-key", "-ResourceGroup $resourceGroup"]
         },
         {
             "name": "New-ImagesInfrastructure.ps1",
@@ -33,7 +49,7 @@
             "request": "launch",
             "script": "${workspaceFolder}/scripts/New-VMImageDeploy.ps1",
             "cwd": "${workspaceFolder}/scripts/New-VMImageDeploy.ps1",
-            "args": ["-ResourceGroupName rg-contoso-agents", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/templates/agent-vmimage.bicep", "-TemplateParameterFilePath ${workspaceFolder}/templates/agent-vmimage.parameters.sbx.json"]
+            "args": ["-ResourceGroupName rg-contoso-agents", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/templates/agents-vmimage.bicep", "-TemplateParameterFilePath ${workspaceFolder}/templates/agents-vmimage.parameters.sbx.json"]
         },
         {
             "name": "New-Image.ps1 Windows",
