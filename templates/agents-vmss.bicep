@@ -17,16 +17,6 @@ param imageDefinitionName string
 @description('Virtual machine size.')
 param vmSize string
 
-
-var osSettings = {
-  Linux: {
-    diskSize: 86
-  }
-  Windows: {
-    diskSize: 256
-  }
-}
-
 @description('The network interface name.')
 param nicName string
 
@@ -38,8 +28,11 @@ param osType string
 
 param computerNameAffix string
 
+@secure()
 @description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
 param adminPublicKey string
+
+
 param storageAccountType string = 'StandardSSD_LRS'
 
 param existingVnetName string
@@ -47,13 +40,22 @@ param existingVnetName string
 @description('The admin user account created when provisioning the VM.')
 param adminUserName string = 'azureuser'
 
-param existingShareImageGalleryName string 
+param existingShareImageGalleryName string
 
 param existingImagesResourceGroupName string
 
 resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = {
   name: existingShareImageGalleryName
   scope: resourceGroup(existingImagesResourceGroupName)
+}
+
+var osSettings = {
+  Linux: {
+    diskSize: 86
+  }
+  Windows: {
+    diskSize: 256
+  }
 }
 
 var computerNamePrefix = 'vm${computerNameAffix}'
