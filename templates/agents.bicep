@@ -9,10 +9,22 @@ param bastionHostName string
 @maxLength(80)
 param bastionNsgName string
 
+@minLength(36)
+@maxLength(36)
+@description('The Azure Active Directory tenant ID that should be used for authenticating requests to the key vault.')
+param tenantId string
+
 @description('Public IP name for the bastion host.')
-@minLength(1)
-@maxLength(80)
 param bastionPipName string
+
+@description('The set of key value pairs of tags to apply to resources.')
+param tags object = {}
+
+@description('The key vault name.')
+param keyVaultName string
+
+@description('The access policies for the key vault.')
+param keyVaultAccessPolicies array
 
 @description('Network Security Group for the VM Agents.')
 @minLength(1)
@@ -20,36 +32,50 @@ param bastionPipName string
 param vmAgentNsgName string
 
 @description('Virtual Network settings.')
-param vNetSettings object = {
-  name: 'vnet'
-  addressPrefixes: [
-    {
-      name: 'firstPrefix'
-      addressPrefix: '10.0.0.0/16'
-    }
-  ]
-  subnets: [
-    {
-      addressPrefix: '10.0.0.0/24'
-    }
-    {
-      addressPrefix: '10.0.1.0/24'
-    }
-    {
-      addressPrefix: '10.0.2.0/24'
-    }
-  ]
-}
+param vNetSettings object
 
-@description('Location for agent and related resources. This will likely be the same region where the ADO org is located.')
+@description('Location for agent and related resources. This will likely be the same region where the ADO organization is located.')
 param location string = resourceGroup().location
 
 // Azure Bastion can only be created in subnet with name 'AzureBastionSubnet'.
 var bastionSubnetName = 'AzureBastionSubnet'
 
-resource vNet 'Microsoft.Network/virtualNetworks@2020-11-01' = {
+resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' = {
+  name: keyVaultName
   location: location
+  tags: tags
+  properties: {
+    accessPolicies: keyVaultAccessPolicies
+    enabledForDeployment: false
+    enabledForDiskEncryption: false
+    enabledForTemplateDeployment: true
+    enablePurgeProtection: true
+    enableRbacAuthorization: false  // This is a preview feature and may be used in the future (replaces access policies)
+    enableSoftDelete: true
+    networkAcls: {
+      bypass: 'AzureServices'
+      defaultAction: 'Deny'
+      ipRules: []
+      virtualNetworkRules: [
+        {
+          id: '/subscriptions/subid/resourceGroups/rg1/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/subnet1'
+          ignoreMissingVnetServiceEndpoint: true
+        }
+      ]
+    }
+    publicNetworkAccess: 'disabled'
+    sku: {
+      family: 'A'
+      name: 'premium'
+    }
+    softDeleteRetentionInDays: 7
+    tenantId: tenantId
+  }
+}
+
+resource vNet 'Microsoft.Network/virtualNetworks@2020-11-01' = {
   name: vNetSettings.name
+  location: location
   properties: {
     addressSpace: {
       addressPrefixes: [

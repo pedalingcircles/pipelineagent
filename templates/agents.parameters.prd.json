@@ -11,12 +11,6 @@
     "bastionPipName": {
       "value": "pip-bastion"
     },
-    "tags": {
-      "value": {
-        "foo": "bar", 
-        "bang": "bazz"
-      }
-    },
     "vmAgentNsgName": {
       "value": "nsg-vmagent"
     },
@@ -27,12 +21,27 @@
       "value": [
         {
           "objectId": "",
-          "tenantId": "[parameters('tenantId')]",
+          "tenantId": "",
           "permissions": {
             "keys": [
               "Get",
               "List",
-              "Create"
+              "Update",
+              "Create",
+              "Import",
+              "Delete",
+              "Recover",
+              "Backup",
+              "Restore"
+            ],
+            "secrets": [
+              "Get",
+              "List",
+              "Set",
+              "Delete",
+              "Recover",
+              "Backup",
+              "Restore"
             ]
           }
         }
