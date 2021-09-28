@@ -25,7 +25,7 @@
     },    
     "existingImagesResourceGroupName": {
       "value": "rg-mijohns-images-sbx-eastus2-001"
-    },    
+    },
     "imageDefinitionName": {
       "value": "ubuntu2004"
     }
