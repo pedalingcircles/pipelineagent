@@ -1,12 +1,17 @@
-@description('The storage account name used by Packer to store VM images.')
-@minLength(3)
-@maxLength(24)
-param storageAccountName string
-
-@description('The Shared Image Gallery name for publishing images to.')
+@description('The product or solution name.')
 @minLength(1)
-@maxLength(80)
-param sharedImageGalleryName string
+@maxLength(12)
+param productName string
+
+@description('The environment type. e.g. "sbx", "dev", "prod"')
+@minLength(2)
+@maxLength(24)
+param environmentType string
+
+@description('The environment use.')
+@minLength(2)
+@maxLength(24)
+param environmentUse string
 
 @description('Virtual Network settings.')
 param vNetSettings object = {
@@ -28,13 +33,15 @@ param vNetSettings object = {
 param location string = resourceGroup().location
 
 var packerSubnetName = 'snet-packer'
+var storageAccountName = 'stimages${uniqueString(resourceGroup().id)}'
+var sharedImageGalleryName = 'sig.${productName}.images'
 
 resource vNet 'Microsoft.Network/virtualNetworks@2020-11-01' = {
   name: vNetSettings.name
   location: location
   tags: {
-    envtype: 'sbx'
-    envuse: 'packer'
+    envtype: environmentType
+    envuse: environmentUse
   }
   properties: {
     addressSpace: {
@@ -70,8 +77,8 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   name: storageAccountName
   location: location
   tags: {
-    envtype: 'sbx'
-    envuse: 'packer'
+    envtype: environmentType
+    envuse: environmentUse
   }
   sku: {
     name: 'Standard_LRS'
@@ -116,8 +123,8 @@ resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' = {
   name: sharedImageGalleryName
   location: location
   tags: {
-    envtype: 'sbx'
-    envuse: 'packer'
+    envtype: environmentType
+    envuse: environmentUse
   }
   properties: {
     description: 'Shared Image Gallery used to store virtual machine images used for creating self-hosted Azure DevOps Agents.'
