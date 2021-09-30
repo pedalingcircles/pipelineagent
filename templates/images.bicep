@@ -29,7 +29,7 @@ param location string = resourceGroup().location
 
 var packerSubnetName = 'snet-packer'
 var storageAccountName = 'stimages${uniqueString(resourceGroup().id)}'
-var sharedImageGalleryName = 'sig.${organizationName}.images'
+var sharedImageGalleryName = 'sig.${organizationName}.images.${uniqueString(resourceGroup().id)}'
 
 resource vNet 'Microsoft.Network/virtualNetworks@2020-11-01' = {
   name: vNetSettings.name
