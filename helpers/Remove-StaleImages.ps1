@@ -1,16 +1,9 @@
 <#
     .DESCRIPTION
-        An example runbook which gets all the ARM resources using the Run As Account (Service Principal)
+        Legacy starter script work in progress.
 
-    .NOTES
-        AUTHOR: Azure Automation Team
-        LASTEDIT: Mar 14, 2016
+        The idea is to havfe a clean up script to remove stage images during a pipeline run. 
 #>
-
-
-
-
-
 
 
 $ResourceGroupName = "contoso-agentimages"
@@ -27,10 +20,6 @@ $ConnectionString = ""
 
 $Context = New-AzStorageContext -StorageAccountName $StorageAccountName -ConnectionString $ConnectionString
 
-
-
-
-
 Get-AzStorageBlob -Container $ImagesContainerName -Context $Context | ForEach-Object {
     Write-Host ($_ | Format-Table | Out-String)
     $lastModified = $_.LastModified.UtcDateTime
@@ -43,10 +32,6 @@ Get-AzStorageBlob -Container $ImagesContainerName -Context $Context | ForEach-Ob
 
     Write-Host "-------------------------------"
 }
-
-
-
-
 
 
 Get-AzStorageBlob -Container $ContainerName -Context $Context
