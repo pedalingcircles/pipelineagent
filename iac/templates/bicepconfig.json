@@ -5,13 +5,13 @@
         "verbose": false,
         "rules": {
           "no-hardcoded-env-urls": {
-            "level": "warning"
+            "level": "error"
           },
           "no-unused-params": {
             "level": "warning"
           },
           "no-unused-vars": {
-            "level": "error"
+            "level": "warning"
           },
           "prefer-interpolation": {
             "level": "warning"
