@@ -5,7 +5,7 @@
         "verbose": false,
         "rules": {
           "no-hardcoded-env-urls": {
-            "level": "error"
+            "level": "warning"
           },
           "no-unused-params": {
             "level": "warning"
@@ -17,7 +17,7 @@
             "level": "warning"
           },
           "secure-parameter-default": {
-            "level": "error"
+            "level": "warning"
           },
           "simplify-interpolation": {
             "level": "warning"
