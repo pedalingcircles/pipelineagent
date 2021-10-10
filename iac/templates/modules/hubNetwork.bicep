@@ -44,12 +44,12 @@ param firewallManagementPublicIPAddressSkuName string
 param firewallManagementPublicIpAllocationMethod string
 param firewallManagementPublicIPAddressAvailabilityZones array
 
+// 'VMProtectionAlerts' is not supported in AzureUsGovernment
 var defaultVirtualNewtorkDiagnosticsLogs = [
-  // TODO: 'VMProtectionAlerts' is not supported in AzureUsGovernment
-  // {
-  //   category: 'VMProtectionAlerts'
-  //   enabled: true
-  // }
+  {
+    category: 'VMProtectionAlerts'
+    enabled: true
+  }
 ]
 
 var defaultVirtualNetworkDiagnosticsMetrics = [
