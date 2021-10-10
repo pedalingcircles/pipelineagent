@@ -7,6 +7,7 @@ param uniqueId string = uniqueString(deployment().name)
 param envType string
 param organization string
 param workload string = 'pipelineagent'
+
 param resourceAffix string = '${workload}-${uniqueId}'
 param nowUtc string = utcNow()
 
@@ -14,16 +15,24 @@ param hubResourceGroupName string = 'rg-${resourceAffix}-hub'
 param agentResourceGroupName string = 'rg-${resourceAffix}-agent'
 param imageBuilderResourceGroupName string = 'rg-${resourceAffix}-imagebuilder'
 param imageResourceGroupName string = 'rg-${resourceAffix}-image'
+param opsResourceGroupName string = 'rg-${resourceAffix}-ops'
 
 param hubSubscriptionId string = subscription().subscriptionId
 param agentSubscriptionId string = subscription().subscriptionId
 param imageBuilderubscriptionId string = subscription().subscriptionId
 param imageSubscriptionId string = subscription().subscriptionId
+param opsSubscriptionId string = subscription().subscriptionId
 
 param hubLocation string = deployment().location
 param agentLocation string = deployment().location
 param imageBuilderLocation string = deployment().location
 param imageLocation string = deployment().location
+param opsLocation string = deployment().location
+
+param logAnalyticsWorkspaceName string = take('${resourceAffix}-laws', 63)
+param logAnalyticsWorkspaceRetentionInDays int = 30
+param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
+param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
 
 param hubTags object = {
   'envtype': envType
@@ -49,6 +58,14 @@ param imageTags object = {
   'workload': workload
   'component': 'image'
 }
+
+param opsTags object = {
+  'envtype': envType
+  'org': organization
+  'workload': workload
+  'component': 'ops'
+}
+
 
 module hubResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-hub-rg-${nowUtc}'
@@ -87,6 +104,33 @@ module imageResourceGroup './modules/resourceGroup.bicep' = {
     location: imageLocation
     tags: imageTags
   }
+}
+
+module opsResourceGroup './modules/resourceGroup.bicep' = {
+  name: 'deploy-ops-rg-${nowUtc}'
+  scope: subscription(opsSubscriptionId)
+  params: {
+    name: opsResourceGroupName
+    location: opsLocation
+    tags: opsTags
+  }
+}
+
+module logAnalyticsWorkspace './modules/logAnalyticsWorkspace.bicep' = {
+  name: 'deploy-laws-${nowUtc}'
+  scope: resourceGroup(opsSubscriptionId, opsResourceGroupName)
+  params: {
+    name: logAnalyticsWorkspaceName
+    location: opsLocation
+    tags: opsTags
+
+    retentionInDays: logAnalyticsWorkspaceRetentionInDays
+    skuName: logAnalyticsWorkspaceSkuName
+    workspaceCappingDailyQuotaGb: logAnalyticsWorkspaceCappingDailyQuotaGb
+  }
+  dependsOn: [
+    opsResourceGroup
+  ]
 }
 
 
