@@ -34,6 +34,39 @@ param logAnalyticsWorkspaceRetentionInDays int = 30
 param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
 param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
 
+// hub networking
+param hubLogStorageAccountName string = toLower(take('sthublogs${uniqueId}', 24))
+param hubLogStorageSkuName string = 'Standard_GRS'
+param hubVirtualNetworkName string = 'hub-vnet'
+param hubVirtualNetworkAddressPrefix string = '10.0.100.0/24'
+param hubVirtualNetworkDiagnosticsLogs array = []
+param hubVirtualNetworkDiagnosticsMetrics array = []
+param hubNetworkSecurityGroupName string = 'hub-nsg'
+param hubNetworkSecurityGroupRules array = []
+param hubSubnetName string = 'hub-subnet'
+param hubSubnetAddressPrefix string = '10.0.100.128/27'
+param hubSubnetServiceEndpoints array = []
+param firewallName string = 'firewall'
+param firewallSkuTier string = 'Premium'
+param firewallPolicyName string = 'firewall-policy'
+param firewallThreatIntelMode string = 'Alert'
+param firewallClientIpConfigurationName string = 'firewall-client-ip-config'
+var firewallClientSubnetName = 'AzureFirewallSubnet' //this must be 'AzureFirewallSubnet'
+param firewallClientSubnetAddressPrefix string = '10.0.100.0/26'
+param firewallClientSubnetServiceEndpoints array = []
+param firewallClientPublicIPAddressName string = 'firewall-client-public-ip'
+param firewallClientPublicIPAddressSkuName string = 'Standard'
+param firewallClientPublicIpAllocationMethod string = 'Static'
+param firewallClientPublicIPAddressAvailabilityZones array = []
+param firewallManagementIpConfigurationName string = 'firewall-management-ip-config'
+var firewallManagementSubnetName = 'AzureFirewallManagementSubnet' //this must be 'AzureFirewallManagementSubnet'
+param firewallManagementSubnetAddressPrefix string = '10.0.100.64/26'
+param firewallManagementSubnetServiceEndpoints array = []
+param firewallManagementPublicIPAddressName string = 'firewall-management-public-ip'
+param firewallManagementPublicIPAddressSkuName string = 'Standard'
+param firewallManagementPublicIpAllocationMethod string = 'Static'
+param firewallManagementPublicIPAddressAvailabilityZones array = []
+
 param hubTags object = {
   'envtype': envType
   'org': organization
@@ -131,6 +164,53 @@ module logAnalyticsWorkspace './modules/logAnalyticsWorkspace.bicep' = {
   dependsOn: [
     opsResourceGroup
   ]
+}
+
+module hub './modules/hubNetwork.bicep' = {
+  name: 'deploy-hub-${nowUtc}'
+  scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
+  params: {
+    location: hubLocation
+    tags: hubTags
+
+    logStorageAccountName: hubLogStorageAccountName
+    logStorageSkuName: hubLogStorageSkuName
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+
+    virtualNetworkName: hubVirtualNetworkName
+    virtualNetworkAddressPrefix: hubVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: hubVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: hubVirtualNetworkDiagnosticsMetrics
+
+    networkSecurityGroupName: hubNetworkSecurityGroupName
+    networkSecurityGroupRules: hubNetworkSecurityGroupRules
+
+    subnetName: hubSubnetName
+    subnetAddressPrefix: hubSubnetAddressPrefix
+    subnetServiceEndpoints: hubSubnetServiceEndpoints
+
+    firewallName: firewallName
+    firewallSkuTier: firewallSkuTier
+    firewallPolicyName: firewallPolicyName
+    firewallThreatIntelMode: firewallThreatIntelMode
+    firewallClientIpConfigurationName: firewallClientIpConfigurationName
+    firewallClientSubnetName: firewallClientSubnetName
+    firewallClientSubnetAddressPrefix: firewallClientSubnetAddressPrefix
+    firewallClientSubnetServiceEndpoints: firewallClientSubnetServiceEndpoints
+    firewallClientPublicIPAddressName: firewallClientPublicIPAddressName
+    firewallClientPublicIPAddressSkuName: firewallClientPublicIPAddressSkuName
+    firewallClientPublicIpAllocationMethod: firewallClientPublicIpAllocationMethod
+    firewallClientPublicIPAddressAvailabilityZones: firewallClientPublicIPAddressAvailabilityZones
+    firewallManagementIpConfigurationName: firewallManagementIpConfigurationName
+    firewallManagementSubnetName: firewallManagementSubnetName
+    firewallManagementSubnetAddressPrefix: firewallManagementSubnetAddressPrefix
+    firewallManagementSubnetServiceEndpoints: firewallManagementSubnetServiceEndpoints
+    firewallManagementPublicIPAddressName: firewallManagementPublicIPAddressName
+    firewallManagementPublicIPAddressSkuName: firewallManagementPublicIPAddressSkuName
+    firewallManagementPublicIpAllocationMethod: firewallManagementPublicIpAllocationMethod
+    firewallManagementPublicIPAddressAvailabilityZones: firewallManagementPublicIPAddressAvailabilityZones
+  }
 }
 
 
