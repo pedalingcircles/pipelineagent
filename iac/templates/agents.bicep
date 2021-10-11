@@ -253,5 +253,39 @@ module operations './modules/spokeNetwork.bicep' = {
   }
 }
 
+module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
+  name: 'deploy-hub-peerings-${nowUtc}'
+  scope: subscription(hubSubscriptionId)
+  params: {
+    hubResourceGroupName: hubResourceGroup.outputs.name
+    hubVirtualNetworkName: hub.outputs.virtualNetworkName
+
+    //identityVirtualNetworkName: identity.outputs.virtualNetworkName
+    operationsVirtualNetworkName: operations.outputs.virtualNetworkName
+    //sharedServicesVirtualNetworkName: sharedServices.outputs.virtualNetworkName
+
+    // Opened Github issue: https://github.com/Azure/missionlz/issues/450
+    //identityVirtualNetworkResourceId: identity.outputs.virtualNetworkResourceId
+    //operationsVirtualNetworkResourceId: sharedServices.outputs.virtualNetworkResourceId
+    //sharedServicesVirtualNetworkResourceId: operations.outputs.virtualNetworkResourceId
+
+    // Potential Fix
+    operationsVirtualNetworkResourceId: operations.outputs.virtualNetworkResourceId
+  }
+}
+
+
+module operationsVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
+  name: 'deploy-operations-peerings-${nowUtc}'
+  scope: subscription(operationsSubscriptionId)
+  params: {
+    spokeResourceGroupName: operationsResourceGroup.outputs.name
+    spokeVirtualNetworkName: operations.outputs.virtualNetworkName
+
+    hubVirtualNetworkName: hub.outputs.virtualNetworkName
+    hubVirtualNetworkResourceId: hub.outputs.virtualNetworkResourceId
+  }
+}
+
 
 
