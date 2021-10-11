@@ -79,6 +79,15 @@ param operationsSubnetName string = replace(hubSubnetName, 'hub', 'operations')
 param operationsSubnetAddressPrefix string = '10.0.115.0/27'
 param operationsSubnetServiceEndpoints array = []
 
+@allowed([
+  'NIST'
+  'IL5' // Gov cloud only, trying to deploy IL5 in AzureCloud will switch to NIST
+  'CMMC'
+  ''
+])
+@description('Built-in policy assignments to assign, default is none. [NIST/IL5/CMMC] IL5 is only availalbe for GOV cloud and will switch to NIST if tried in AzureCloud.')
+param policy string = ''
+
 param hubTags object = {
   'envtype': envType
   'org': organization
@@ -287,5 +296,26 @@ module operationsVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
   }
 }
 
+module hubPolicyAssignment './modules/policyAssignment.bicep' = {
+  name: 'assign-policy-hub-${nowUtc}'
+  scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
+  params: {
+    builtInAssignment: policy
+    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+    operationsSubscriptionId: operationsSubscriptionId
+  }
+}
+
+module operationsPolicyAssignment './modules/policyAssignment.bicep' = {
+  name: 'assign-policy-operations-${nowUtc}'
+  scope: resourceGroup(operationsSubscriptionId, operationsResourceGroupName)
+  params: {
+    builtInAssignment: policy
+    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+    operationsSubscriptionId: operationsSubscriptionId
+  }
+}
 
 
