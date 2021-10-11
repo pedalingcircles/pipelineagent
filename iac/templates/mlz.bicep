@@ -206,13 +206,13 @@ module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
     hubResourceGroupName: hubResourceGroup.outputs.name
     hubVirtualNetworkName: hub.outputs.virtualNetworkName
 
-    identityVirtualNetworkName: identity.outputs.virtualNetworkName
+    //identityVirtualNetworkName: identity.outputs.virtualNetworkName
     operationsVirtualNetworkName: operations.outputs.virtualNetworkName
-    sharedServicesVirtualNetworkName: sharedServices.outputs.virtualNetworkName
+    //sharedServicesVirtualNetworkName: sharedServices.outputs.virtualNetworkName
 
-    identityVirtualNetworkResourceId: identity.outputs.virtualNetworkResourceId
+    //identityVirtualNetworkResourceId: identity.outputs.virtualNetworkResourceId
     operationsVirtualNetworkResourceId: sharedServices.outputs.virtualNetworkResourceId
-    sharedServicesVirtualNetworkResourceId: operations.outputs.virtualNetworkResourceId
+    //sharedServicesVirtualNetworkResourceId: operations.outputs.virtualNetworkResourceId
   }
 }
 
