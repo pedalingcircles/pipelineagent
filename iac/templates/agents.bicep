@@ -15,19 +15,19 @@ param hubResourceGroupName string = 'rg-${resourceAffix}-hub'
 param agentResourceGroupName string = 'rg-${resourceAffix}-agent'
 param imageBuilderResourceGroupName string = 'rg-${resourceAffix}-imagebuilder'
 param imageResourceGroupName string = 'rg-${resourceAffix}-image'
-param opsResourceGroupName string = 'rg-${resourceAffix}-ops'
+param operationsResourceGroupName string = 'rg-${resourceAffix}-operations'
 
 param hubSubscriptionId string = subscription().subscriptionId
 param agentSubscriptionId string = subscription().subscriptionId
 param imageBuilderubscriptionId string = subscription().subscriptionId
 param imageSubscriptionId string = subscription().subscriptionId
-param opsSubscriptionId string = subscription().subscriptionId
+param operationsSubscriptionId string = subscription().subscriptionId
 
 param hubLocation string = deployment().location
 param agentLocation string = deployment().location
 param imageBuilderLocation string = deployment().location
 param imageLocation string = deployment().location
-param opsLocation string = deployment().location
+param operationsLocation string = deployment().location
 
 param logAnalyticsWorkspaceName string = take('${resourceAffix}-laws', 63)
 param logAnalyticsWorkspaceRetentionInDays int = 30
@@ -67,6 +67,18 @@ param firewallManagementPublicIPAddressSkuName string = 'Standard'
 param firewallManagementPublicIpAllocationMethod string = 'Static'
 param firewallManagementPublicIPAddressAvailabilityZones array = []
 
+param operationsLogStorageAccountName string = toLower(take('opslogs${uniqueId}', 24))
+param operationsLogStorageSkuName string = hubLogStorageSkuName
+param operationsVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'operations')
+param operationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
+param operationsVirtualNetworkDiagnosticsLogs array = []
+param operationsVirtualNetworkDiagnosticsMetrics array = []
+param operationsNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'operations')
+param operationsNetworkSecurityGroupRules array = []
+param operationsSubnetName string = replace(hubSubnetName, 'hub', 'operations')
+param operationsSubnetAddressPrefix string = '10.0.115.0/27'
+param operationsSubnetServiceEndpoints array = []
+
 param hubTags object = {
   'envtype': envType
   'org': organization
@@ -92,11 +104,11 @@ param imageTags object = {
   'component': 'image'
 }
 
-param opsTags object = {
+param operationsTags object = {
   'envtype': envType
   'org': organization
   'workload': workload
-  'component': 'ops'
+  'component': 'operations'
 }
 
 
@@ -139,30 +151,30 @@ module imageResourceGroup './modules/resourceGroup.bicep' = {
   }
 }
 
-module opsResourceGroup './modules/resourceGroup.bicep' = {
-  name: 'deploy-ops-rg-${nowUtc}'
-  scope: subscription(opsSubscriptionId)
+module operationsResourceGroup './modules/resourceGroup.bicep' = {
+  name: 'deploy-operations-rg-${nowUtc}'
+  scope: subscription(operationsSubscriptionId)
   params: {
-    name: opsResourceGroupName
-    location: opsLocation
-    tags: opsTags
+    name: operationsResourceGroupName
+    location: operationsLocation
+    tags: operationsTags
   }
 }
 
 module logAnalyticsWorkspace './modules/logAnalyticsWorkspace.bicep' = {
   name: 'deploy-laws-${nowUtc}'
-  scope: resourceGroup(opsSubscriptionId, opsResourceGroupName)
+  scope: resourceGroup(operationsSubscriptionId, operationsResourceGroupName)
   params: {
     name: logAnalyticsWorkspaceName
-    location: opsLocation
-    tags: opsTags
+    location: operationsLocation
+    tags: operationsTags
 
     retentionInDays: logAnalyticsWorkspaceRetentionInDays
     skuName: logAnalyticsWorkspaceSkuName
     workspaceCappingDailyQuotaGb: logAnalyticsWorkspaceCappingDailyQuotaGb
   }
   dependsOn: [
-    opsResourceGroup
+    operationsResourceGroup
   ]
 }
 
@@ -213,7 +225,33 @@ module hub './modules/hubNetwork.bicep' = {
   }
 }
 
+module operations './modules/spokeNetwork.bicep' = {
+  name: 'deploy-operations-spoke-${nowUtc}'
+  scope: resourceGroup(operationsSubscriptionId, operationsResourceGroupName)
+  params: {
+    location: operationsLocation
+    tags: operationsTags
 
+    logStorageAccountName: operationsLogStorageAccountName
+    logStorageSkuName: operationsLogStorageSkuName
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+
+    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
+
+    virtualNetworkName: operationsVirtualNetworkName
+    virtualNetworkAddressPrefix: operationsVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: operationsVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: operationsVirtualNetworkDiagnosticsMetrics
+
+    networkSecurityGroupName: operationsNetworkSecurityGroupName
+    networkSecurityGroupRules: operationsNetworkSecurityGroupRules
+
+    subnetName: operationsSubnetName
+    subnetAddressPrefix: operationsSubnetAddressPrefix
+    subnetServiceEndpoints: operationsSubnetServiceEndpoints
+  }
+}
 
 
 
