@@ -318,4 +318,21 @@ module operationsPolicyAssignment './modules/policyAssignment.bicep' = {
   }
 }
 
+module hubSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = {
+  name: 'activity-logs-hub-${nowUtc}'
+  scope: subscription(hubSubscriptionId)
+  params: {
+    diagnosticSettingName: 'log-hub-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+  }
+}
+
+module operationsSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != operationsSubscriptionId) {
+  name: 'activity-logs-operations-${nowUtc}'
+  scope: subscription(operationsSubscriptionId)
+  params: {
+    diagnosticSettingName: 'log-operations-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+  }
+}
 
