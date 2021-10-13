@@ -1,41 +1,52 @@
 // scope
 targetScope = 'subscription'
 
-// Can optionally use resource group here as a scope
-param uniqueId string = uniqueString(deployment().name)
-
-param envType string
+@description('Used to identify environment types for naming resources.')
+@allowed([
+  'ephemeral'   // Short lived environments used for smoke testing and PR approvals
+  'sandbox'     // Used for experimental work and it not part of the promotion process
+  'integration' // The first integration environment. Typically the first environment deployed off of the trunk branch.
+  'development' // The main environment used by developers and engineers to validate, debug, showcase, and collaborate on the solution.
+  'demo'        // The demo environment. This is used to showcase to customers, the internal team, of leadership. It can optionally be used for sprint demos.
+  'test'        // The funtional testing environment
+  'acceptance'  // User acceptance testing (aka UAT)
+  'staging'     // A mirroried or similiar version of production. Typically all settings match including SKUs and configuration 
+  'production'  // The live production environment
+])
+param environmentType string
 param organization string
 param workload string = 'pipelineagent'
-
-param resourceAffix string = '${workload}-${uniqueId}'
 param nowUtc string = utcNow()
 
-param hubResourceGroupName string = 'rg-${resourceAffix}-hub'
-param agentResourceGroupName string = 'rg-${resourceAffix}-agent'
-param imageBuilderResourceGroupName string = 'rg-${resourceAffix}-imagebuilder'
-param imageResourceGroupName string = 'rg-${resourceAffix}-image'
-param operationsResourceGroupName string = 'rg-${resourceAffix}-operations'
+// resource group names
+var hubResourceGroupName = 'rg-${replace(names.outputs.resourceName, '[delimiterplaceholder]', '-')}-hub'
+var agentResourceGroupName = 'rg-${replace(names.outputs.resourceName, '[delimiterplaceholder]', '-')}-agent'
+var imageBuilderResourceGroupName = 'rg-${replace(names.outputs.resourceName, '[delimiterplaceholder]', '-')}-imagebuilder'
+var imageResourceGroupName = 'rg-${replace(names.outputs.resourceName, '[delimiterplaceholder]', '-')}-image'
+var operationsResourceGroupName = 'rg-${replace(names.outputs.resourceName, '[delimiterplaceholder]', '-')}-operations'
 
+// subscription ids. They could all potentially be different
 param hubSubscriptionId string = subscription().subscriptionId
 param agentSubscriptionId string = subscription().subscriptionId
 param imageBuilderubscriptionId string = subscription().subscriptionId
 param imageSubscriptionId string = subscription().subscriptionId
 param operationsSubscriptionId string = subscription().subscriptionId
 
+// locations. They could all potentially be different
 param hubLocation string = deployment().location
 param agentLocation string = deployment().location
 param imageBuilderLocation string = deployment().location
 param imageLocation string = deployment().location
 param operationsLocation string = deployment().location
 
-param logAnalyticsWorkspaceName string = take('${resourceAffix}-laws', 63)
+// taking 63 minus the literal characters (15) = 48
+var logAnalyticsWorkspaceName = take('log-operations-${replace(names.outputs.resourceNameShort, '[delimiterplaceholder]', '-')}', 63)
 param logAnalyticsWorkspaceRetentionInDays int = 30
 param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
 param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
 
 // hub networking
-param hubLogStorageAccountName string = toLower(take('sthublogs${uniqueId}', 24))
+var hubLogStorageAccountName = take('sthublogs${replace(names.outputs.resourceNameShort, '[delimiterplaceholder]', '')}', 24)
 param hubLogStorageSkuName string = 'Standard_GRS'
 param hubVirtualNetworkName string = 'hub-vnet'
 param hubVirtualNetworkAddressPrefix string = '10.0.100.0/24'
@@ -67,7 +78,7 @@ param firewallManagementPublicIPAddressSkuName string = 'Standard'
 param firewallManagementPublicIpAllocationMethod string = 'Static'
 param firewallManagementPublicIPAddressAvailabilityZones array = []
 
-param operationsLogStorageAccountName string = toLower(take('opslogs${uniqueId}', 24))
+var operationsLogStorageAccountName = take('stopslogs${replace(names.outputs.resourceNameShort, '[delimiterplaceholder]', '')}', 24)
 param operationsLogStorageSkuName string = hubLogStorageSkuName
 param operationsVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'operations')
 param operationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
@@ -134,37 +145,45 @@ param windowsVmCreateOption string = 'FromImage'
 param windowsVmStorageAccountType string = 'StandardSSD_LRS'
 
 param hubTags object = {
-  'envtype': envType
+  'environmentType': environmentType
   'org': organization
   'workload': workload
   'component': 'hub'
 }
 param agentTags object = {
-  'envtype': envType
+  'environmentType': environmentType
   'org': organization
   'workload': workload
   'component': 'agent'
 }
 param imageBuilderTags object = {
-  'envtype': envType
+  'environmentType': environmentType
   'org': organization
   'workload': workload
   'component': 'imagebuilder'
 }
 param imageTags object = {
-  'envtype': envType
+  'environmentType': environmentType
   'org': organization
   'workload': workload
   'component': 'image'
 }
 
 param operationsTags object = {
-  'envtype': envType
+  'environmentType': environmentType
   'org': organization
   'workload': workload
   'component': 'operations'
 }
 
+module names './modules/convention.bicep' = {
+  name: 'namingconvention'
+  scope: subscription(hubSubscriptionId)
+  params: {
+    environmentType: environmentType
+    workload: 'pipelineagent'
+  }
+}
 
 module hubResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-hub-rg-${nowUtc}'
