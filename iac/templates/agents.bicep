@@ -13,12 +13,20 @@ targetScope = 'subscription'
   'staging'     // A mirroried or similiar version of production. Typically all settings match including SKUs and configuration 
   'production'  // The live production environment
 ])
-param environmentType string = 'sandbox'
-param organization string
+param environmentType string
 
 @description('Used to identify the type of workload.')
 @maxLength(15)
 param workload string = 'pipelineagent'
+
+@description('Abbreviated values of the workload.')
+@maxLength(4)
+param workloadShort string = 'pa'
+
+@description('The organization that\'s responsible for the workload.')
+param organization string
+
+param nowUtc string = utcNow()
 
 var environmentTypeMap = {
   ephemeral: 'eph'
@@ -34,8 +42,6 @@ var environmentTypeMap = {
 var environmentTypeShort = environmentTypeMap[environmentType]
 var uniqueId = uniqueString(deployment().name)
 
-param workloadShort string = 'pa'
-param nowUtc string = utcNow()
 var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${uniqueId}'
 var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${environmentTypeShort}[delimiterplaceholder]${uniqueId}'
 
@@ -463,3 +469,30 @@ module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
   }
 }
 
+// outputs
+output hubSubscriptionId string = hubSubscriptionId
+output hubResourceGroupName string = hubResourceGroup.outputs.name
+output hubResourceGroupResourceId string = hubResourceGroup.outputs.id
+output hubVirtualNetworkName string = hub.outputs.virtualNetworkName
+output hubVirtualNetworkResourceId string = hub.outputs.virtualNetworkResourceId
+output hubSubnetName string = hub.outputs.subnetName
+output hubSubnetResourceId string = hub.outputs.subnetResourceId
+output hubSubnetAddressPrefix string = hub.outputs.subnetAddressPrefix
+output hubNetworkSecurityGroupName string = hub.outputs.networkSecurityGroupName
+output hubNetworkSecurityGroupResourceId string = hub.outputs.networkSecurityGroupResourceId
+output hubFirewallPrivateIPAddress string = hub.outputs.firewallPrivateIPAddress
+
+output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.outputs.name
+output logAnalyticsWorkspaceResourceId string = logAnalyticsWorkspace.outputs.id
+output firewallPrivateIPAddress string = hub.outputs.firewallPrivateIPAddress
+
+output operationsSubscriptionId string = operationsSubscriptionId
+output operationsResourceGroupName string = operationsResourceGroup.outputs.name
+output operationsResourceGroupResourceId string = operationsResourceGroup.outputs.id
+output operationsVirtualNetworkName string = operations.outputs.virtualNetworkName
+output operationsVirtualNetworkResourceId string = operations.outputs.virtualNetworkResourceId
+output operationsSubnetName string = operations.outputs.subnetName
+output operationsSubnetResourceId string = operations.outputs.subnetResourceId
+output operationsSubnetAddressPrefix string = operations.outputs.subnetAddressPrefix
+output operationsNetworkSecurityGroupName string = operations.outputs.networkSecurityGroupName
+output operationsNetworkSecurityGroupResourceId string = operations.outputs.networkSecurityGroupResourceId
