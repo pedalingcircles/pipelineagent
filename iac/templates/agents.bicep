@@ -13,17 +13,38 @@ targetScope = 'subscription'
   'staging'     // A mirroried or similiar version of production. Typically all settings match including SKUs and configuration 
   'production'  // The live production environment
 ])
-param environmentType string
+param environmentType string = 'sandbox'
 param organization string
+
+@description('Used to identify the type of workload.')
+@maxLength(15)
 param workload string = 'pipelineagent'
+
+var environmentTypeMap = {
+  ephemeral: 'eph'
+  sandbox: 'sbx'
+  integration: 'int'
+  development: 'dev'
+  demo: 'dem'
+  test: 'tst'
+  acceptance: 'uat'
+  staging: 'stg'
+  production: 'prd'
+}
+var environmentTypeShort = environmentTypeMap[environmentType]
+var uniqueId = uniqueString(deployment().name)
+
+param workloadShort string = 'pa'
 param nowUtc string = utcNow()
+var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${uniqueId}'
+var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${environmentTypeShort}[delimiterplaceholder]${uniqueId}'
 
 // resource group names
-var hubResourceGroupName = 'rg-${replace(names.outputs.resourceName, '[delimiterplaceholder]', '-')}-hub'
-var agentResourceGroupName = 'rg-${replace(names.outputs.resourceName, '[delimiterplaceholder]', '-')}-agent'
-var imageBuilderResourceGroupName = 'rg-${replace(names.outputs.resourceName, '[delimiterplaceholder]', '-')}-imagebuilder'
-var imageResourceGroupName = 'rg-${replace(names.outputs.resourceName, '[delimiterplaceholder]', '-')}-image'
-var operationsResourceGroupName = 'rg-${replace(names.outputs.resourceName, '[delimiterplaceholder]', '-')}-operations'
+var hubResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-hub'
+var agentResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-agent'
+var imageBuilderResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-imagebuilder'
+var imageResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-image'
+var operationsResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-operations'
 
 // subscription ids. They could all potentially be different
 param hubSubscriptionId string = subscription().subscriptionId
@@ -40,13 +61,13 @@ param imageLocation string = deployment().location
 param operationsLocation string = deployment().location
 
 // taking 63 minus the literal characters (15) = 48
-var logAnalyticsWorkspaceName = take('log-operations-${replace(names.outputs.resourceNameShort, '[delimiterplaceholder]', '-')}', 63)
+var logAnalyticsWorkspaceName = take('log-operations-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 63)
 param logAnalyticsWorkspaceRetentionInDays int = 30
 param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
 param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
 
 // hub networking
-var hubLogStorageAccountName = take('sthublogs${replace(names.outputs.resourceNameShort, '[delimiterplaceholder]', '')}', 24)
+var hubLogStorageAccountName = take('sthublogs${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param hubLogStorageSkuName string = 'Standard_GRS'
 param hubVirtualNetworkName string = 'hub-vnet'
 param hubVirtualNetworkAddressPrefix string = '10.0.100.0/24'
@@ -78,7 +99,7 @@ param firewallManagementPublicIPAddressSkuName string = 'Standard'
 param firewallManagementPublicIpAllocationMethod string = 'Static'
 param firewallManagementPublicIPAddressAvailabilityZones array = []
 
-var operationsLogStorageAccountName = take('stopslogs${replace(names.outputs.resourceNameShort, '[delimiterplaceholder]', '')}', 24)
+var operationsLogStorageAccountName = take('stopslogs${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param operationsLogStorageSkuName string = hubLogStorageSkuName
 param operationsVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'operations')
 param operationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
@@ -175,16 +196,6 @@ param operationsTags object = {
   'workload': workload
   'component': 'operations'
 }
-
-module names './modules/convention.bicep' = {
-  name: 'namingconvention'
-  scope: subscription(hubSubscriptionId)
-  params: {
-    environmentType: environmentType
-    workload: 'pipelineagent'
-  }
-}
-
 module hubResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-hub-rg-${nowUtc}'
   scope: subscription(hubSubscriptionId)
