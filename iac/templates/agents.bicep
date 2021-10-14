@@ -438,6 +438,10 @@ module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
   params: {
     hubResourceGroupName: hubResourceGroup.outputs.name
     hubVirtualNetworkName: hub.outputs.virtualNetworkName
+    imageVirtualNetworkName: image.outputs.virtualNetworkName
+    imageVirtualNetworkResourceId: image.outputs.virtualNetworkResourceId
+    agentVirtualNetworkName: agent.outputs.virtualNetworkName
+    agentVirtualNetworkResourceId: agent.outputs.virtualNetworkResourceId
     operationsVirtualNetworkName: operations.outputs.virtualNetworkName
     operationsVirtualNetworkResourceId: operations.outputs.virtualNetworkResourceId
   }
