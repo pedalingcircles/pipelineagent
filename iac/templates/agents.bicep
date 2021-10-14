@@ -231,9 +231,6 @@ param operationsTags object = {
   'component': 'operations'
 }
 
-
-
-
 module hubResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-hub-rg-${nowUtc}'
   scope: subscription(hubSubscriptionId)
@@ -620,7 +617,7 @@ module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
 
 
 module sharedImageGallery './modules/sharedImageGallery.bicep' = {
-  name: 'deploy-sig-${nowUtc}'
+  name: 'deploy-sharedimagegallery-${nowUtc}'
   scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
   params: {
     name: sharedImageGalleryName

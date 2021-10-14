@@ -44,6 +44,8 @@ param firewallManagementPublicIPAddressSkuName string
 param firewallManagementPublicIpAllocationMethod string
 param firewallManagementPublicIPAddressAvailabilityZones array
 
+param nowUtc string = utcNow()
+
 // 'VMProtectionAlerts' is not supported in AzureUsGovernment
 var defaultVirtualNewtorkDiagnosticsLogs = [
   {
@@ -97,7 +99,7 @@ var defaultNetworkSecurityGroupRules = [
 ]
 
 module logStorage './storageAccount.bicep' = {
-  name: 'logStorage'
+  name: 'deploy-log-storage-${nowUtc}'
   params: {
     storageAccountName: logStorageAccountName
     location: location
@@ -107,7 +109,7 @@ module logStorage './storageAccount.bicep' = {
 }
 
 module networkSecurityGroup './networkSecurityGroup.bicep' = {
-  name: 'networkSecurityGroup'
+  name: 'deploy-nsg-${nowUtc}'
   params: {
     name: networkSecurityGroupName
     location: location
@@ -118,7 +120,7 @@ module networkSecurityGroup './networkSecurityGroup.bicep' = {
 }
 
 module virtualNetwork './virtualNetwork.bicep' = {
-  name: 'virtualNetwork'
+  name: 'deploy-vnet-${nowUtc}'
   params: {
     name: virtualNetworkName
     location: location
@@ -152,7 +154,7 @@ module virtualNetwork './virtualNetwork.bicep' = {
 }
 
 module routeTable './routeTable.bicep' = {
-  name: 'routeTable'
+  name: 'deploy-routetable-${nowUtc}'
   params: {
     name: routeTableName
     location: location
@@ -184,7 +186,7 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
 }
 
 module firewallClientPublicIPAddress './publicIPAddress.bicep' = {
-  name: 'firewallClientPublicIPAddress'
+  name: 'deploy-firewall-client-public-ip-${nowUtc}'
   params: {
     name: firewallClientPublicIPAddressName
     location: location
@@ -197,7 +199,7 @@ module firewallClientPublicIPAddress './publicIPAddress.bicep' = {
 }
 
 module firewallManagementPublicIPAddress './publicIPAddress.bicep' = {
-  name: 'firewallManagementPublicIPAddress'
+  name: 'deploy-firewall-mgmt-public-ip-${nowUtc}'
   params: {
     name: firewallManagementPublicIPAddressName
     location: location
@@ -210,7 +212,7 @@ module firewallManagementPublicIPAddress './publicIPAddress.bicep' = {
 }
 
 module firewall './firewall.bicep' = {
-  name: 'firewall'
+  name: 'deploy-firewall-${nowUtc}'
   params: {
     name: firewallName
     location: location
