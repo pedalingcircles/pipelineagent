@@ -75,13 +75,13 @@ param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
 // hub networking
 var hubLogStorageAccountName = take('sthublogs${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param hubLogStorageSkuName string = 'Standard_GRS'
-param hubVirtualNetworkName string = 'hub-vnet'
+param hubVirtualNetworkName string = 'vnet-hub'
 param hubVirtualNetworkAddressPrefix string = '10.0.100.0/24'
 param hubVirtualNetworkDiagnosticsLogs array = []
 param hubVirtualNetworkDiagnosticsMetrics array = []
-param hubNetworkSecurityGroupName string = 'hub-nsg'
+param hubNetworkSecurityGroupName string = 'nsg-hub'
 param hubNetworkSecurityGroupRules array = []
-param hubSubnetName string = 'hub-subnet'
+param hubSubnetName string = 'snet-hub'
 param hubSubnetAddressPrefix string = '10.0.100.128/27'
 param hubSubnetServiceEndpoints array = []
 param firewallName string = 'firewall'
