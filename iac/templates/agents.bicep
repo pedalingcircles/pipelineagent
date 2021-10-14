@@ -119,6 +119,21 @@ param operationsSubnetName string = replace(hubSubnetName, 'hub', 'operations')
 param operationsSubnetAddressPrefix string = '10.0.115.0/27'
 param operationsSubnetServiceEndpoints array = []
 
+// image spoke networking
+var imageLogStorageAccountName = take('stimage${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
+param imageLogStorageSkuName string = hubLogStorageSkuName
+param imageVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'image')
+param imageVirtualNetworkAddressPrefix string = '10.0.115.0/26'
+param imageVirtualNetworkDiagnosticsLogs array = []
+param imageVirtualNetworkDiagnosticsMetrics array = []
+param imageNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'image')
+param imageNetworkSecurityGroupRules array = []
+param imageSubnetName string = replace(hubSubnetName, 'hub', 'image')
+param imageSubnetAddressPrefix string = '10.0.115.0/27'
+param imageSubnetServiceEndpoints array = []
+
+
+
 @allowed([
   'NIST'
   'IL5' // Gov cloud only, trying to deploy IL5 in AzureCloud will switch to NIST
@@ -204,6 +219,10 @@ param operationsTags object = {
   'workload': workload
   'component': 'operations'
 }
+
+
+
+
 module hubResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-hub-rg-${nowUtc}'
   scope: subscription(hubSubscriptionId)
@@ -458,6 +477,35 @@ module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
     windowsVmVersion: windowsVmVersion
     windowsVmCreateOption: windowsVmCreateOption
     windowsVmStorageAccountType: windowsVmStorageAccountType
+  }
+}
+
+
+module image './modules/spokeNetwork.bicep' = {
+  name: 'deploy-image-spoke-${nowUtc}'
+  scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
+  params: {
+    location: imageLocation
+    tags: imageTags
+
+    logStorageAccountName: imageLogStorageAccountName
+    logStorageSkuName: imageLogStorageSkuName
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+
+    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
+
+    virtualNetworkName: imageVirtualNetworkName
+    virtualNetworkAddressPrefix: imageVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: imageVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: imageVirtualNetworkDiagnosticsMetrics
+
+    networkSecurityGroupName: imageNetworkSecurityGroupName
+    networkSecurityGroupRules: imageNetworkSecurityGroupRules
+
+    subnetName: imageSubnetName
+    subnetAddressPrefix: imageSubnetAddressPrefix
+    subnetServiceEndpoints: imageSubnetServiceEndpoints
   }
 }
 
