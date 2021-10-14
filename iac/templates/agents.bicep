@@ -123,26 +123,26 @@ param operationsSubnetServiceEndpoints array = []
 var imageLogStorageAccountName = take('stimage${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param imageLogStorageSkuName string = hubLogStorageSkuName
 param imageVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'image')
-param imageVirtualNetworkAddressPrefix string = '10.0.115.0/26'
+param imageVirtualNetworkAddressPrefix string = '10.0.120.0/26'
 param imageVirtualNetworkDiagnosticsLogs array = []
 param imageVirtualNetworkDiagnosticsMetrics array = []
 param imageNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'image')
 param imageNetworkSecurityGroupRules array = []
 param imageSubnetName string = replace(hubSubnetName, 'hub', 'image')
-param imageSubnetAddressPrefix string = '10.0.115.0/27'
+param imageSubnetAddressPrefix string = '10.0.120.0/27'
 param imageSubnetServiceEndpoints array = []
 
 // agent spoke networking
 var agentLogStorageAccountName = take('stagent${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param agentLogStorageSkuName string = hubLogStorageSkuName
 param agentVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'agent')
-param agentVirtualNetworkAddressPrefix string = '10.0.115.0/26'
+param agentVirtualNetworkAddressPrefix string = '10.1.100.0/16'
 param agentVirtualNetworkDiagnosticsLogs array = []
 param agentVirtualNetworkDiagnosticsMetrics array = []
 param agentNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'agent')
 param agentNetworkSecurityGroupRules array = []
 param agentSubnetName string = replace(hubSubnetName, 'hub', 'agent')
-param agentSubnetAddressPrefix string = '10.0.115.0/27'
+param agentSubnetAddressPrefix string = '10.1.100.0/16'
 param agentSubnetServiceEndpoints array = []
 
 @allowed([
