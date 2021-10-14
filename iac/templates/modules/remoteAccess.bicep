@@ -52,13 +52,14 @@ param windowsVmVersion string
 param windowsVmCreateOption string
 param windowsVmStorageAccountType string
 
+param nowUtc string = utcNow()
+
 resource hubVirtualNetwork 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
   name: hubVirtualNetworkName
 }
 
 module bastionHost './bastionHost.bicep' = {
-  name: 'remoteAccess-bastionHost'
-
+  name: 'deploy-remote-access-bastionhost-${nowUtc}'
   params: {
     name: bastionHostName
     location: location
@@ -75,7 +76,7 @@ module bastionHost './bastionHost.bicep' = {
 }
 
 module linuxNetworkInterface './networkInterface.bicep' = {
-  name: 'remoteAccess-linuxNetworkInterface'
+  name: 'deploy-remote-access-linux-nic-${nowUtc}'
   params: {
     name: linuxNetworkInterfaceName
     location: location
@@ -89,7 +90,7 @@ module linuxNetworkInterface './networkInterface.bicep' = {
 }
 
 module linuxVirtualMachine './linuxVirtualMachine.bicep' = {
-  name: 'remoteAccess-linuxVirtualMachine'
+  name: 'deploy-remote-access-linux-vm-${nowUtc}'
   params: {
     name: linuxVmName
     location: location
@@ -110,7 +111,7 @@ module linuxVirtualMachine './linuxVirtualMachine.bicep' = {
 }
 
 module windowsNetworkInterface './networkInterface.bicep' = {
-  name: 'remoteAccess-windowsNetworkInterface'
+  name: 'deploy-remote-access-windows-nic-${nowUtc}'
   params: {
     name: windowsNetworkInterfaceName
     location: location
@@ -124,7 +125,7 @@ module windowsNetworkInterface './networkInterface.bicep' = {
 }
 
 module windowsVirtualMachine './windowsVirtualMachine.bicep' = {
-  name: 'remoteAccess-windowsVirtualMachine'
+  name: 'deploy-remote-access-windows-vm-${nowUtc}'
   params: {
     name: windowsVmName
     location: location
