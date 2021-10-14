@@ -349,17 +349,7 @@ module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
   params: {
     hubResourceGroupName: hubResourceGroup.outputs.name
     hubVirtualNetworkName: hub.outputs.virtualNetworkName
-
-    //identityVirtualNetworkName: identity.outputs.virtualNetworkName
     operationsVirtualNetworkName: operations.outputs.virtualNetworkName
-    //sharedServicesVirtualNetworkName: sharedServices.outputs.virtualNetworkName
-
-    // Opened Github issue: https://github.com/Azure/missionlz/issues/450
-    //identityVirtualNetworkResourceId: identity.outputs.virtualNetworkResourceId
-    //operationsVirtualNetworkResourceId: sharedServices.outputs.virtualNetworkResourceId
-    //sharedServicesVirtualNetworkResourceId: operations.outputs.virtualNetworkResourceId
-
-    // Potential Fix
     operationsVirtualNetworkResourceId: operations.outputs.virtualNetworkResourceId
   }
 }
@@ -467,6 +457,19 @@ module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
     windowsVmCreateOption: windowsVmCreateOption
     windowsVmStorageAccountType: windowsVmStorageAccountType
   }
+}
+
+module sharedImageGallery './modules/sharedImageGallery.bicep' = {
+  name: 'deploy-sig-${nowUtc}'
+  scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
+  params: {
+    name: logAnalyticsWorkspaceName
+    location: operationsLocation
+    tags: imageTags
+  }
+  dependsOn: [
+    imageResourceGroup
+  ]
 }
 
 // outputs
