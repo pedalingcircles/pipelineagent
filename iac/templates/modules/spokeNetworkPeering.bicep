@@ -6,9 +6,10 @@ param spokeVirtualNetworkName string
 param hubVirtualNetworkName string
 param hubVirtualNetworkResourceId string
 
+param nowUtc string = utcNow()
 module spokeNetworkPeering './virtualNetworkPeering.bicep' = {
   scope: resourceGroup(spokeResourceGroupName)
-  name: 'spokeNetworkPeering'
+  name: 'deploy-spoke-network-peering-${nowUtc}'
   params: {
     name: '${spokeVirtualNetworkName}/to-${hubVirtualNetworkName}'
     remoteVirtualNetworkResourceId: hubVirtualNetworkResourceId
