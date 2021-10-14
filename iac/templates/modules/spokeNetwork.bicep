@@ -26,6 +26,8 @@ param routeTableRouteAddressPrefix string = '0.0.0.0/0'
 param routeTableRouteNextHopIpAddress string = firewallPrivateIPAddress
 param routeTableRouteNextHopType string = 'VirtualAppliance'
 
+param nowUtc string = utcNow()
+
 var defaultVirtualNetworkDiagnosticsLogs = [
   // TODO: 'VMProtectionAlerts' is not supported in AzureUsGovernment
   // {
@@ -79,7 +81,7 @@ var defaultNetworkSecurityGroupRules = [
 ]
 
 module logStorage './storageAccount.bicep' = {
-  name: 'logStorage'
+  name: 'deploy-log-storage-${nowUtc}'
   params: {
     storageAccountName: logStorageAccountName
     location: location
@@ -89,7 +91,7 @@ module logStorage './storageAccount.bicep' = {
 }
 
 module networkSecurityGroup './networkSecurityGroup.bicep' = {
-  name: 'networkSecurityGroup'
+  name: 'deploy-nsg-${nowUtc}'
   params: {
     name: networkSecurityGroupName
     location: location
@@ -100,7 +102,7 @@ module networkSecurityGroup './networkSecurityGroup.bicep' = {
 }
 
 module routeTable './routeTable.bicep' = {
-  name: 'routeTable'
+  name: 'deploy-routetable-${nowUtc}'
   params: {
     name: routeTableName
     location: location
@@ -114,7 +116,7 @@ module routeTable './routeTable.bicep' = {
 }
 
 module virtualNetwork './virtualNetwork.bicep' = {
-  name: 'virtualNetwork'
+  name: 'deploy-vnet-${nowUtc}'
   params: {
     name: virtualNetworkName
     location: location
