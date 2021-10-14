@@ -375,6 +375,63 @@ module operations './modules/spokeNetwork.bicep' = {
   }
 }
 
+// agent spoke
+module agent './modules/spokeNetwork.bicep' = {
+  name: 'deploy-agent-spoke-${nowUtc}'
+  scope: resourceGroup(agentSubscriptionId, agentResourceGroupName)
+  params: {
+    location: agentLocation
+    tags: agentTags
+
+    logStorageAccountName: agentLogStorageAccountName
+    logStorageSkuName: agentLogStorageSkuName
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+
+    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
+
+    virtualNetworkName: agentVirtualNetworkName
+    virtualNetworkAddressPrefix: agentVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: agentVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: agentVirtualNetworkDiagnosticsMetrics
+
+    networkSecurityGroupName: agentNetworkSecurityGroupName
+    networkSecurityGroupRules: agentNetworkSecurityGroupRules
+
+    subnetName: agentSubnetName
+    subnetAddressPrefix: agentSubnetAddressPrefix
+    subnetServiceEndpoints: agentSubnetServiceEndpoints
+  }
+}
+
+module image './modules/spokeNetwork.bicep' = {
+  name: 'deploy-image-spoke-${nowUtc}'
+  scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
+  params: {
+    location: imageLocation
+    tags: imageTags
+
+    logStorageAccountName: imageLogStorageAccountName
+    logStorageSkuName: imageLogStorageSkuName
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+
+    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
+
+    virtualNetworkName: imageVirtualNetworkName
+    virtualNetworkAddressPrefix: imageVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: imageVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: imageVirtualNetworkDiagnosticsMetrics
+
+    networkSecurityGroupName: imageNetworkSecurityGroupName
+    networkSecurityGroupRules: imageNetworkSecurityGroupRules
+
+    subnetName: imageSubnetName
+    subnetAddressPrefix: imageSubnetAddressPrefix
+    subnetServiceEndpoints: imageSubnetServiceEndpoints
+  }
+}
+
 module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
   name: 'deploy-hub-peerings-${nowUtc}'
   scope: subscription(hubSubscriptionId)
@@ -399,6 +456,31 @@ module operationsVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
   }
 }
 
+module agentVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
+  name: 'deploy-agent-peerings-${nowUtc}'
+  scope: subscription(agentSubscriptionId)
+  params: {
+    spokeResourceGroupName: agentResourceGroup.outputs.name
+    spokeVirtualNetworkName: agent.outputs.virtualNetworkName
+
+    hubVirtualNetworkName: hub.outputs.virtualNetworkName
+    hubVirtualNetworkResourceId: hub.outputs.virtualNetworkResourceId
+  }
+}
+
+module imageVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
+  name: 'deploy-image-peerings-${nowUtc}'
+  scope: subscription(imageSubscriptionId)
+  params: {
+    spokeResourceGroupName: imageResourceGroup.outputs.name
+    spokeVirtualNetworkName: image.outputs.virtualNetworkName
+
+    hubVirtualNetworkName: hub.outputs.virtualNetworkName
+    hubVirtualNetworkResourceId: hub.outputs.virtualNetworkResourceId
+  }
+}
+
+
 module hubPolicyAssignment './modules/policyAssignment.bicep' = {
   name: 'assign-policy-hub-${nowUtc}'
   scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
@@ -421,6 +503,28 @@ module operationsPolicyAssignment './modules/policyAssignment.bicep' = {
   }
 }
 
+module agentPolicyAssignment './modules/policyAssignment.bicep' = {
+  name: 'assign-policy-agent-${nowUtc}'
+  scope: resourceGroup(agentSubscriptionId, agentResourceGroupName)
+  params: {
+    builtInAssignment: policy
+    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+    logAnalyticsWorkspaceResourceGroupName: agentResourceGroup.outputs.name
+    operationsSubscriptionId: agentSubscriptionId
+  }
+}
+
+module imagePolicyAssignment './modules/policyAssignment.bicep' = {
+  name: 'assign-policy-image-${nowUtc}'
+  scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
+  params: {
+    builtInAssignment: policy
+    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+    logAnalyticsWorkspaceResourceGroupName: imageResourceGroup.outputs.name
+    operationsSubscriptionId: imageSubscriptionId
+  }
+}
+
 module hubSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = {
   name: 'activity-logs-hub-${nowUtc}'
   scope: subscription(hubSubscriptionId)
@@ -435,6 +539,24 @@ module operationsSubscriptionCreateActivityLogging './modules/centralLogging.bic
   scope: subscription(operationsSubscriptionId)
   params: {
     diagnosticSettingName: 'log-operations-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+  }
+}
+
+module agentSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != agentSubscriptionId) {
+  name: 'activity-logs-agent-${nowUtc}'
+  scope: subscription(agentSubscriptionId)
+  params: {
+    diagnosticSettingName: 'log-agent-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+  }
+}
+
+module imageSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != imageSubscriptionId) {
+  name: 'activity-logs-image-${nowUtc}'
+  scope: subscription(imageSubscriptionId)
+  params: {
+    diagnosticSettingName: 'log-image-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
   }
 }
@@ -492,33 +614,7 @@ module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
 }
 
 // image spoke
-module image './modules/spokeNetwork.bicep' = {
-  name: 'deploy-image-spoke-${nowUtc}'
-  scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
-  params: {
-    location: imageLocation
-    tags: imageTags
 
-    logStorageAccountName: imageLogStorageAccountName
-    logStorageSkuName: imageLogStorageSkuName
-
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
-
-    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
-
-    virtualNetworkName: imageVirtualNetworkName
-    virtualNetworkAddressPrefix: imageVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: imageVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: imageVirtualNetworkDiagnosticsMetrics
-
-    networkSecurityGroupName: imageNetworkSecurityGroupName
-    networkSecurityGroupRules: imageNetworkSecurityGroupRules
-
-    subnetName: imageSubnetName
-    subnetAddressPrefix: imageSubnetAddressPrefix
-    subnetServiceEndpoints: imageSubnetServiceEndpoints
-  }
-}
 
 module sharedImageGallery './modules/sharedImageGallery.bicep' = {
   name: 'deploy-sig-${nowUtc}'
@@ -533,34 +629,7 @@ module sharedImageGallery './modules/sharedImageGallery.bicep' = {
   ]
 }
 
-// agent spoke
-module agent './modules/spokeNetwork.bicep' = {
-  name: 'deploy-agent-spoke-${nowUtc}'
-  scope: resourceGroup(agentSubscriptionId, agentResourceGroupName)
-  params: {
-    location: agentLocation
-    tags: agentTags
 
-    logStorageAccountName: agentLogStorageAccountName
-    logStorageSkuName: agentLogStorageSkuName
-
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
-
-    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
-
-    virtualNetworkName: agentVirtualNetworkName
-    virtualNetworkAddressPrefix: agentVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: agentVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: agentVirtualNetworkDiagnosticsMetrics
-
-    networkSecurityGroupName: agentNetworkSecurityGroupName
-    networkSecurityGroupRules: agentNetworkSecurityGroupRules
-
-    subnetName: agentSubnetName
-    subnetAddressPrefix: agentSubnetAddressPrefix
-    subnetServiceEndpoints: agentSubnetServiceEndpoints
-  }
-}
 
 
 
