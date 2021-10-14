@@ -132,7 +132,18 @@ param imageSubnetName string = replace(hubSubnetName, 'hub', 'image')
 param imageSubnetAddressPrefix string = '10.0.115.0/27'
 param imageSubnetServiceEndpoints array = []
 
-
+// agent spoke networking
+var agentLogStorageAccountName = take('stagent${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
+param agentLogStorageSkuName string = hubLogStorageSkuName
+param agentVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'agent')
+param agentVirtualNetworkAddressPrefix string = '10.0.115.0/26'
+param agentVirtualNetworkDiagnosticsLogs array = []
+param agentVirtualNetworkDiagnosticsMetrics array = []
+param agentNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'agent')
+param agentNetworkSecurityGroupRules array = []
+param agentSubnetName string = replace(hubSubnetName, 'hub', 'agent')
+param agentSubnetAddressPrefix string = '10.0.115.0/27'
+param agentSubnetServiceEndpoints array = []
 
 @allowed([
   'NIST'
@@ -480,7 +491,7 @@ module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
   }
 }
 
-
+// image spoke
 module image './modules/spokeNetwork.bicep' = {
   name: 'deploy-image-spoke-${nowUtc}'
   scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
@@ -521,6 +532,37 @@ module sharedImageGallery './modules/sharedImageGallery.bicep' = {
     imageResourceGroup
   ]
 }
+
+// agent spoke
+module agent './modules/spokeNetwork.bicep' = {
+  name: 'deploy-agent-spoke-${nowUtc}'
+  scope: resourceGroup(agentSubscriptionId, agentResourceGroupName)
+  params: {
+    location: agentLocation
+    tags: agentTags
+
+    logStorageAccountName: agentLogStorageAccountName
+    logStorageSkuName: agentLogStorageSkuName
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+
+    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
+
+    virtualNetworkName: agentVirtualNetworkName
+    virtualNetworkAddressPrefix: agentVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: agentVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: agentVirtualNetworkDiagnosticsMetrics
+
+    networkSecurityGroupName: agentNetworkSecurityGroupName
+    networkSecurityGroupRules: agentNetworkSecurityGroupRules
+
+    subnetName: agentSubnetName
+    subnetAddressPrefix: agentSubnetAddressPrefix
+    subnetServiceEndpoints: agentSubnetServiceEndpoints
+  }
+}
+
+
 
 // outputs
 output hubSubscriptionId string = hubSubscriptionId
