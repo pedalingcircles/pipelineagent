@@ -6,9 +6,7 @@ param description string = 'Shared Image Gallery used to store virtual machine i
 resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' = {
   name: sharedImageGalleryName
   location: location
-  tags: {
-    envtype: tags
-  }
+  tags: tags
   properties: {
     description: description
   }
