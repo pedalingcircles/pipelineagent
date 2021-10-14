@@ -6,6 +6,8 @@ param skuName string = 'PerGB2018'
 param workspaceCappingDailyQuotaGb int = -1
 param deploySentinel bool = false
 
+param nowUtc string = utcNow()
+
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' = {
   name: name
   location: location
@@ -23,7 +25,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06
 
 //// sentinel
 module sentinelSolution './sentinelSolution.bicep' = if (deploySentinel) {
-  name: 'sentinelSolution'
+  name: 'deploy-sentinalsolution-${nowUtc}'
   params: {
     workspaceName: logAnalyticsWorkspace.name
     workspaceLocation: location
