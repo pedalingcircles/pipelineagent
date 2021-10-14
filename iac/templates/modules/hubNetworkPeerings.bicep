@@ -2,21 +2,30 @@ targetScope = 'subscription'
 
 param hubResourceGroupName string
 param hubVirtualNetworkName string
-//param identityVirtualNetworkName string
-//param identityVirtualNetworkResourceId string
+param imageVirtualNetworkName string
+param imageVirtualNetworkResourceId string
+param agentVirtualNetworkName string
+param agentVirtualNetworkResourceId string
 param operationsVirtualNetworkName string
 param operationsVirtualNetworkResourceId string
-//param sharedServicesVirtualNetworkName string
-//param sharedServicesVirtualNetworkResourceId string
 
-// module hubToIdentityVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
-//   scope: resourceGroup(hubResourceGroupName)
-//   name: 'hubToIdentityVirtualNetworkPeering'
-//   params: {
-//     name: '${hubVirtualNetworkName}/to-${identityVirtualNetworkName}'
-//     remoteVirtualNetworkResourceId: identityVirtualNetworkResourceId
-//   }
-// }
+module hubToImageVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
+  scope: resourceGroup(hubResourceGroupName)
+  name: 'hubToImageVirtualNetworkPeering'
+  params: {
+    name: '${hubVirtualNetworkName}/to-${imageVirtualNetworkName}'
+    remoteVirtualNetworkResourceId: imageVirtualNetworkResourceId
+  }
+}
+
+module hubToAgentVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
+  scope: resourceGroup(hubResourceGroupName)
+  name: 'hubToAgentVirtualNetworkPeering'
+  params: {
+    name: '${hubVirtualNetworkName}/to-${agentVirtualNetworkName}'
+    remoteVirtualNetworkResourceId: agentVirtualNetworkResourceId
+  }
+}
 
 module hubToOperationsVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
   scope: resourceGroup(hubResourceGroupName)
@@ -27,11 +36,4 @@ module hubToOperationsVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
   }
 }
 
-// module hubToSharedServicesVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
-//   scope: resourceGroup(hubResourceGroupName)
-//   name: 'hubToSharedServicesVirtualNetworkPeering'
-//   params: {
-//     name: '${hubVirtualNetworkName}/to-${sharedServicesVirtualNetworkName}'
-//     remoteVirtualNetworkResourceId: sharedServicesVirtualNetworkResourceId
-//   }
-// }
+
