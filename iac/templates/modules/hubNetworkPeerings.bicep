@@ -9,9 +9,11 @@ param agentVirtualNetworkResourceId string
 param operationsVirtualNetworkName string
 param operationsVirtualNetworkResourceId string
 
+param nowUtc string = utcNow()
+
 module hubToImageVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
   scope: resourceGroup(hubResourceGroupName)
-  name: 'hubToImageVirtualNetworkPeering'
+  name: 'deploy-hubtoimage-vnet-peering-storage-${nowUtc}'
   params: {
     name: '${hubVirtualNetworkName}/to-${imageVirtualNetworkName}'
     remoteVirtualNetworkResourceId: imageVirtualNetworkResourceId
@@ -20,7 +22,7 @@ module hubToImageVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
 
 module hubToAgentVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
   scope: resourceGroup(hubResourceGroupName)
-  name: 'hubToAgentVirtualNetworkPeering'
+  name: 'deploy-hubtoagent-vnet-peering-storage-${nowUtc}'
   params: {
     name: '${hubVirtualNetworkName}/to-${agentVirtualNetworkName}'
     remoteVirtualNetworkResourceId: agentVirtualNetworkResourceId
@@ -29,7 +31,7 @@ module hubToAgentVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
 
 module hubToOperationsVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
   scope: resourceGroup(hubResourceGroupName)
-  name: 'hubToOperationsVirtualNetworkPeering'
+  name: 'deploy-hubtooperations-vnet-peering-storage-${nowUtc}'
   params: {
     name: '${hubVirtualNetworkName}/to-${operationsVirtualNetworkName}'
     remoteVirtualNetworkResourceId: operationsVirtualNetworkResourceId
