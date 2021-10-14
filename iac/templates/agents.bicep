@@ -136,13 +136,13 @@ param imageSubnetServiceEndpoints array = []
 var agentLogStorageAccountName = take('stagent${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param agentLogStorageSkuName string = hubLogStorageSkuName
 param agentVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'agent')
-param agentVirtualNetworkAddressPrefix string = '10.1.100.0/16'
+param agentVirtualNetworkAddressPrefix string = '10.1.0.0/16'
 param agentVirtualNetworkDiagnosticsLogs array = []
 param agentVirtualNetworkDiagnosticsMetrics array = []
 param agentNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'agent')
 param agentNetworkSecurityGroupRules array = []
 param agentSubnetName string = replace(hubSubnetName, 'hub', 'agent')
-param agentSubnetAddressPrefix string = '10.1.100.0/16'
+param agentSubnetAddressPrefix string = '10.1.100.0/24'
 param agentSubnetServiceEndpoints array = []
 
 @allowed([
