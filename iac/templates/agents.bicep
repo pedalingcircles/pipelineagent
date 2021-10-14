@@ -66,6 +66,8 @@ param imageBuilderLocation string = deployment().location
 param imageLocation string = deployment().location
 param operationsLocation string = deployment().location
 
+var sharedImageGalleryName = take('sig.${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '.')}', 80)
+
 // taking 63 minus the literal characters (15) = 48
 var logAnalyticsWorkspaceName = take('log-operations-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 63)
 param logAnalyticsWorkspaceRetentionInDays int = 30
@@ -463,8 +465,8 @@ module sharedImageGallery './modules/sharedImageGallery.bicep' = {
   name: 'deploy-sig-${nowUtc}'
   scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
   params: {
-    name: logAnalyticsWorkspaceName
-    location: operationsLocation
+    name: sharedImageGalleryName
+    location: imageLocation
     tags: imageTags
   }
   dependsOn: [
