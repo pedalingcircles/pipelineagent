@@ -447,7 +447,6 @@ module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
   }
 }
 
-
 module operationsVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
   name: 'deploy-operations-peerings-${nowUtc}'
   scope: subscription(operationsSubscriptionId)
@@ -513,8 +512,8 @@ module agentPolicyAssignment './modules/policyAssignment.bicep' = {
   params: {
     builtInAssignment: policy
     logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: agentResourceGroup.outputs.name
-    operationsSubscriptionId: agentSubscriptionId
+    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+    operationsSubscriptionId: operationsSubscriptionId
   }
 }
 
@@ -524,8 +523,8 @@ module imagePolicyAssignment './modules/policyAssignment.bicep' = {
   params: {
     builtInAssignment: policy
     logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: imageResourceGroup.outputs.name
-    operationsSubscriptionId: imageSubscriptionId
+    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+    operationsSubscriptionId: operationsSubscriptionId
   }
 }
 
