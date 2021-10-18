@@ -1,7 +1,6 @@
 // scope
 targetScope = 'resourceGroup'
 
-
 @description('Used to identify environment types for naming resources.')
 @allowed([
   'ephemeral'   // Short lived environments used for smoke testing and PR approvals
@@ -43,35 +42,41 @@ var environmentTypeMap = {
 var environmentTypeShort = environmentTypeMap[environmentType]
 var uniqueId = uniqueString(deployment().name)
 
-
 param location string = resourceGroup().location
 param resourceGroupName string
+
 param tags object = {
-  'environmentType': 'sbx'
-  'org': 'contoso'
-  'workload': 'pipelineagent'
+  'environmentType': environmentType
+  'org': organization
+  'workload': workload
   'component': 'vmagent'
 }
 
-
-param ipConfigName string = "vm-agent-ip-config"
+param ipConfigName string = 'vm-agent-ip-config'
 
 @description('Used to identify environment types for naming resources.')
 @allowed([
   'Standard_D2_v3' 
   'Standard_D8s_v3'
 ])
-param vmSize string
+param vmSize string = 'Standard_D2_v3'
 param osDiskType string = 'StandardSSD_LRS'
-param adminUsername string = 'agentuser'
-param adminPublicKey string
+param adminUsername string = 'azureuser'
 
-var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${uniqueId}'
+@description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
+@secure()
+@minLength(14)
+param adminPublicKey  string
+
+//var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${uniqueId}'
 var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${environmentTypeShort}[delimiterplaceholder]${uniqueId}'
 
 param existingSharedImageGalleryName string
 param existingImageResourceGroupName string
+param existingNetworkSecurityGroupName string
+param existingSubnetName string
 param imageDefinitionName string
+
 
 //var windowsVmName = take('vm${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 15)
 var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
@@ -94,7 +99,7 @@ module virtualMachine './modules/linuxVirtualMachineAgent.bicep' = {
     existingSharedImageGalleryName: existingSharedImageGalleryName
     existingImageResourceGroupName: existingImageResourceGroupName
     imageDefinitionName: imageDefinitionName
-    existingNetworkSecurityGroupName: 'foo'
-    existingSubnetName: 'foo'
+    existingNetworkSecurityGroupName: existingNetworkSecurityGroupName
+    existingSubnetName: existingSubnetName
   }
 }
