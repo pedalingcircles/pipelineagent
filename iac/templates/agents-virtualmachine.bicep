@@ -64,7 +64,6 @@ param osDiskType string = 'StandardSSD_LRS'
 param adminUsername string = 'azureuser'
 
 @description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
-@secure()
 @minLength(14)
 param adminPublicKey  string
 
@@ -76,7 +75,6 @@ param existingImageResourceGroupName string
 param existingNetworkSecurityGroupName string
 param existingSubnetName string
 param imageDefinitionName string
-
 
 //var windowsVmName = take('vm${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 15)
 var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
