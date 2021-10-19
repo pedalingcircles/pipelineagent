@@ -26,7 +26,7 @@ param existingImageResourceGroupName string
 @description('The start index of how many VMs to provision.')
 param vmCountStart int = 0
 @description('The number of VMs to provision.')
-param vmCount int = 1
+param vmCountStop int = 5
 param imageDefinitionName string
 
 param existingNetworkSecurityGroupName string
@@ -50,39 +50,39 @@ resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = 
   scope: resourceGroup(existingImageResourceGroupName)
 }
 
-resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(vmCountStart, vmCount): {
-  name: '${vmName}${i}'
-  location: location
-  tags: tags
-  properties: {
-    hardwareProfile: {
-      vmSize: vmSize
-    }
-    storageProfile: {
-      osDisk: {
-        createOption: 'FromImage'
-        managedDisk: {
-          storageAccountType: osDiskType
-        }
-      }
-      imageReference: {
-        id: '${sharedImageGallery.id}/images/${imageDefinitionName}'
-      }
-    }
-    networkProfile: {
-      networkInterfaces: [
-        {
-          id: networkInterface[0].id
-        }
-      ]
-    }
-    osProfile: {
-      computerName: '${vmName}${i}'
-      adminUsername: adminUsername
-      linuxConfiguration: linuxConfiguration
-    }
-  }
-}]
+// resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(vmCountStart, vmCountStop): {
+//   name: '${vmName}${i}'
+//   location: location
+//   tags: tags
+//   properties: {
+//     hardwareProfile: {
+//       vmSize: vmSize
+//     }
+//     storageProfile: {
+//       osDisk: {
+//         createOption: 'FromImage'
+//         managedDisk: {
+//           storageAccountType: osDiskType
+//         }
+//       }
+//       imageReference: {
+//         id: '${sharedImageGallery.id}/images/${imageDefinitionName}'
+//       }
+//     }
+//     networkProfile: {
+//       networkInterfaces: [
+//         {
+//           id: networkInterface[i].id
+//         }
+//       ]
+//     }
+//     osProfile: {
+//       computerName: '${vmName}${i}'
+//       adminUsername: adminUsername
+//       linuxConfiguration: linuxConfiguration
+//     }
+//   }
+// }]
 
 
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-02-01' existing = {
@@ -94,8 +94,8 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing 
   name: existingSubnetName
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2021-02-01' = [for i in range(vmCountStart,vmCount): {
-  name: '${nicName}${i}'
+resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(0,1): {
+  name: '${nicName}-${i}'
   location: location
   tags: tags
 
@@ -108,6 +108,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-02-01' = [fo
             id: subnet.id
           }
           primary: true
+          privateIPAddressVersion: 'IPv4'
           privateIPAllocationMethod: privateIPAddressAllocationMethod
         }
       }
@@ -118,7 +119,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2021-02-01' = [fo
   }
 }]
 
-output vmCount int = vmCount
 output vmCountStart int = vmCountStart
+output vmCountStop int = vmCountStop
 output adminUsername string = adminUsername
 output authenticationType string = 'sshPublicKey'

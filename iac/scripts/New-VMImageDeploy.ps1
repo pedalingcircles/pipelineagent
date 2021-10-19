@@ -12,6 +12,6 @@ az deployment group create `
     --resource-group $ResourceGroupName `
     --template-file $TemplateFilePath `
     --parameters $TemplateParameterFilePath `
-    --parameters adminPublicKey=$adminPublicKey
+    --parameters adminPublicKey=$adminPublicKey agentToken=$pat
 
     
