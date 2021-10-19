@@ -17,7 +17,7 @@ param osDiskType string
 param adminUsername string
 
 @description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
-@secure()
+//@secure()
 @minLength(14)
 param adminPublicKey  string
 
