@@ -17,7 +17,6 @@ param osDiskType string
 param adminUsername string
 
 @description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
-//@secure()
 @minLength(14)
 param adminPublicKey  string
 
@@ -73,7 +72,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
     networkProfile: {
       networkInterfaces: [
         {
-          id: networkInterface[i].id
+          id: networkInterface[0].id
         }
       ]
     }
@@ -89,6 +88,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-02-01' existing = {
   name: existingNetworkSecurityGroupName
 }
+
 
 resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing = {
   name: existingSubnetName
