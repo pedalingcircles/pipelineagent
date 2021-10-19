@@ -8,9 +8,8 @@ templateFilePath='/mnt/c/Users/mijohns/Source/repos/byvrate/pipelineagent/iac/te
 sshPubKeyFilePath=~/.ssh/vmagent-priv-key.pub
 adminPublicKey=$(cat "$sshPubKeyFilePath")
 
-echo $adminPublicKey
-
 az deployment group create \
+--debug \
 --resource-group 'rg-pipelineagent-sandbox-u63kxyluy6fdo-agent' \
 --name agentVmDeployment \
 --no-prompt true \

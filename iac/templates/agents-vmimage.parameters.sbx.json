@@ -8,14 +8,17 @@
     "nicNameAffix": {
       "value": "mijohnslinuxtest"
     },
-    "vmCountStart": {
-      "value": 0
+    "vmSize": {
+      "value": "Standard_D8s_v3"
     },
-    "vmCountEnd": {
-      "value": 1
+    "agentToken": {
+      "value": ""
     },
-    "osType": {
-      "value": "Linux"
+    "adoUrl": {
+      "value": "https://wwpss.visualstudio.com/Aware"
+    },
+    "adminPublicKey": {
+      "value": ""
     },
     "existingVnetName": {
       "value": "vnet-agents"
