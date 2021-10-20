@@ -45,11 +45,21 @@ var uniqueId = uniqueString(deployment().name)
 param location string = resourceGroup().location
 param resourceGroupName string
 
-param tags object = {
+param nicTags object = {
   'environmentType': environmentType
   'org': organization
   'workload': workload
   'component': 'vmagent'
+}
+
+param vmTags object = {
+  'environmentType': environmentType
+  'org': organization
+  'workload': workload
+  'component': 'vmagent'
+  'os': 'linux'
+  'imagedefinitionname': imageDefinitionName
+  'imagedefinitionversion': imageDefinitionVersion
 }
 
 param ipConfigName string = 'vm-agent-ip-config'
@@ -79,6 +89,11 @@ param imageDefinitionName string
 param imageDefinitionVersion string
 
 //var windowsVmName = take('vm${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 15)
+
+// os type (already in the definition name)
+// image
+// version
+// bg
 var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
 var nicName =  take('nic-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 80)
 
@@ -90,7 +105,8 @@ module virtualMachine './modules/linuxVirtualMachineAgent.bicep' = {
     vmName: linuxVmName
     nicName: nicName
     location: location
-    tags: tags
+    vmTags: vmTags
+    nicTags: nicTags
     ipConfigurationName: ipConfigName
     vmSize: vmSize
     osDiskType: osDiskType

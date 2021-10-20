@@ -7,7 +7,8 @@ param nicName string
 @description('The location for the VMs and NICs.')
 param location string
 
-param tags object = {}
+param vmTags object = {}
+param nicTags object = {}
 
 param privateIPAddressAllocationMethod string = 'Dynamic'
 param ipConfigurationName string
@@ -71,7 +72,7 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-02-0
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(0, vmCount): {
   name: '${nicName}-${format('{0:000}', i)}'
   location: location
-  tags: tags
+  tags: nicTags
 
   properties: {
     ipConfigurations: [
@@ -102,7 +103,7 @@ resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = 
 resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(0, vmCount): {
   name: '${vmName}${i}'
   location: location
-  tags: tags
+  tags: vmTags
   properties: {
     hardwareProfile: {
       vmSize: vmSize
