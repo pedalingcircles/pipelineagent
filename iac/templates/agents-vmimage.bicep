@@ -21,7 +21,7 @@ param storageAccountType string = 'StandardSSD_LRS'
 @description('The start index of how many VMs to provision.')
 param vmCountStart int = 0
 @description('The number of VMs to provision.')
-param vmCount int = 1
+param vmCount int = 4
 
 @description('Azure region to create resources in.')
 param location string = resourceGroup().location
@@ -82,6 +82,14 @@ var osSettings = {
   }
 }
 
+
+
+
+
+
+
+
+
 resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = {
   name: existingShareImageGalleryName
   scope: resourceGroup(existingImagesResourceGroupName)
@@ -90,6 +98,32 @@ resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = 
 resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
   name: existingVnetName
 }
+
+resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(vmCountStart,vmCount):  {
+  name: '${nicName}${i}'
+  location: location
+  tags: tags
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          subnet: {
+            id: vnet.properties.subnets[0].id
+          }
+          primary: true
+          privateIPAddressVersion: 'IPv4'
+        }
+      }
+    ]
+    dnsSettings: {
+      dnsServers: []
+    }
+    enableAcceleratedNetworking: false
+    enableIPForwarding: false
+  }
+}]
 
 resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(vmCountStart,vmCount):  {
   name: '${vmName}${i}'
@@ -147,51 +181,29 @@ resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
   }
 }]
 
+
+
+
 var scriptExtensionFileUris = [
   'https://raw.githubusercontent.com/pedalingcircles/pipelineagent/vmscaleset/scripts/installer-agent-extension.sh'
 ]
 
-resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(vmCountStart,vmCount):  {
-  name: '${virtualmachine[i].name}/agentextension'
-  location: location
-  tags: tags
-  properties: {
-    publisher: 'Microsoft.Azure.Extensions'
-    type: 'CustomScript'
-    typeHandlerVersion: '2.1'
-    autoUpgradeMinorVersion: true
-    settings: {
-    }
-    protectedSettings: {
-      //commandToExecute: 'sudo sh echo.sh'
-      commandToExecute: 'sudo ./scriptextensionlinux.sh ${agentUser} ${agentPool} ${agentToken} ${adoUrl} ${agentVersion}'
-      fileUris: scriptExtensionFileUris
-    }
-  }
-}]
-
-resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(vmCountStart,vmCount):  {
-  name: '${nicName}${i}'
-  location: location
-  tags: tags
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        properties: {
-          privateIPAllocationMethod: 'Dynamic'
-          subnet: {
-            id: vnet.properties.subnets[0].id
-          }
-          primary: true
-          privateIPAddressVersion: 'IPv4'
-        }
-      }
-    ]
-    dnsSettings: {
-      dnsServers: []
-    }
-    enableAcceleratedNetworking: false
-    enableIPForwarding: false
-  }
-}]
+// resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(vmCountStart,vmCount):  {
+//   name: '${virtualmachine[i].name}/agentextension'
+//   location: location
+//   tags: tags
+//   properties: {
+//     publisher: 'Microsoft.Azure.Extensions'
+//     type: 'CustomScript'
+//     typeHandlerVersion: '2.1'
+//     autoUpgradeMinorVersion: true
+//     settings: {
+//     }
+//     protectedSettings: {
+//       //commandToExecute: 'sudo sh echo.sh'
+//       commandToExecute: 'sudo ./scriptextensionlinux.sh ${agentUser} ${agentPool} ${agentToken} ${adoUrl} ${agentVersion}'
+//       fileUris: scriptExtensionFileUris
+//     }
+//   }
+// }]
+                                                                     
