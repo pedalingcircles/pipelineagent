@@ -29,7 +29,7 @@ param imageDefinitionName string
 
 param existingNetworkSecurityGroupName string
 param existingSubnetName string
-
+param existingVnetName string
 
 var linuxConfiguration = {
   disablePasswordAuthentication: true
@@ -51,6 +51,9 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing 
   name: existingSubnetName
 }
 
+resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
+  name: existingVnetName
+}
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = {
   name: '${nicName}0'
@@ -63,7 +66,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = {
         properties: {
           privateIPAllocationMethod: 'Dynamic'
           subnet: {
-            id: subnet.id
+            id: vnet.properties.subnets[0].id
           }
           primary: true
           privateIPAddressVersion: 'IPv4'

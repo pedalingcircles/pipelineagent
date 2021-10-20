@@ -99,5 +99,6 @@ module virtualMachine './modules/linuxVirtualMachineAgent.bicep' = {
     imageDefinitionName: imageDefinitionName
     existingNetworkSecurityGroupName: existingNetworkSecurityGroupName
     existingSubnetName: existingSubnetName
+    existingVnetName: 'vnet-agent'
   }
 }
