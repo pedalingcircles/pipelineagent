@@ -15,6 +15,14 @@ targetScope = 'resourceGroup'
 ])
 param environmentType string
 
+@description('Represents differentiate on a side by side deployments if needed.')
+@maxLength(15)
+@allowed([
+  'b'   // Represents blue
+  'g'   // Represents green
+])
+param blueGreen string = 'b'
+
 @description('Used to identify the type of workload.')
 @maxLength(15)
 param workload string = 'pipelineagent'
@@ -77,8 +85,8 @@ param adminUsername string = 'azureuser'
 @minLength(14)
 param adminPublicKey  string
 
-//var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${uniqueId}'
-var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${environmentTypeShort}[delimiterplaceholder]${uniqueId}'
+var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${blueGreen}'
+var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${environmentTypeShort}[delimiterplaceholder]${blueGreen}'
 
 param existingSharedImageGalleryName string
 param existingImageResourceGroupName string
@@ -90,13 +98,9 @@ param imageDefinitionVersion string
 
 //var windowsVmName = take('vm${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 15)
 
-// os type (already in the definition name)
-// image
-// version
-// bg
-var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
-var nicName =  take('nic-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 80)
 
+var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
+var nicName =  take('nic-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 80)
 
 module virtualMachine './modules/linuxVirtualMachineAgent.bicep' = {
   name: 'deploy-agent-virtualmachine-${nowUtc}'
