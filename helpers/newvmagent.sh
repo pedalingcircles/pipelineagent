@@ -9,7 +9,6 @@ sshPubKeyFilePath=~/.ssh/vmagent-priv-key.pub
 adminPublicKey=$(cat "$sshPubKeyFilePath")
 
 az deployment group create \
---debug \
 --resource-group 'rg-pipelineagent-sandbox-u63kxyluy6fdo-agent' \
 --name agentVmDeployment \
 --no-prompt true \

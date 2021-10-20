@@ -99,7 +99,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
   name: existingVnetName
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(vmCountStart,vmCount):  {
+resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(0,vmCount): {
   name: '${nicName}${i}'
   location: location
   tags: tags
