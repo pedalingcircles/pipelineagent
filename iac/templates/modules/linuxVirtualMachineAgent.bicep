@@ -1,10 +1,10 @@
 @description('The virtual machine name.')
 param vmName string
 
-@description('The network interface name. There will be a prefix and suffix attached to this affix.')
+@description('The network interface name.')
 param nicName string
 
-@description('The location for VMs and NICs.')
+@description('The location for the VMs and NICs.')
 param location string
 
 param tags object = {}
@@ -20,15 +20,28 @@ param adminUsername string
 @minLength(14)
 param adminPublicKey  string
 
+@description('The existing Shared Image Gallery name.')
 param existingSharedImageGalleryName string
+
+@description('The existing image resource group name.')
 param existingImageResourceGroupName string
 
 @description('The number of VMs to provision.')
 param vmCount int = 2
+
+@description('The image definition to use. This value is in the Shared Image Gallery')
 param imageDefinitionName string
 
-param existingNetworkSecurityGroupName string
+@description('The image definition version ot use.')
+param imageDefinitionVersion string
+
+@description('The existing subnet name in the virtual network that hosts the VMs.')
 param existingSubnetName string
+
+@description('The existing network security group name in the virtual network that hosts the VMs.')
+param existingNetworkSecurityGroupName string
+
+@description('The existing virtual network name that hosts the VMs.')
 param existingVnetName string
 
 var linuxConfiguration = {
@@ -43,10 +56,6 @@ var linuxConfiguration = {
   }
 }
 
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-02-01' existing = {
-  name: existingNetworkSecurityGroupName
-}
-
 resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing = {
   name: existingSubnetName
 }
@@ -55,58 +64,34 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
   name: existingVnetName
 }
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = {
-  name: '${nicName}0'
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-02-01' existing = {
+  name: existingNetworkSecurityGroupName
+}
+
+resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(0, vmCount): {
+  name: '${nicName}-${format('{0:000}', i)}'
   location: location
   tags: tags
+
   properties: {
     ipConfigurations: [
       {
-        name: 'ipconfig1'
+        name: ipConfigurationName
         properties: {
-          privateIPAllocationMethod: 'Dynamic'
           subnet: {
-            id: '${vnet.id}/subnets/${existingSubnetName}'
+            id: '${vnet.id}/subnets/${subnet.name}'
           }
           primary: true
           privateIPAddressVersion: 'IPv4'
+          privateIPAllocationMethod: privateIPAddressAllocationMethod
         }
       }
     ]
-    dnsSettings: {
-      dnsServers: []
+    networkSecurityGroup: {
+      id: networkSecurityGroup.id
     }
-    enableAcceleratedNetworking: false
-    enableIPForwarding: false
   }
-}
-
-
-
-// resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(0,1): {
-//   name: '${nicName}-${i}'
-//   location: location
-//   tags: tags
-
-//   properties: {
-//     ipConfigurations: [
-//       {
-//         name: ipConfigurationName
-//         properties: {
-//           subnet: {
-//             id: subnet.id
-//           }
-//           primary: true
-//           privateIPAddressVersion: 'IPv4'
-//           privateIPAllocationMethod: privateIPAddressAllocationMethod
-//         }
-//       }
-//     ]
-//     networkSecurityGroup: {
-//       id: networkSecurityGroup.id
-//     }
-//   }
-// }]
+}]
 
 
 resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = {
@@ -114,43 +99,44 @@ resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = 
   scope: resourceGroup(existingImageResourceGroupName)
 }
 
-// resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(0, vmCount): {
-//   name: '${vmName}${i}'
-//   location: location
-//   tags: tags
-//   properties: {
-//     hardwareProfile: {
-//       vmSize: vmSize
-//     }
-//     storageProfile: {
-//       osDisk: {
-//         createOption: 'FromImage'
-//         managedDisk: {
-//           storageAccountType: osDiskType
-//         }
-//       }
-//       imageReference: {
-//         id: '${sharedImageGallery.id}/images/${imageDefinitionName}'
-//       }
-//     }
-//     networkProfile: {
-//       networkInterfaces: [
-//         {
-//           id: networkInterface[i].id
-//         }
-//       ]
-//     }
-//     osProfile: {
-//       computerName: '${vmName}${i}'
-//       adminUsername: adminUsername
-//       linuxConfiguration: linuxConfiguration
-//     }
-//   }
-// }]
-
-
-
+resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(0, vmCount): {
+  name: '${vmName}${i}'
+  location: location
+  tags: tags
+  properties: {
+    hardwareProfile: {
+      vmSize: vmSize
+    }
+    storageProfile: {
+      osDisk: {
+        createOption: 'FromImage'
+        managedDisk: {
+          storageAccountType: osDiskType
+        }
+      }
+      imageReference: {
+        id: '${sharedImageGallery.id}/images/${imageDefinitionName}/versions/${imageDefinitionVersion}'
+      }
+    }
+    networkProfile: {
+      networkInterfaces: [
+        {
+          id: networkInterface[i].id
+        }
+      ]
+    }
+    osProfile: {
+      computerName: '${vmName}${i}'
+      adminUsername: adminUsername
+      linuxConfiguration: linuxConfiguration
+    }
+  }
+}]
 
 output vmCountStop int = vmCount
+output nicInfo array = [for i in range(0, vmCount): {
+  id: networkInterface[i].id
+  name: networkInterface[i].name
+}]
 output adminUsername string = adminUsername
 output authenticationType string = 'sshPublicKey'
