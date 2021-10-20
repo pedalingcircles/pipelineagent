@@ -48,7 +48,6 @@ var environmentTypeMap = {
   production: 'prd'
 }
 var environmentTypeShort = environmentTypeMap[environmentType]
-var uniqueId = uniqueString(deployment().name)
 
 param location string = resourceGroup().location
 param resourceGroupName string
