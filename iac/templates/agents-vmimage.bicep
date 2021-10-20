@@ -27,18 +27,6 @@ param vmCount int = 4
 param location string = resourceGroup().location
 
 
-@description('The Azure DevOps agent pool.')
-param agentPool string = 'ContosoTestPool'
-
-@description('The agent version to install.')
-param agentVersion string = '2.193.1'
-
-@description('The Personal Access Token.')
-param agentToken string
-
-@description('The Azure DevOps organization URL.')
-param adoUrl string
-
 @description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
 param adminPublicKey string
 
@@ -79,13 +67,6 @@ var osSettings = {
     diskSize: 256
   }
 }
-
-
-
-
-
-
-
 
 
 resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = {
@@ -182,9 +163,9 @@ resource virtualmachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
 
 
 
-var scriptExtensionFileUris = [
-  'https://raw.githubusercontent.com/pedalingcircles/pipelineagent/vmscaleset/scripts/installer-agent-extension.sh'
-]
+// var scriptExtensionFileUris = [
+//   'https://raw.githubusercontent.com/pedalingcircles/pipelineagent/vmscaleset/scripts/installer-agent-extension.sh'
+// ]
 
 // resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(vmCountStart,vmCount):  {
 //   name: '${virtualmachine[i].name}/agentextension'

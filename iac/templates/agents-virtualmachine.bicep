@@ -84,7 +84,7 @@ param adminUsername string = 'azureuser'
 @minLength(14)
 param adminPublicKey  string
 
-var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${blueGreen}'
+//var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${blueGreen}'
 var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${environmentTypeShort}[delimiterplaceholder]${blueGreen}'
 
 param existingSharedImageGalleryName string
