@@ -59,7 +59,7 @@ param ipConfigName string = 'vm-agent-ip-config'
   'Standard_D2_v3' 
   'Standard_D8s_v3'
 ])
-param vmSize string = 'Standard_D2_v3'
+param vmSize string = 'Standard_D8s_v3'
 param osDiskType string = 'StandardSSD_LRS'
 param adminUsername string = 'azureuser'
 
@@ -73,8 +73,10 @@ var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${envi
 param existingSharedImageGalleryName string
 param existingImageResourceGroupName string
 param existingNetworkSecurityGroupName string
+param existingVnetName string
 param existingSubnetName string
 param imageDefinitionName string
+param imageDefinitionVersion string
 
 //var windowsVmName = take('vm${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 15)
 var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
@@ -97,8 +99,9 @@ module virtualMachine './modules/linuxVirtualMachineAgent.bicep' = {
     existingSharedImageGalleryName: existingSharedImageGalleryName
     existingImageResourceGroupName: existingImageResourceGroupName
     imageDefinitionName: imageDefinitionName
+    imageDefinitionVersion: imageDefinitionVersion
     existingNetworkSecurityGroupName: existingNetworkSecurityGroupName
     existingSubnetName: existingSubnetName
-    existingVnetName: 'vnet-agent'
+    existingVnetName: existingVnetName
   }
 }
