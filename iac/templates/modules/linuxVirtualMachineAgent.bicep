@@ -66,7 +66,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = {
         properties: {
           privateIPAllocationMethod: 'Dynamic'
           subnet: {
-            id: vnet.properties.subnets[0].id
+            id: '${vnet.id}/subnets/${existingSubnetName}'
           }
           primary: true
           privateIPAddressVersion: 'IPv4'
