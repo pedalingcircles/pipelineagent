@@ -26,8 +26,6 @@ param vmCount int = 4
 @description('Azure region to create resources in.')
 param location string = resourceGroup().location
 
-@description('VM local account to configure and run the agent.')
-param agentUser string = 'azureuser'
 
 @description('The Azure DevOps agent pool.')
 param agentPool string = 'ContosoTestPool'
