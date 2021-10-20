@@ -22,7 +22,6 @@ az deployment group create \
     existingSharedImageGalleryName='sig.contoso.images' \
     existingImageResourceGroupName='rg-contoso-images' \
     imageDefinitionName='ubuntu2004' \
-    imageDefinitionVersion='ubuntu2004' \
     imageDefinitionVersion='1.0.76' \
     existingNetworkSecurityGroupName='nsg-agent' \
     existingVnetName='vnet-agent' \
