@@ -134,6 +134,33 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
   }
 }]
 
+var scriptExtensionFileUris = [
+  'https://foobar.blob.core.windows.net/agentutils/hello.sh'
+]
+
+resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(0,vmCount):  {
+  name: '${virtualMachine[i].name}/agentextension'
+  location: location
+  tags: vmTags
+  properties: {
+    publisher: 'Microsoft.Azure.Extensions'
+    type: 'CustomScript'
+    typeHandlerVersion: '2.1'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: scriptExtensionFileUris
+      commandToExecute: 'sh hello.sh'
+    }
+  }
+}]
+
+//     protectedSettings: {
+//       //commandToExecute: 'sudo sh echo.sh'
+//       commandToExecute: 'sudo ./scriptextensionlinux.sh ${agentUser} ${agentPool} ${agentToken} ${adoUrl} ${agentVersion}'
+//       fileUris: scriptExtensionFileUris
+//     }
+
+
 output vmCountStop int = vmCount
 output nicInfo array = [for i in range(0, vmCount): {
   id: networkInterface[i].id
