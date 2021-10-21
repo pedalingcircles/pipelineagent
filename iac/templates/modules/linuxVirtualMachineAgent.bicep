@@ -45,6 +45,10 @@ param existingNetworkSecurityGroupName string
 @description('The existing virtual network name that hosts the VMs.')
 param existingVnetName string
 
+param existingStorageAccountName string
+
+param containerName string = 'scriptextensions'
+
 var linuxConfiguration = {
   disablePasswordAuthentication: true
   ssh: {
@@ -69,6 +73,14 @@ resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
 
 resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-02-01' existing = {
   name: existingNetworkSecurityGroupName
+}
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' existing = {
+  name: existingStorageAccountName
+}
+
+resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
+  name: containerName
 }
 
 resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(0, vmCount): {
@@ -160,3 +172,4 @@ output nicInfo array = [for i in range(0, vmCount): {
 }]
 output adminUsername string = adminUsername
 output authenticationType string = 'sshPublicKey'
+output containerName string = containerName
