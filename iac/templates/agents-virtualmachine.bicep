@@ -97,6 +97,7 @@ param imageDefinitionVersion string
 //var windowsVmName = take('vm${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 15)
 param scriptExtensionScriptUris array
 
+param existingStorageAccountName
 
 var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
 var nicName =  take('nic-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 80)
@@ -123,5 +124,6 @@ module virtualMachine './modules/linuxVirtualMachineAgent.bicep' = {
     existingSubnetName: existingSubnetName
     existingVnetName: existingVnetName
     scriptExtensionScriptUris: scriptExtensionScriptUris
+    existingStorageAccountName: existingStorageAccountName
   }
 }
