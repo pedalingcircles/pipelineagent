@@ -79,7 +79,13 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' existing 
   name: existingStorageAccountName
 }
 
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2021-04-01' = {
+  parent: storageAccount
+  name: 'default'
+}
+
 resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
+  parent: blobService
   name: containerName
 }
 
