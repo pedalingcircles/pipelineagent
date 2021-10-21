@@ -644,7 +644,7 @@ module agentKeyVault './modules/keyVault.bicep' = {
     keyVaultAccessPolicies: []
     tenentId: subscription().tenantId
     existingVnetName: agentVirtualNetworkName
-    existingSubnetName: agentVirtualNetworkName
+    existingSubnetName: agentSubnetName
   }
   dependsOn: [
     agentResourceGroup
