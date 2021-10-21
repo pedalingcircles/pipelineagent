@@ -651,7 +651,6 @@ module agentKeyVault './modules/keyVault.bicep' = {
   ]
 }
 
-
 // outputs
 output hubSubscriptionId string = hubSubscriptionId
 output hubResourceGroupName string = hubResourceGroup.outputs.name
