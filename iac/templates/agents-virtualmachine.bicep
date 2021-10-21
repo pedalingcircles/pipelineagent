@@ -97,7 +97,7 @@ param imageDefinitionVersion string
 //var windowsVmName = take('vm${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 15)
 param scriptExtensionScriptUris array
 
-param existingStorageAccountName
+param existingStorageAccountName string
 
 var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
 var nicName =  take('nic-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 80)
