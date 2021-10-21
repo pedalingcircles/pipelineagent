@@ -68,6 +68,8 @@ param operationsLocation string = deployment().location
 
 var sharedImageGalleryName = take('sig.${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '.')}', 80)
 
+
+
 // taking 63 minus the literal characters (15) = 48
 var logAnalyticsWorkspaceName = take('log-operations-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 63)
 param logAnalyticsWorkspaceRetentionInDays int = 30
@@ -230,6 +232,9 @@ param operationsTags object = {
   'workload': workload
   'component': 'operations'
 }
+
+var agentKeyVaultName = take('kv-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 24)
+
 
 module hubResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-hub-rg-${nowUtc}'
@@ -613,7 +618,7 @@ module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
   }
 }
 
-// image spoke
+
 
 
 module sharedImageGallery './modules/sharedImageGallery.bicep' = {
@@ -629,8 +634,22 @@ module sharedImageGallery './modules/sharedImageGallery.bicep' = {
   ]
 }
 
-
-
+module agentKeyVault './modules/keyVault.bicep' = {
+  name: 'deploy-agentkeyvault-${nowUtc}'
+  scope: resourceGroup(agentSubscriptionId, agentResourceGroupName)
+  params: {
+    name: agentKeyVaultName
+    location: agentLocation
+    tags: agentTags
+    keyVaultAccessPolicies: []
+    tenentId: subscription().tenantId
+    existingVnetName: agentVirtualNetworkName
+    existingSubnetName: agentVirtualNetworkName
+  }
+  dependsOn: [
+    agentResourceGroup
+  ]
+}
 
 
 // outputs
