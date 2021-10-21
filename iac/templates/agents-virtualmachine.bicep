@@ -35,7 +35,6 @@ param workloadShort string = 'pa'
 param organization string
 
 param nowUtc string = utcNow()
-
 var environmentTypeMap = {
   ephemeral: 'eph'
   sandbox: 'sbx'
@@ -96,6 +95,7 @@ param imageDefinitionName string
 param imageDefinitionVersion string
 
 //var windowsVmName = take('vm${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 15)
+param scriptExtensionScriptUris array 
 
 
 var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
@@ -122,5 +122,6 @@ module virtualMachine './modules/linuxVirtualMachineAgent.bicep' = {
     existingNetworkSecurityGroupName: existingNetworkSecurityGroupName
     existingSubnetName: existingSubnetName
     existingVnetName: existingVnetName
+    scriptExtensionScriptUris: scriptExtensionScriptUris
   }
 }
