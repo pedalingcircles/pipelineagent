@@ -95,7 +95,7 @@ param imageDefinitionName string
 param imageDefinitionVersion string
 
 //var windowsVmName = take('vm${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 15)
-param scriptExtensionScriptUris array 
+param scriptExtensionScriptUris array
 
 
 var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
