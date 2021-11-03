@@ -21,25 +21,25 @@ function usage {
 
 if [ -z "$STORAGE_ACCOUNT_NAME" ]; then
   usage
-  echo 1>&2 "error: missing STORAGE_ACCOUNT_NAME (1st argument) variable"
+  echo 1>&2 "##vso[task.logissue type=error]missing STORAGE_ACCOUNT_NAME (1st argument) variable"
   exit 1
 fi
 
 if [ -z "$CONTAINER_NAME" ]; then
   usage
-  echo 1>&2 "error: missing CONTAINER_NAME (2nd argument) variable"
+  echo 1>&2 "##vso[task.logissue type=error]missing CONTAINER_NAME (2nd argument) variable"
   exit 1
 fi
 
 if [ -z "$INSTALL_DIRECTORY" ]; then
   usage
-  echo 1>&2 "error: missing INSTALL_DIRECTORY (3rd argument) variable"
+  echo 1>&2 "##vso[task.logissue type=error]missing INSTALL_DIRECTORY (3rd argument) variable"
   exit 1
 fi
       
 if [ -z "$AGENT_INSTALLER_SOURCE_PATH" ]; then
   usage
-  echo 1>&2 "error: missing AGENT_INSTALLER_SOURCE_PATH (4th argument) variable"
+  echo 1>&2 "##vso[task.logissue type=error]missing AGENT_INSTALLER_SOURCE_PATH (4th argument) variable"
   exit 1
 fi
 
