@@ -7,10 +7,18 @@
         {
             "type": "bashdb",
             "request": "launch",
+            "name": "provision-virtualmachine.sh",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/iac/scripts/provision-virtualmachine.sh",
+            "args": ["contoso","eastus2","cbadc96b-2923-4459-bb2d-b237af7f84d6","sandbox","/mnt/c/Users/mijohns/Source/repos/byvrate/pipelineagent/iac/templates/agents-virtualmachine.bicep","~/.ssh/vmagent-priv-key.pub","rg-pipelineagent-sandbox-u63kxyluy6fdo-agent","rg-contoso-images","sig.contoso.images","ubuntu2004","1.0.54","nsg-agent","vnet-agent","snet-agent","stagentpasbxu63kxyluy6fd","scriptextensions", "25403"]
+        },
+        {
+            "type": "bashdb",
+            "request": "launch",
             "name": "Bash-Debug (select script from list of sh files)",
             "cwd": "${workspaceFolder}",
             "program": "${command:SelectScriptName}",
-            "args": []
+            "args": ["stagentpasbxu63kxyluy6fd", "scriptextensions",  "001", "/mnt/c/Users/mijohns/Source/repos/byvrate/pipelineagent/iac/scripts/agentinstallers"]
         },
         {
             "name": "PowerShell Launch Current File",
