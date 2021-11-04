@@ -14,14 +14,14 @@ SSH_PUBLICKEY_FILE_PATH=$6
 AGENT_RESOURCEGROUP_NAME=$7
 IMAGE_RESOURCEGROUP_NAME=$8
 SHARED_IMAGEGALLERY_NAME=$9
-IMAGE_DEFINITION_NAME=$10
-IMAGE_DEFINITION_VERSION=$11
-NETWORK_SECURITYGROUP_NAME=$13
-VNET_NAME=$14
-SUBNET_NAME=$15
-STORAGEACCOUNT_NAME=$16
-CONTAINER_NAME=$17
-INSTALL_DIRECTORY=$18
+IMAGE_DEFINITION_NAME=${10}
+IMAGE_DEFINITION_VERSION=${11}
+NETWORK_SECURITYGROUP_NAME=${12}
+VNET_NAME=${13}
+SUBNET_NAME=${14}
+STORAGEACCOUNT_NAME=${15}
+CONTAINER_NAME=${16}
+INSTALL_DIRECTORY=${17}
 
 # print usage to the console
 function usage {
@@ -173,7 +173,8 @@ for blob_name in ${blobnames[@]}; do
     --name $blob_name \
     --account-name $STORAGEACCOUNT_NAME \
     --auth-mode login \
-    --protocol https -o tsv)
+    --protocol https \
+    -o tsv)
 
   blob_sastoken=$(az storage blob generate-sas \
     --account-name $STORAGEACCOUNT_NAME \
@@ -183,34 +184,41 @@ for blob_name in ${blobnames[@]}; do
     --name $blob_name \
     --permissions r \
     --expiry $end_expiry \
-    --https-only)
+    --https-only \
+    -o tsv)
 
-  script_extensions_scripturis+=("${blob_url}?${blob_sastoken}")
+  # Adding to the array, but we need extra quotes due 
+  # to the formatting of passing an "array" via Azure CLI
+  script_extensions_scripturis+=("\"${blob_url}?${blob_sastoken}\"")
   unset blob_sastoken
   echo "added script url for blob '$blob_name' to array"
 done
 
 public_key=$(cat "$SSH_PUBLICKEY_FILE_PATH")
 
+echo $(IFS=, ; printf "(%s)" "${script_extensions_scripturis[*]}")
+
 az deployment group create \
-  --resource-group '$agentResourceGroupName' \
+  --resource-group '$AGENT_RESOURCEGROUP_NAME' \
+  --debug \
   --name agentVmDeployment \
   --no-prompt true \
-  --subscription $subscription \
-  --template-file $templateFilePath \
+  --subscription $SUBSCRIPTION \
+  --template-file $TEMPLATE_FILE_PATH \
   --parameters \
-      environmentType=$environmentType \
-      organization=$organizationName \
-      resourceGroupName='$AGENT_RESOURCEGROUP_NAME' \
+      environmentType=$ENVIRONMENT_TYPE \
+      organization=$ORGANIZATION_NAME \
+      resourceGroupName=$AGENT_RESOURCEGROUP_NAME \
       adminPublicKey="$public_key" \
-      existingSharedImageGalleryName='$SHARED_IMAGEGALLERY_NAME' \
-      existingImageResourceGroupName='$IMAGE_RESOURCEGROUP_NAME' \
-      imageDefinitionName='$IMAGE_DEFINITION_NAME' \
-      imageDefinitionVersion='$IMAGE_DEFINITION_VERSION' \
-      existingNetworkSecurityGroupName='$NETWORK_SECURITYGROUP_NAME' \
-      existingVnetName='$VNET_NAME' \
-      existingSubnetName='$SUBNET_NAME' \
-      existingStorageAccountName='$STORAGEACCOUNT_NAME' \
-      scriptExtensionScriptUris=$script_extensions_scripturis
+      existingSharedImageGalleryName=$SHARED_IMAGEGALLERY_NAME \
+      existingImageResourceGroupName=$IMAGE_RESOURCEGROUP_NAME \
+      imageDefinitionName=$IMAGE_DEFINITION_NAME \
+      imageDefinitionVersion=$IMAGE_DEFINITION_VERSION \
+      existingNetworkSecurityGroupName=$NETWORK_SECURITYGROUP_NAME \
+      existingVnetName=$VNET_NAME \
+      existingSubnetName=$SUBNET_NAME \
+      existingStorageAccountName=$STORAGEACCOUNT_NAME \
+      scriptExtensionScriptUris=$(IFS=, ; printf "(%s)" "${script_extensions_scripturis[*]}")
 
 unset public_key
+ 
