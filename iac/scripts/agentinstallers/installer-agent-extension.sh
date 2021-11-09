@@ -4,8 +4,6 @@
 ##  Desc:  Installs the Azure DevOps Agent. 
 ################################################################################
 
-# Constants
-
 # Must be run as sudo
 if [ "$EUID" -ne 0 ]; then
   echo "Please run as root. Exiting."
