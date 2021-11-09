@@ -84,26 +84,8 @@ echo "Downloading agent via link:$agent_download_url"
 curl --show-error --location $agent_download_url | tar -xz
 chown -R $AZP_AGENT_NAME $INSTALL_DIR
 
-# if [ "$AGENT_VERSION" = "latest" ]; then
-#   echo "Agent version argument is $AGENT_VERSION: Finding current latest version from https://api.github.com/repositories/53052789/releases/latest"
-#   curl -s https://api.github.com/repositories/53052789/releases/latest | jq -r .assets[].browser_download_url
-
-#   agent_url=(jq --raw-output '[?contains(name, `pipelines-agent-linux-x64`) == `true`].downloadUrl | [0]' assets.json)
-#   echo "Using URL '$agent_url' to download latest agent version based on OS specification pipelines-agent-linux-x64"
-# else
-#   agent_url="https://vstsagentpackage.azureedge.net/agent/${AGENT_VERSION}/vsts-agent-linux-x64-${AGENT_VERSION}.tar.gz"
-#   echo "Agent version argument is $AGENT_VERSION: Directly downloading from '$agent_url'"
-# fi
-
 echo "Configure agent (service) software..."
-# https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#unattended-config
-runuser $AZP_AGENT_NAME -c "${INSTALL_DIR}/config.sh" \
-    --unattended \
-    --url $AZP_URL \
-    --auth PAT \
-    --token $(cat "$AZP_TOKEN_FILE") \
-    --pool $AZP_POOL \
-    --acceptTeeEula" & wait $!
+runuser $AZP_AGENT_NAME -c "${INSTALL_DIR}/config.sh --unattended --url $AZP_URL --auth pat --token $(cat "$AZP_TOKEN_FILE") --pool $AZP_POOL --acceptTeeEula" & wait $!
 
 echo "Install and start the agent (service) software..."
 ./svc.sh install $AZP_AGENT_NAME
