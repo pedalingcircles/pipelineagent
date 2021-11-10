@@ -15,6 +15,16 @@ targetScope = 'resourceGroup'
 ])
 param environmentType string
 
+@description('The Azure DevOps (ADO) agent pool name.')
+param agentPool string
+
+@secure()
+@description('The personal access token (PAT) used to setup the agent in the agent pool in ADO.')
+param pat string
+
+@description('The URL of the ADO organization.')
+param orgUrl string
+
 @description('Represents differentiate on a side by side deployments if needed.')
 @maxLength(15)
 @allowed([
@@ -112,6 +122,9 @@ module virtualMachine './modules/linuxVirtualMachineAgent.bicep' = {
     vmTags: vmTags
     nicTags: nicTags
     ipConfigurationName: ipConfigName
+    agentPool: agentPool
+    pat: pat
+    orgUrl: orgUrl
     vmSize: vmSize
     osDiskType: osDiskType
     adminUsername: adminUsername
