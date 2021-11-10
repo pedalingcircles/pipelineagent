@@ -73,6 +73,7 @@ param existingNetworkSecurityGroupName string
 @description('The existing virtual network name that hosts the VMs.')
 param existingVnetName string
 
+@description('The existing storage account name used by the VMs.')
 param existingStorageAccountName string
 
 param containerName string = 'scriptextensions'
