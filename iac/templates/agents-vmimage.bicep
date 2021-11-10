@@ -20,12 +20,12 @@ param storageAccountType string = 'StandardSSD_LRS'
 
 @description('The start index of how many VMs to provision.')
 param vmCountStart int = 0
+
 @description('The number of VMs to provision.')
 param vmCount int = 4
 
 @description('Azure region to create resources in.')
 param location string = resourceGroup().location
-
 
 @description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
 param adminPublicKey string
@@ -33,6 +33,7 @@ param adminPublicKey string
 @description('The set of key valure paris of tags to apply to resources.')
 param tags object = {}
 
+@description('The operating system of the osDiskImage.')
 @allowed([
   'Linux'
   'Windows'
@@ -49,12 +50,16 @@ param blueGreen string = 'b'
 @description('The admin user account created when provisioning the VM.')
 param adminUserName string = 'azureuser'
 
+@description('The existing virtual network.')
 param existingVnetName string
 
+@description('The existing Shared Image Gallery.')
 param existingShareImageGalleryName string 
 
+@description('The existing resource group name that stores all the images.')
 param existingImagesResourceGroupName string
 
+@description('The image definition name used to provision the VM(s).')
 param imageDefinitionName string
 
 var nicName = 'nic-${nicNameAffix}'
@@ -67,7 +72,6 @@ var osSettings = {
     diskSize: 256
   }
 }
-
 
 resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = {
   name: existingShareImageGalleryName

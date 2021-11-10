@@ -25,7 +25,7 @@ param pat string
 @description('The URL of the ADO organization.')
 param orgUrl string
 
-@description('Represents differentiate on a side by side deployments if needed.')
+@description('Represents a to differiantate on a side by side deployments if needed.')
 @maxLength(15)
 @allowed([
   'b'   // Represents blue
@@ -44,7 +44,82 @@ param workloadShort string = 'pa'
 @description('The organization that\'s responsible for the workload.')
 param organization string
 
+@description('Date string used to uniquely identify a deployment name.')
 param nowUtc string = utcNow()
+
+@description('The location of the virtual machine resources.')
+param location string = resourceGroup().location
+
+@description('The agent resource group name.')
+param resourceGroupName string
+
+@description('Tags used to label the network interface card(s).')
+param nicTags object = {
+  'environmentType': environmentType
+  'org': organization
+  'workload': workload
+  'component': 'vmagent'
+}
+
+@description('Tags used to label the VMs.')
+param vmTags object = {
+  'environmentType': environmentType
+  'org': organization
+  'workload': workload
+  'component': 'vmagent'
+  'os': 'linux'
+  'imagedefinitionname': imageDefinitionName
+  'imagedefinitionversion': imageDefinitionVersion
+}
+
+@description('The IP config name for the VMs.')
+param ipConfigName string = 'vm-agent-ip-config'
+
+@description('Specifies the size of the virtual machine.')
+@allowed([
+  'Standard_D2_v3' 
+  'Standard_D8s_v3'
+])
+param vmSize string = 'Standard_D8s_v3'
+
+@description('Specifies information about the operating system disk used by the VMs.')
+param osDiskType string = 'StandardSSD_LRS'
+
+@description('Specifies the name of the administrator account.')
+param adminUsername string = 'azureuser'
+
+@description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
+@minLength(14)
+param adminPublicKey  string
+
+@description('The existing Shared Image Gallery name.')
+param existingSharedImageGalleryName string
+
+@description('The existing image resource group name.')
+param existingImageResourceGroupName string
+
+@description('The existing network security group name in the virtual network that hosts the VMs.')
+param existingNetworkSecurityGroupName string
+
+@description('The existing virtual network name that hosts the VMs.')
+param existingVnetName string
+
+@description('The existing subnet name in the virtual network that hosts the VMs.')
+param existingSubnetName string
+
+@description('The image definition to use. This value is in the Shared Image Gallery')
+param imageDefinitionName string
+
+@description('The image definition version ot use.')
+param imageDefinitionVersion string
+
+@description('Array of URLs for the script extensions used by the VMs.')
+param scriptExtensionScriptUris array
+
+@description('The existing storage account name used by the VMs.')
+param existingStorageAccountName string
+
+var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${environmentTypeShort}[delimiterplaceholder]${blueGreen}'
 var environmentTypeMap = {
   ephemeral: 'eph'
   sandbox: 'sbx'
@@ -57,58 +132,6 @@ var environmentTypeMap = {
   production: 'prd'
 }
 var environmentTypeShort = environmentTypeMap[environmentType]
-
-param location string = resourceGroup().location
-param resourceGroupName string
-
-param nicTags object = {
-  'environmentType': environmentType
-  'org': organization
-  'workload': workload
-  'component': 'vmagent'
-}
-
-param vmTags object = {
-  'environmentType': environmentType
-  'org': organization
-  'workload': workload
-  'component': 'vmagent'
-  'os': 'linux'
-  'imagedefinitionname': imageDefinitionName
-  'imagedefinitionversion': imageDefinitionVersion
-}
-
-param ipConfigName string = 'vm-agent-ip-config'
-
-@description('Used to identify environment types for naming resources.')
-@allowed([
-  'Standard_D2_v3' 
-  'Standard_D8s_v3'
-])
-param vmSize string = 'Standard_D8s_v3'
-param osDiskType string = 'StandardSSD_LRS'
-param adminUsername string = 'azureuser'
-
-@description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
-@minLength(14)
-param adminPublicKey  string
-
-//var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${blueGreen}'
-var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${environmentTypeShort}[delimiterplaceholder]${blueGreen}'
-
-param existingSharedImageGalleryName string
-param existingImageResourceGroupName string
-param existingNetworkSecurityGroupName string
-param existingVnetName string
-param existingSubnetName string
-param imageDefinitionName string
-param imageDefinitionVersion string
-
-//var windowsVmName = take('vm${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 15)
-param scriptExtensionScriptUris array
-
-param existingStorageAccountName string
-
 var linuxVmName = take('vm-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 64)
 var nicName =  take('nic-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 80)
 
