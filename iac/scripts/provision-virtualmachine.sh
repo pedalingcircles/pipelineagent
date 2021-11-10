@@ -25,7 +25,7 @@ INSTALL_DIRECTORY=${17}
 
 # print usage to the console
 function usage {
-    echo "usage: installer-agent-extension.sh [organization] [location] [subscription] [envtype] [templatefilepath] [sshpublickeypath] [agentresourcegroupname] [imageresourcegroupname] [sharedgalleryname] [imagedefinition] [imagedefinitionversion] [networksecuritygroup] [vnet] [subnet] [storageaccount] [container] [installdirectory]"
+    echo "usage: installer-agent-extension.sh organization location subscription envtype templatefilepath sshpublickeypath agentresourcegroupname imageresourcegroupname sharedgalleryname imagedefinition imagedefinitionversion networksecuritygroup vnet subnet storageaccount container installdirectory"
     echo "  organization              The organization that's responsible for the agent workload"
     echo "  location                  The Azure region"
     echo "  subscription              The Azure subscription id"
@@ -156,7 +156,7 @@ blobnames=($(az storage blob list \
   --query "[].name" --out tsv))
 
 if [ ${#blobnames[@]} -eq 0 ]; then
-  echo 1>&2 "##vso[task.logissue type=error]could not find any blob names in '$storageAccountName storage account with path '$containerName/$installDirectory'"
+  echo 1>&2 "##vso[task.logissue type=error]could not find any blob names in '$storageAccountName' storage account with path '$containerName/$installDirectory'"
   exit 1
 fi
 
@@ -199,8 +199,7 @@ public_key=$(cat "$SSH_PUBLICKEY_FILE_PATH")
 echo $(IFS=, ; printf "(%s)" "${script_extensions_scripturis[*]}")
 
 az deployment group create \
-  --resource-group '$AGENT_RESOURCEGROUP_NAME' \
-  --debug \
+  --resource-group $AGENT_RESOURCEGROUP_NAME \
   --name agentVmDeployment \
   --no-prompt true \
   --subscription $SUBSCRIPTION \
