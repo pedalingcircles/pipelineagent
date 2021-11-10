@@ -22,10 +22,14 @@ SUBNET_NAME=${14}
 STORAGEACCOUNT_NAME=${15}
 CONTAINER_NAME=${16}
 INSTALL_DIRECTORY=${17}
+AGENT_POOL=${18}
+PAT=${19}
+ORG_URL=${20}
 
 # print usage to the console
-function usage {
-    echo "usage: installer-agent-extension.sh organization location subscription envtype templatefilepath sshpublickeypath agentresourcegroupname imageresourcegroupname sharedgalleryname imagedefinition imagedefinitionversion networksecuritygroup vnet subnet storageaccount container installdirectory"
+function usage() 
+{
+    echo "usage: installer-agent-extension.sh organization location subscription envtype templatefilepath sshpublickeypath agentresourcegroupname imageresourcegroupname sharedgalleryname imagedefinition imagedefinitionversion networksecuritygroup vnet subnet storageaccount container installdirectory agentpool pat orgurl"
     echo "  organization              The organization that's responsible for the agent workload"
     echo "  location                  The Azure region"
     echo "  subscription              The Azure subscription id"
@@ -43,6 +47,9 @@ function usage {
     echo "  storageaccount            The storage account name"
     echo "  container                 The storage account container name"
     echo "  installdirectory          The directory inside the storage container where the agent install scripts are located"
+    echo "  agentpool                 The Azure DevOps (ADO) agent pool name"
+    echo "  pat                       The personal access token"
+    echo "  orgurl                    The Azure DevOps (ADO) organization URL"
     exit 1
 }
 
@@ -148,15 +155,33 @@ if [ -z "$INSTALL_DIRECTORY" ]; then
   exit 1
 fi
 
-blobnames=($(az storage blob list \
+if [ -z "$AGENT_POOL" ]; then
+  usage
+  echo 1>&2 "##vso[task.logissue type=error]missing AGENT_POOL (18th argument) variable"
+  exit 1
+fi
+
+if [ -z "$PAT" ]; then
+  usage
+  echo 1>&2 "##vso[task.logissue type=error]missing PAT (19th argument) variable"
+  exit 1
+fi
+
+if [ -z "$ORG_URL" ]; then
+  usage
+  echo 1>&2 "##vso[task.logissue type=error]missing ORG_URL (20th argument) variable"
+  exit 1
+fi
+
+blobnames=$(az storage blob list \
   --container-name $CONTAINER_NAME \
   --account-name $STORAGEACCOUNT_NAME \
   --auth-mode login \
   --prefix $INSTALL_DIRECTORY \
-  --query "[].name" --out tsv))
+  --query "[].name" --out tsv)
 
 if [ ${#blobnames[@]} -eq 0 ]; then
-  echo 1>&2 "##vso[task.logissue type=error]could not find any blob names in '$storageAccountName' storage account with path '$containerName/$installDirectory'"
+  echo 1>&2 "##vso[task.logissue type=error]could not find any blob names in '$STORAGEACCOUNT_NAME' storage account with path '$CONTAINER_NAME/$INSTALL_DIRECTORY'"
   exit 1
 fi
 
@@ -209,6 +234,9 @@ az deployment group create \
       organization=$ORGANIZATION_NAME \
       resourceGroupName=$AGENT_RESOURCEGROUP_NAME \
       adminPublicKey="$public_key" \
+      agentPool="$AGENT_POOL" \
+      pat=$PAT \
+      orgUrl=$ORG_URL \
       existingSharedImageGalleryName=$SHARED_IMAGEGALLERY_NAME \
       existingImageResourceGroupName=$IMAGE_RESOURCEGROUP_NAME \
       imageDefinitionName=$IMAGE_DEFINITION_NAME \
@@ -220,4 +248,3 @@ az deployment group create \
       scriptExtensionScriptUris=$(IFS=, ; printf "(%s)" "${script_extensions_scripturis[*]}")
 
 unset public_key
- 
