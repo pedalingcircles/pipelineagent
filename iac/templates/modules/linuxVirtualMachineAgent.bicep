@@ -24,8 +24,9 @@ param privateIPAddressAllocationMethod string = 'Dynamic'
 param ipConfigurationName string
 
 @description('The Azure DevOps (ADO) agent pool name.')
-param pool string = 'ContosoTestPool'
+param agentPool string
 
+@secure()
 @description('The personal access token (PAT) used to setup the agent in the agent pool in ADO.')
 param pat string
 
@@ -191,7 +192,7 @@ resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: scriptExtensionScriptUris
-      commandToExecute: 'sudo ./installer-agent-extension.sh ${adminUsername} ${pool} ${pat} ${orgUrl} ${agentVersionTag}'
+      commandToExecute: 'sudo ./installer-agent-extension.sh ${adminUsername} ${agentPool} ${pat} ${orgUrl} ${agentVersionTag}'
     }
   }
 }]
