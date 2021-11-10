@@ -26,6 +26,7 @@ param workloadShort string = 'pa'
 @description('The organization that\'s responsible for the workload.')
 param organization string
 
+@description('The timestamp for deployment names.')
 param nowUtc string = utcNow()
 
 var environmentTypeMap = {
@@ -41,7 +42,6 @@ var environmentTypeMap = {
 }
 var environmentTypeShort = environmentTypeMap[environmentType]
 var uniqueId = uniqueString(deployment().name)
-
 var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${uniqueId}'
 var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${environmentTypeShort}[delimiterplaceholder]${uniqueId}'
 
@@ -66,18 +66,19 @@ param imageBuilderLocation string = deployment().location
 param imageLocation string = deployment().location
 param operationsLocation string = deployment().location
 
-var sharedImageGalleryName = take('sig.${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '.')}', 80)
-
-
-
-// taking 63 minus the literal characters (15) = 48
-var logAnalyticsWorkspaceName = take('log-operations-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 63)
+// Log analytics workspace settings
 param logAnalyticsWorkspaceRetentionInDays int = 30
 param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
 param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
 
+var sharedImageGalleryName = take('sig.${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '.')}', 80)
+
+// taking 63 minus the literal characters (15) = 48
+var logAnalyticsWorkspaceName = take('log-operations-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 63)
+
 // hub networking
 var hubLogStorageAccountName = take('sthublogs${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
+
 param hubLogStorageSkuName string = 'Standard_GRS'
 param hubVirtualNetworkName string = 'vnet-hub'
 param hubVirtualNetworkAddressPrefix string = '10.0.100.0/24'
@@ -88,6 +89,7 @@ param hubNetworkSecurityGroupRules array = []
 param hubSubnetName string = 'snet-hub'
 param hubSubnetAddressPrefix string = '10.0.100.128/27'
 param hubSubnetServiceEndpoints array = []
+
 param firewallName string = 'firewall'
 param firewallSkuTier string = 'Premium'
 param firewallPolicyName string = 'firewall-policy'
