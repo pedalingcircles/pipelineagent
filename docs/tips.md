@@ -45,3 +45,27 @@ Parameter file
 ```azurecli
 az deployment group what-if --resource-group mijohns-vnet-sbx --subscription cbadc96b-2923-4459-bb2d-b237af7f84d6 --template-file iac/contoso-net-template.bicep --parameters iac/contoso-net-template.parameters.sbx.json
 ```
+
+## Agent Software
+
+It's a challenge to both automatically find the correct software endpoint, but also download it as well as install it.
+
+The standard URL to download agent software is the following. Note that this could change at anytime so a better method is suggested:
+https://vstsagentpackage.azureedge.net/agent/<agentversion>/vsts-agent-linux-x64-<agentversion>.tar.gz
+
+An [Issue](https://github.com/microsoft/azure-pipelines-agent/issues/1333#issuecomment-352471130) was raised in GitHub that referenced an API, but I can't find this API documented anywhere:
+https://account.visualstudio.com/_apis/distributedtask/packages/agent?%24top=1
+
+An [Issue](https://github.com/microsoft/azure-pipelines-agent/issues/1423#issuecomment-367384800) was raised in GitHub that referenced getting the related asset information to find out the official endpoints to download the agent software.
+
+``` bash
+curl -s https://api.github.com/repos/Microsoft/vsts-agent/releases/latest | jq -r .assets[].browser_download_url
+
+
+
+
+
+```
+
+
+
