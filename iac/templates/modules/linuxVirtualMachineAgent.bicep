@@ -7,14 +7,41 @@ param nicName string
 @description('The location for the VMs and NICs.')
 param location string
 
+@description('Tags for the VM machines and associated resources like disks.')
 param vmTags object = {}
+
+@description('Tags for the NICs.')
 param nicTags object = {}
 
+@description('IP address allocation method.')
+@allowed([
+  'Dynamic'
+  'Static'
+])
 param privateIPAddressAllocationMethod string = 'Dynamic'
+
+@description('The IP configuration name.')
 param ipConfigurationName string
 
+@description('The Azure DevOps (ADO) agent pool name.')
+param pool string = 'ContosoTestPool'
+
+@description('The personal access token (PAT) used to setup the agent in the agent pool in ADO.')
+param pat string
+
+@description('The URL of the ADO organization.')
+param orgUrl string
+
+@description('The agent version tag used to identify the agent software release. Optional. Use "latest" to specificy latest of specific tag otherwise. e.g. "v2.194.0')
+param agentVersionTag string = 'latest'
+
+@description('Specifies the size of the virtual machine.')
 param vmSize string
+
+@description('Specifies the storage account type for the managed disk.')
 param osDiskType string
+
+@description('Specifies the name of the administrator account.')
 param adminUsername string
 
 @description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
@@ -114,7 +141,6 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [fo
   }
 }]
 
-
 resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = {
   name: existingSharedImageGalleryName
   scope: resourceGroup(existingImageResourceGroupName)
@@ -154,7 +180,6 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i 
   }
 }]
 
-
 resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(0,vmCount):  {
   name: '${virtualMachine[i].name}/agentextension'
   location: location
@@ -166,7 +191,7 @@ resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: scriptExtensionScriptUris
-      commandToExecute: 'sh hello.sh'
+      commandToExecute: 'sudo ./installer-agent-extension.sh ${adminUsername} ${pool} ${pat} ${orgUrl} ${agentVersionTag}'
     }
   }
 }]
