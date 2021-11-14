@@ -553,7 +553,7 @@ module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
   }
 }
 
-module sharedImageGallery './modules/sharedImageGallery.bicep' = if(deployAgentKeyVault)
+module sharedImageGallery './modules/sharedImageGallery.bicep' = {
   name: 'deploy-sharedimagegallery-${nowUtc}'
   scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
   params: {
@@ -566,7 +566,7 @@ module sharedImageGallery './modules/sharedImageGallery.bicep' = if(deployAgentK
   ]
 }
 
-module agentKeyVault './modules/keyVault.bicep' = {
+module agentKeyVault './modules/keyVault.bicep' = if(deployAgentKeyVault) {
   name: 'deploy-agent-keyvault-${nowUtc}'
   scope: resourceGroup(agentSubscriptionId, agentResourceGroupName)
   params: {
