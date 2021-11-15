@@ -16,10 +16,15 @@
 The Azure subscription Id where resources will be created.
 
 .PARAMETER BuildResourceGroupName
-The resource group name that Packer builds in.
+    An existing resource group to run the build in.
+
+.PARAMETER CaptureContainerName
+    Destination container name. Essentially the "directory" where your 
+    VHD will be organized in Azure. The captured VHD's URL will be
+    https://<storage_account>.blob.core.windows.net/system/Microsoft.Compute/Images/<capture_container_name>/<capture_name_prefix>.xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.vhd
 
 .PARAMETER ResourceGroupName
-    The Azure resource group name where the Azure resources will be created.
+    Resource group under which the final artifact will be stored.
 
 .PARAMETER ImageGenerationRepositoryRoot
     The root path of the image generation repository source.
@@ -27,8 +32,27 @@ The resource group name that Packer builds in.
 .PARAMETER ImageType
     The type of the image being generated. Valid options are: {"Windows2016", "Windows2019", "Ubuntu1604", "Ubuntu1804"}.
 
+.PARAMETER ServicePrincipalClientId
+    The type of the image being generated. Valid options are: {"Windows2016", "Windows2019", "Ubuntu1604", "Ubuntu1804"}.
+
+.PARAMETER ServicePrincipalObjectId
+    The type of the image being generated. Valid options are: {"Windows2016", "Windows2019", "Ubuntu1604", "Ubuntu1804"}.
+
+.PARAMETER ServicePrincipalClientSecret
+    The type of the image being generated. Valid options are: {"Windows2016", "Windows2019", "Ubuntu1604", "Ubuntu1804"}.
+
+
 .PARAMETER AzureLocation
     The location of the resources being created in Azure. For example "East US".
+
+.PARAMETER StorageAccountName
+    Storage account under which the final artifact will be stored.
+
+.NOTES
+
+    There must be RBAC Owner to the BuildResourceGroupName
+
+    see: https://www.packer.io/docs/builders/azure/arm
 
 #>
 
@@ -56,7 +80,7 @@ param(
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("Windows2016","Windows2019","Ubuntu1604","Ubuntu1804","Ubuntu2004")]
+    [ValidateSet("Windows2016","Windows2019","Windows2022","Ubuntu1804","Ubuntu2004")]
     [string]$ImageType,
 
     [Parameter(Mandatory=$true)]
@@ -69,7 +93,7 @@ param(
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$ServicePrincipalClientSecret,
+    [securestring]$ServicePrincipalClientSecret,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -87,8 +111,8 @@ switch ($ImageType) {
     ("Windows2019") {
         $relativeTemplatePath = Join-Path "win" "windows2019.json"
     }
-    ("Ubuntu1604") {
-        $relativeTemplatePath = Join-Path "linux" "ubuntu1604.json"
+    ("Windows2022") {
+        $relativeTemplatePath = Join-Path "win" "windows2022.json"
     }
     ("Ubuntu1804") {
         $relativeTemplatePath = Join-Path "linux" "ubuntu1804.json"
