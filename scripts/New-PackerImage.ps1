@@ -12,19 +12,39 @@
     It's assumed that this script is run from an Azure DevOps Pipeline, but can also
     be run interactively from a user's machine.
 
+.PARAMETER ServicePrincipalClientId
+    The Active Directory service principal associated with the builder.
+
+.PARAMETER ServicePrincipalClientSecret
+    The password or secret for the service principal.
+
 .PARAMETER SubscriptionId
 The Azure subscription Id where resources will be created.
+
+.PARAMETER TenantId
+    The Active Directory tenant identifier with which your 
+    ServicePrincipalClientId and SubscriptionId are associated.
+
+.PARAMETER ResourceGroupName
+    Resource group under which the final artifact will be stored.
+
+.PARAMETER StorageAccountName
+    Storage account under which the final artifact will be stored.
 
 .PARAMETER BuildResourceGroupName
     An existing resource group to run the build in.
 
-.PARAMETER CaptureContainerName
-    Destination container name. Essentially the "directory" where your 
-    VHD will be organized in Azure. The captured VHD's URL will be
-    https://<storage_account>.blob.core.windows.net/system/Microsoft.Compute/Images/<capture_container_name>/<capture_name_prefix>.xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx.vhd
+.PARAMETER AzureLocation
+    The location of the resources being created in Azure. For example "East US".
 
-.PARAMETER ResourceGroupName
-    Resource group under which the final artifact will be stored.
+.PARAMETER VnetName
+    A pre-existing virtual network for the VM.
+
+.PARAMETER VnetResourceGroupName
+    The resource group for the pre-existing virtual network for the VM.
+
+.PARAMETER VnetSubnetName
+    The sbunet name in the pre-existing virtual network for the VM.
 
 .PARAMETER ImageGenerationRepositoryRoot
     The root path of the image generation repository source.
@@ -32,27 +52,7 @@ The Azure subscription Id where resources will be created.
 .PARAMETER ImageType
     The type of the image being generated. Valid options are: {"Windows2016", "Windows2019", "Ubuntu1604", "Ubuntu1804"}.
 
-.PARAMETER ServicePrincipalClientId
-    The type of the image being generated. Valid options are: {"Windows2016", "Windows2019", "Ubuntu1604", "Ubuntu1804"}.
-
-.PARAMETER ServicePrincipalObjectId
-    The type of the image being generated. Valid options are: {"Windows2016", "Windows2019", "Ubuntu1604", "Ubuntu1804"}.
-
-.PARAMETER ServicePrincipalClientSecret
-    The type of the image being generated. Valid options are: {"Windows2016", "Windows2019", "Ubuntu1604", "Ubuntu1804"}.
-
-
-.PARAMETER AzureLocation
-    The location of the resources being created in Azure. For example "East US".
-
-.PARAMETER StorageAccountName
-    Storage account under which the final artifact will be stored.
-
 .NOTES
-
-    There must be RBAC Owner to the BuildResourceGroupName
-
-    see: https://www.packer.io/docs/builders/azure/arm
 
 #>
 
@@ -60,7 +60,27 @@ The Azure subscription Id where resources will be created.
 param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
+    [string]$ServicePrincipalClientId,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [securestring]$ServicePrincipalClientSecret,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$SubscriptionId,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$TenantId,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$ResourceGroupName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$StorageAccountName,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -68,11 +88,19 @@ param(
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$CaptureContainerName,
+    [string]$AzureLocation,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$ResourceGroupName,
+    [string]$VnetName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$VnetResourceGroupName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$VnetSubnetName,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -81,27 +109,7 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [ValidateSet("Windows2016","Windows2019","Windows2022","Ubuntu1804","Ubuntu2004")]
-    [string]$ImageType,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]$ServicePrincipalClientId,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]$ServicePrincipalObjectId,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [securestring]$ServicePrincipalClientSecret,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]$TenantId,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]$StorageAccountName
+    [string]$ImageType
 )
 
 switch ($ImageType) {
@@ -125,7 +133,6 @@ switch ($ImageType) {
     }
 }
 
-$installPassword = $env:UserName + [System.GUID]::NewGuid().ToString().ToUpper();
 $imageTemplatePath = [IO.Path]::Combine($ImageGenerationRepositoryRoot, "images", $relativeTemplatePath)
 
 if (-not (Test-Path $imageTemplatePath)) {
@@ -139,19 +146,21 @@ if (-not ($packerBinary)) {
 }
 
 $env:PACKER_LOG=1
-$env:PACKER_LOG_PATH="packerlog.txt"
+$dateStamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssK")
+$env:PACKER_LOG_PATH="packerlog-$($dateStamp).txt"
 
 & $packerBinary build -on-error=cleanup `
     -var "client_id=$($ServicePrincipalClientId)" `
     -var "client_secret=$($ServicePrincipalClientSecret)" `
     -var "subscription_id=$($SubscriptionId)" `
-    -var "build_resource_group_name=$($BuildResourceGroupName)" `
-    -var "capture_container_name=$($CaptureContainerName)" `
     -var "tenant_id=$($TenantId)" `
-    -var "object_id=$($ServicePrincipalObjectId)" `
     -var "resource_group=$($ResourceGroupName)" `
     -var "storage_account=$($StorageAccountName)" `
-    -var "install_password=$($installPassword)" `
+    -var "build_resource_group_name=$($BuildResourceGroupName)" `
+    -var "location=$($AzureLocation)" `
+    -var "virtual_network_name=$($VnetName)" `
+    -var "virtual_network_resource_group_name=$($VnetResourceGroupName)" `
+    -var "virtual_network_subnet_name=$($VnetSubnetName)" `
     $imageTemplatePath
 
 Write-Host "Packer build completed"
