@@ -1,8 +1,8 @@
 #!/bin/bash -e
 ##########################################################
 ##  File:  provision-adoagents-infra.sh
-##  Desc:  Uses Azure CLI to call a bicep file (template) 
-##         to provision ADO agent infrastructure
+##  Desc:  Uses Bicep/ARM templates to provision ADO 
+##         agent infrastructure. 
 ##########################################################
 
 ORGANIZATION_NAME=$1

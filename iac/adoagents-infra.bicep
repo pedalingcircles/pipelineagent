@@ -132,8 +132,8 @@ param imageVirtualNetworkDiagnosticsLogs array = []
 param imageVirtualNetworkDiagnosticsMetrics array = []
 param imageNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'image')
 param imageNetworkSecurityGroupRules array = []
-param imageSubnetName string = replace(hubSubnetName, 'hub', 'image')
-param imageSubnetAddressPrefix string = '10.0.120.0/27'
+param imageSubnetName string = replace(hubSubnetName, 'hub', 'packer')
+param imageSubnetAddressPrefix string = '10.0.120.0/28'
 param imageSubnetServiceEndpoints array = []
 
 // agent spoke networking

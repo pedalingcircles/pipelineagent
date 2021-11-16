@@ -34,9 +34,6 @@ The Azure subscription Id where resources will be created.
 .PARAMETER BuildResourceGroupName
     An existing resource group to run the build in.
 
-.PARAMETER AzureLocation
-    The location of the resources being created in Azure. For example "East US".
-
 .PARAMETER VnetName
     A pre-existing virtual network for the VM.
 
@@ -85,10 +82,6 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]$BuildResourceGroupName,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]$AzureLocation,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -151,13 +144,12 @@ $env:PACKER_LOG_PATH="packerlog-$($dateStamp).txt"
 
 & $packerBinary build -on-error=cleanup `
     -var "client_id=$($ServicePrincipalClientId)" `
-    -var "client_secret=$($ServicePrincipalClientSecret)" `
+    -var "client_secret=$(ConvertFrom-SecureString -SecureString $ServicePrincipalClientSecret -AsPlainText)" `
     -var "subscription_id=$($SubscriptionId)" `
     -var "tenant_id=$($TenantId)" `
     -var "resource_group=$($ResourceGroupName)" `
     -var "storage_account=$($StorageAccountName)" `
     -var "build_resource_group_name=$($BuildResourceGroupName)" `
-    -var "location=$($AzureLocation)" `
     -var "virtual_network_name=$($VnetName)" `
     -var "virtual_network_resource_group_name=$($VnetResourceGroupName)" `
     -var "virtual_network_subnet_name=$($VnetSubnetName)" `
