@@ -55,6 +55,7 @@ if [ -z "$TEMPLATE_FILE_PATH" ]; then
 fi
 
 if [ WHAT_IF -eq 0 ]; then
+  echo "Running deployment operation"
   az deployment sub create \
     --name deploy-adoagent-baseline-$(date -u +"%Y%m%dT%H%M%SZ") \
     --no-prompt true \
@@ -65,6 +66,7 @@ if [ WHAT_IF -eq 0 ]; then
         environmentType=$ENVIRONMENT_TYPE \
         organization=$ORGANIZATION_NAME
 else
+  echo "Running what-if operation"
   az deployment sub what-if \
     --name deploy-adoagent-baseline-$(date -u +"%Y%m%dT%H%M%SZ") \
     --no-prompt true \
