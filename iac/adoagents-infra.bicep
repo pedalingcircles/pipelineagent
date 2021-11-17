@@ -316,6 +316,14 @@ module hub './modules/hubNetwork.bicep' = {
     firewallManagementPublicIPAddressSkuName: firewallManagementPublicIPAddressSkuName
     firewallManagementPublicIpAllocationMethod: firewallManagementPublicIpAllocationMethod
     firewallManagementPublicIPAddressAvailabilityZones: firewallManagementPublicIPAddressAvailabilityZones
+
+    bastionHostName: bastionHostName
+    bastionHostSubnetAddressPrefix: bastionHostSubnetAddressPrefix
+    bastionHostPublicIPAddressName: bastionHostPublicIPAddressName
+    bastionHostPublicIPAddressSkuName: bastionHostPublicIPAddressSkuName
+    bastionHostPublicIPAddressAllocationMethod: bastionHostPublicIPAddressAllocationMethod
+    bastionHostPublicIPAddressAvailabilityZones: bastionHostPublicIPAddressAvailabilityZones
+    bastionHostIPConfigurationName: bastionHostIPConfigurationName
   }
 }
 
@@ -536,22 +544,23 @@ module imageSubscriptionCreateActivityLogging './modules/centralLogging.bicep' =
   }
 }
 
-module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
-  name: 'deploy-remote-access-${nowUtc}'
-  scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
 
-  params: {
-    location: hubLocation
-    hubVirtualNetworkName: hub.outputs.virtualNetworkName
-    bastionHostName: bastionHostName
-    bastionHostSubnetAddressPrefix: bastionHostSubnetAddressPrefix
-    bastionHostPublicIPAddressName: bastionHostPublicIPAddressName
-    bastionHostPublicIPAddressSkuName: bastionHostPublicIPAddressSkuName
-    bastionHostPublicIPAddressAllocationMethod: bastionHostPublicIPAddressAllocationMethod
-    bastionHostPublicIPAddressAvailabilityZones: bastionHostPublicIPAddressAvailabilityZones
-    bastionHostIPConfigurationName: bastionHostIPConfigurationName
-  }
-}
+// module remoteAccess './modules/remoteAccess.bicep' = if(deployRemoteAccess) {
+//   name: 'deploy-remote-access-${nowUtc}'
+//   scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
+
+//   params: {
+//     location: hubLocation
+//     hubVirtualNetworkName: hub.outputs.virtualNetworkName
+//     bastionHostName: bastionHostName
+//     bastionHostSubnetAddressPrefix: bastionHostSubnetAddressPrefix
+//     bastionHostPublicIPAddressName: bastionHostPublicIPAddressName
+//     bastionHostPublicIPAddressSkuName: bastionHostPublicIPAddressSkuName
+//     bastionHostPublicIPAddressAllocationMethod: bastionHostPublicIPAddressAllocationMethod
+//     bastionHostPublicIPAddressAvailabilityZones: bastionHostPublicIPAddressAvailabilityZones
+//     bastionHostIPConfigurationName: bastionHostIPConfigurationName
+//   }
+// }
 
 module sharedImageGallery './modules/sharedImageGallery.bicep' = {
   name: 'deploy-sharedimagegallery-${nowUtc}'

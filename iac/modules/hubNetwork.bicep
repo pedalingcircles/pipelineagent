@@ -44,6 +44,16 @@ param firewallManagementPublicIPAddressSkuName string
 param firewallManagementPublicIpAllocationMethod string
 param firewallManagementPublicIPAddressAvailabilityZones array
 
+param bastionHostName string
+param bastionHostSubnetAddressPrefix string
+param bastionHostPublicIPAddressName string
+param bastionHostPublicIPAddressSkuName string
+param bastionHostPublicIPAddressAllocationMethod string = 'Static'
+param bastionHostPublicIPAddressAvailabilityZones array
+param bastionHostIPConfigurationName string
+
+var azureBastionSubnetName = 'AzureBastionSubnet' // The subnet name for Azure Bastion Hosts must be 'AzureBastionSubnet'
+
 param nowUtc string = utcNow()
 
 // 'VMProtectionAlerts' is not supported in AzureUsGovernment
@@ -146,8 +156,13 @@ module virtualNetwork './virtualNetwork.bicep' = {
           serviceEndpoints: firewallManagementSubnetServiceEndpoints
         }
       }
+      {
+        name: azureBastionSubnetName
+        properties: {
+          addressPrefix: bastionHostSubnetAddressPrefix
+        }
+      }
     ]
-
     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
     logStorageAccountResourceId: logStorage.outputs.id
   }
@@ -230,6 +245,22 @@ module firewall './firewall.bicep' = {
     managementIpConfigurationName: firewallManagementIpConfigurationName
     managementIpConfigurationSubnetResourceId: '${virtualNetwork.outputs.id}/subnets/${firewallManagementSubnetName}'
     managementIpConfigurationPublicIPAddressResourceId: firewallManagementPublicIPAddress.outputs.id
+  }
+}
+
+
+module bastionHost './bastionHost.bicep' = {
+  name: 'deploy-remote-access-bastionhost-${nowUtc}'
+  params: {
+    name: bastionHostName
+    hubVirtualNetworkName: virtualNetworkName
+    location: location
+    tags: tags
+    publicIPAddressName: bastionHostPublicIPAddressName
+    publicIPAddressSkuName: bastionHostPublicIPAddressSkuName
+    publicIPAddressAllocationMethod: bastionHostPublicIPAddressAllocationMethod
+    publicIPAddressAvailabilityZones: bastionHostPublicIPAddressAvailabilityZones
+    ipConfigurationName: bastionHostIPConfigurationName
   }
 }
 
