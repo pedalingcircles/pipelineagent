@@ -54,7 +54,7 @@ if [ -z "$TEMPLATE_FILE_PATH" ]; then
   exit 1
 fi
 
-if [ WHAT_IF -eq 0 ]; then
+if [ $WHAT_IF -eq 0 ]; then
   echo "Running deployment operation"
   az deployment sub create \
     --name deploy-adoagent-baseline-$(date -u +"%Y%m%dT%H%M%SZ") \
