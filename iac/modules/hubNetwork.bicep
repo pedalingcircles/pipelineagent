@@ -52,9 +52,9 @@ param bastionHostPublicIPAddressAllocationMethod string = 'Static'
 param bastionHostPublicIPAddressAvailabilityZones array
 param bastionHostIPConfigurationName string
 
-var azureBastionSubnetName = 'AzureBastionSubnet' // The subnet name for Azure Bastion Hosts must be 'AzureBastionSubnet'
-
 param nowUtc string = utcNow()
+
+var azureBastionSubnetName = 'AzureBastionSubnet' // The subnet name for Azure Bastion Hosts must be 'AzureBastionSubnet'
 
 var defaultVirtualNewtorkDiagnosticsLogs = [
   {
@@ -251,15 +251,19 @@ module bastionHost './bastionHost.bicep' = {
   name: 'deploy-remote-access-bastionhost-${nowUtc}'
   params: {
     name: bastionHostName
-    bastionHostSubnetName: azureBastionSubnetName
     location: location
     tags: tags
+    virtualNetworkName: virtualNetworkName
+    subnetName: azureBastionSubnetName
     publicIPAddressName: bastionHostPublicIPAddressName
     publicIPAddressSkuName: bastionHostPublicIPAddressSkuName
     publicIPAddressAllocationMethod: bastionHostPublicIPAddressAllocationMethod
     publicIPAddressAvailabilityZones: bastionHostPublicIPAddressAvailabilityZones
     ipConfigurationName: bastionHostIPConfigurationName
   }
+  dependsOn: [
+    virtualNetwork
+  ]
 }
 
 output virtualNetworkName string = virtualNetwork.outputs.name

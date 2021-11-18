@@ -161,7 +161,6 @@ param policy string = ''
 // Key vault deployment not currently working
 param deployAgentKeyVault bool = false
 
-
 param bastionHostName string = 'bastionHost'
 param bastionHostSubnetAddressPrefix string = '10.0.100.160/27'
 param bastionHostPublicIPAddressName string = 'bastionHostPublicIPAddress'
