@@ -56,7 +56,6 @@ var azureBastionSubnetName = 'AzureBastionSubnet' // The subnet name for Azure B
 
 param nowUtc string = utcNow()
 
-// 'VMProtectionAlerts' is not supported in AzureUsGovernment
 var defaultVirtualNewtorkDiagnosticsLogs = [
   {
     category: 'VMProtectionAlerts'
@@ -253,7 +252,7 @@ module bastionHost './bastionHost.bicep' = {
   name: 'deploy-remote-access-bastionhost-${nowUtc}'
   params: {
     name: bastionHostName
-    hubVirtualNetworkName: virtualNetworkName
+    bastionHostSubnetName: azureBastionSubnetName
     location: location
     tags: tags
     publicIPAddressName: bastionHostPublicIPAddressName
