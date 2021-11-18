@@ -158,9 +158,6 @@ param agentSubnetServiceEndpoints array = []
 @description('Built-in policy assignments to assign, default is none. [NIST/IL5/CMMC] IL5 is only availalbe for GOV cloud and will switch to NIST if tried in AzureCloud.')
 param policy string = ''
 
-@description('Provision Azure Bastion Host and jumpboxes in this deployment')
-param deployRemoteAccess bool = true
-
 // Key vault deployment not currently working
 param deployAgentKeyVault bool = false
 
