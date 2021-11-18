@@ -247,7 +247,6 @@ module firewall './firewall.bicep' = {
   }
 }
 
-
 module bastionHost './bastionHost.bicep' = {
   name: 'deploy-remote-access-bastionhost-${nowUtc}'
   params: {
