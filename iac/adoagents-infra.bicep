@@ -57,6 +57,7 @@ param hubSubscriptionId string = subscription().subscriptionId
 param agentSubscriptionId string = subscription().subscriptionId
 param imageBuilderubscriptionId string = subscription().subscriptionId
 param imageSubscriptionId string = subscription().subscriptionId
+param imageBuilderSubscriptionId string = subscription().subscriptionId
 param operationsSubscriptionId string = subscription().subscriptionId
 
 // locations. They could all potentially be different
@@ -78,7 +79,6 @@ var logAnalyticsWorkspaceName = take('log-operations-${replace(resourceNamePlace
 
 // hub networking
 var hubLogStorageAccountName = take('sthublogs${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
-
 param hubLogStorageSkuName string = 'Standard_GRS'
 param hubVirtualNetworkName string = 'vnet-hub'
 param hubVirtualNetworkAddressPrefix string = '10.0.100.0/24'
@@ -149,6 +149,19 @@ param agentSubnetName string = replace(hubSubnetName, 'hub', 'agent')
 param agentSubnetAddressPrefix string = '10.1.100.0/24'
 param agentSubnetServiceEndpoints array = []
 
+// imagebuilding spoke networking
+var imageBuilderLogStorageAccountName = take('stimgbldr${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
+param imageBuilderLogStorageSkuName string = hubLogStorageSkuName
+param imageBuilderVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'imagebuilder')
+param imageBuilderVirtualNetworkAddressPrefix string = '10.0.130.0/24'
+param imageBuilderVirtualNetworkDiagnosticsLogs array = []
+param imageBuilderVirtualNetworkDiagnosticsMetrics array = []
+param imageBuilderNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'imagebuilder')
+param imageBuilderNetworkSecurityGroupRules array = []
+param imageBuilderSubnetName string = replace(hubSubnetName, 'hub', 'imagebuilder')
+param imageBuilderSubnetAddressPrefix string = '10.0.130.0/25'
+param imageBuilderSubnetServiceEndpoints array = []
+
 @allowed([
   'NIST'
   'IL5' // Gov cloud only, trying to deploy IL5 in AzureCloud will switch to NIST
@@ -200,7 +213,6 @@ param operationsTags object = {
 }
 
 var agentKeyVaultName = take('kv-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 24)
-
 
 module hubResourceGroup './modules/resourceGroup.bicep' = {
   name: 'deploy-hub-rg-${nowUtc}'
@@ -408,6 +420,34 @@ module image './modules/spokeNetwork.bicep' = {
   }
 }
 
+module imageBuilder './modules/spokeNetwork.bicep' = {
+  name: 'deploy-imagebuilder-spoke-${nowUtc}'
+  scope: resourceGroup(imageBuilderSubscriptionId, imageBuilderResourceGroupName)
+  params: {
+    location: imageBuilderLocation
+    tags: imageBuilderTags
+
+    logStorageAccountName: imageBuilderLogStorageAccountName
+    logStorageSkuName: imageBuilderLogStorageSkuName
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
+
+    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
+
+    virtualNetworkName: imageBuilderVirtualNetworkName
+    virtualNetworkAddressPrefix: imageBuilderVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: imageBuilderVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: imageBuilderVirtualNetworkDiagnosticsMetrics
+
+    networkSecurityGroupName: imageBuilderNetworkSecurityGroupName
+    networkSecurityGroupRules: imageBuilderNetworkSecurityGroupRules
+
+    subnetName: imageBuilderSubnetName
+    subnetAddressPrefix: imageBuilderSubnetAddressPrefix
+    subnetServiceEndpoints: imageBuilderSubnetServiceEndpoints
+  }
+}
+
 module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
   name: 'deploy-hub-peerings-${nowUtc}'
   scope: subscription(hubSubscriptionId)
@@ -415,7 +455,9 @@ module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
     hubResourceGroupName: hubResourceGroup.outputs.name
     hubVirtualNetworkName: hub.outputs.virtualNetworkName
     imageVirtualNetworkName: image.outputs.virtualNetworkName
+    imageBuilderVirtualNetworkName: imageBuilder.outputs.virtualNetworkName
     imageVirtualNetworkResourceId: image.outputs.virtualNetworkResourceId
+    imageBuilderVirtualNetworkResourceId: imageBuilder.outputs.virtualNetworkResourceId
     agentVirtualNetworkName: agent.outputs.virtualNetworkName
     agentVirtualNetworkResourceId: agent.outputs.virtualNetworkResourceId
     operationsVirtualNetworkName: operations.outputs.virtualNetworkName
@@ -453,6 +495,18 @@ module imageVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
   params: {
     spokeResourceGroupName: imageResourceGroup.outputs.name
     spokeVirtualNetworkName: image.outputs.virtualNetworkName
+
+    hubVirtualNetworkName: hub.outputs.virtualNetworkName
+    hubVirtualNetworkResourceId: hub.outputs.virtualNetworkResourceId
+  }
+}
+
+module imageBuilderVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
+  name: 'deploy-imagebuilder-peerings-${nowUtc}'
+  scope: subscription(imageBuilderSubscriptionId)
+  params: {
+    spokeResourceGroupName: imageBuilderResourceGroup.outputs.name
+    spokeVirtualNetworkName: imageBuilder.outputs.virtualNetworkName
 
     hubVirtualNetworkName: hub.outputs.virtualNetworkName
     hubVirtualNetworkResourceId: hub.outputs.virtualNetworkResourceId
@@ -504,6 +558,17 @@ module imagePolicyAssignment './modules/policyAssignment.bicep' = {
   }
 }
 
+module imageBuilderPolicyAssignment './modules/policyAssignment.bicep' = {
+  name: 'assign-policy-imagebuilder-${nowUtc}'
+  scope: resourceGroup(imageBuilderSubscriptionId, imageBuilderResourceGroupName)
+  params: {
+    builtInAssignment: policy
+    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+    operationsSubscriptionId: operationsSubscriptionId
+  }
+}
+
 module hubSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = {
   name: 'activity-logs-hub-${nowUtc}'
   scope: subscription(hubSubscriptionId)
@@ -536,6 +601,15 @@ module imageSubscriptionCreateActivityLogging './modules/centralLogging.bicep' =
   scope: subscription(imageSubscriptionId)
   params: {
     diagnosticSettingName: 'log-image-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+  }
+}
+
+module imageBuilderSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != imageBuilderSubscriptionId) {
+  name: 'activity-logs-imagebuilder-${nowUtc}'
+  scope: subscription(imageBuilderSubscriptionId)
+  params: {
+    diagnosticSettingName: 'log-imagebuilder-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
   }
 }

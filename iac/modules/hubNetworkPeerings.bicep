@@ -3,7 +3,9 @@ targetScope = 'subscription'
 param hubResourceGroupName string
 param hubVirtualNetworkName string
 param imageVirtualNetworkName string
+param imageBuilderVirtualNetworkName string
 param imageVirtualNetworkResourceId string
+param imageBuilderVirtualNetworkResourceId string
 param agentVirtualNetworkName string
 param agentVirtualNetworkResourceId string
 param operationsVirtualNetworkName string
@@ -17,6 +19,15 @@ module hubToImageVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
   params: {
     name: '${hubVirtualNetworkName}/to-${imageVirtualNetworkName}'
     remoteVirtualNetworkResourceId: imageVirtualNetworkResourceId
+  }
+}
+
+module hubToImageBuilderVirtualNetworkPeering './virtualNetworkPeering.bicep' = {
+  scope: resourceGroup(hubResourceGroupName)
+  name: 'deploy-hubtoimagebuilder-vnet-peering-storage-${nowUtc}'
+  params: {
+    name: '${hubVirtualNetworkName}/to-${imageBuilderVirtualNetworkName}'
+    remoteVirtualNetworkResourceId: imageBuilderVirtualNetworkResourceId
   }
 }
 
