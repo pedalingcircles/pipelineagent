@@ -9,7 +9,6 @@ param publicIPAddressSkuName string
 param publicIPAddressAllocationMethod string
 param publicIPAddressAvailabilityZones array
 
-
 resource vnet 'Microsoft.Network/virtualNetworks@2021-02-01' existing = {
   name: virtualNetworkName
 }

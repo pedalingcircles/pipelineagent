@@ -4,6 +4,7 @@ param tags object = {}
 param logStorageAccountName string
 param logStorageSkuName string
 
+param logAnalyticsWorkspaceName string
 param logAnalyticsWorkspaceResourceId string
 
 param virtualNetworkName string
@@ -13,6 +14,8 @@ param virtualNetworkDiagnosticsMetrics array
 
 param networkSecurityGroupName string
 param networkSecurityGroupRules array
+param networkSecurityGroupDiagnosticsLogs array
+param networkSecurityGroupDiagnosticsMetrics array
 
 param subnetName string
 param subnetAddressPrefix string
@@ -27,6 +30,8 @@ param firewallName string
 param firewallSkuTier string
 param firewallPolicyName string
 param firewallThreatIntelMode string
+param firewallDiagnosticsLogs array
+param firewallDiagnosticsMetrics array
 param firewallClientIpConfigurationName string
 param firewallClientSubnetName string
 param firewallClientSubnetAddressPrefix string
@@ -43,6 +48,15 @@ param firewallManagementPublicIPAddressName string
 param firewallManagementPublicIPAddressSkuName string
 param firewallManagementPublicIpAllocationMethod string
 param firewallManagementPublicIPAddressAvailabilityZones array
+
+param publicIPAddressDiagnosticsLogs array
+param publicIPAddressDiagnosticsMetrics array
+
+param supportedClouds array = [
+  'AzureCloud'
+  'AzureUSGovernment'
+]
+
 
 param bastionHostName string
 param bastionHostSubnetAddressPrefix string
@@ -108,7 +122,7 @@ var defaultNetworkSecurityGroupRules = [
 ]
 
 module logStorage './storageAccount.bicep' = {
-  name: 'deploy-log-storage-${nowUtc}'
+  name: 'deploy-hub-log-storage-${nowUtc}'
   params: {
     storageAccountName: logStorageAccountName
     location: location
@@ -118,27 +132,30 @@ module logStorage './storageAccount.bicep' = {
 }
 
 module networkSecurityGroup './networkSecurityGroup.bicep' = {
-  name: 'deploy-nsg-${nowUtc}'
+  name: 'deploy-hub-nsg-${nowUtc}'
   params: {
     name: networkSecurityGroupName
     location: location
     tags: tags
 
-    securityRules: empty(networkSecurityGroupRules) ? defaultNetworkSecurityGroupRules : networkSecurityGroupRules
+    securityRules: networkSecurityGroupRules
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: networkSecurityGroupDiagnosticsLogs
+    metrics: networkSecurityGroupDiagnosticsMetrics
   }
 }
 
 module virtualNetwork './virtualNetwork.bicep' = {
-  name: 'deploy-vnet-${nowUtc}'
+  name: 'deploy-hub-vnet-${nowUtc}'
   params: {
     name: virtualNetworkName
     location: location
     tags: tags
 
     addressPrefix: virtualNetworkAddressPrefix
-
-    diagnosticsLogs: empty(virtualNetworkDiagnosticsLogs) ? defaultVirtualNewtorkDiagnosticsLogs : virtualNetworkDiagnosticsLogs
-    diagnosticsMetrics: empty(virtualNetworkDiagnosticsMetrics) ? defaultVirtualNetworkDiagnosticsMetrics : virtualNetworkDiagnosticsMetrics
 
     subnets: [
       {
@@ -162,8 +179,12 @@ module virtualNetwork './virtualNetwork.bicep' = {
         }
       }
     ]
+
     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
     logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: virtualNetworkDiagnosticsLogs
+    metrics: virtualNetworkDiagnosticsMetrics
   }
 }
 
@@ -191,7 +212,9 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
     routeTable: {
       id: routeTable.outputs.id
     }
-    serviceEndpoints: empty(subnetServiceEndpoints) ? defaultSubnetServiceEndpoints : subnetServiceEndpoints
+    serviceEndpoints: subnetServiceEndpoints
+    privateEndpointNetworkPolicies: 'Disabled'
+    privateLinkServiceNetworkPolicies: 'Enabled'
   }
   dependsOn: [
     virtualNetwork
@@ -209,6 +232,12 @@ module firewallClientPublicIPAddress './publicIPAddress.bicep' = {
     skuName: firewallClientPublicIPAddressSkuName
     publicIpAllocationMethod: firewallClientPublicIpAllocationMethod
     availabilityZones: firewallClientPublicIPAddressAvailabilityZones
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: publicIPAddressDiagnosticsLogs
+    metrics: publicIPAddressDiagnosticsMetrics
   }
 }
 
@@ -222,6 +251,12 @@ module firewallManagementPublicIPAddress './publicIPAddress.bicep' = {
     skuName: firewallManagementPublicIPAddressSkuName
     publicIpAllocationMethod: firewallManagementPublicIpAllocationMethod
     availabilityZones: firewallManagementPublicIPAddressAvailabilityZones
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: publicIPAddressDiagnosticsLogs
+    metrics: publicIPAddressDiagnosticsMetrics
   }
 }
 
@@ -244,7 +279,27 @@ module firewall './firewall.bicep' = {
     managementIpConfigurationName: firewallManagementIpConfigurationName
     managementIpConfigurationSubnetResourceId: '${virtualNetwork.outputs.id}/subnets/${firewallManagementSubnetName}'
     managementIpConfigurationPublicIPAddressResourceId: firewallManagementPublicIPAddress.outputs.id
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: firewallDiagnosticsLogs
+    metrics: firewallDiagnosticsMetrics
   }
+}
+
+module azureMonitorPrivateLink './privateLink.bicep' = if ( contains(supportedClouds, environment().name) ){
+  name: 'azure-monitor-private-link'
+  params: {
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    privateEndpointSubnetName: subnetName
+    privateEndpointVnetName: virtualNetwork.outputs.name
+    tags: tags
+  }
+  dependsOn: [
+    subnet
+  ]
 }
 
 module bastionHost './bastionHost.bicep' = {
