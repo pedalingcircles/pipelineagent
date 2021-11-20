@@ -8,8 +8,6 @@ param workspaceCappingDailyQuotaGb int = -1
 @description('Whether or not to deploy Sentinel solution to workspace.')
 param deploySentinel bool = false
 
-param nowUtc string = utcNow()
-
 // Solutions to add to workspace
 var solutions = [
   {

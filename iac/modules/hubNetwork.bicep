@@ -70,57 +70,6 @@ param nowUtc string = utcNow()
 
 var azureBastionSubnetName = 'AzureBastionSubnet' // The subnet name for Azure Bastion Hosts must be 'AzureBastionSubnet'
 
-var defaultVirtualNewtorkDiagnosticsLogs = [
-  {
-    category: 'VMProtectionAlerts'
-    enabled: true
-  }
-]
-
-var defaultVirtualNetworkDiagnosticsMetrics = [
-  {
-    category: 'AllMetrics'
-    enabled: true
-  }
-]
-
-var defaultSubnetServiceEndpoints = [
-  {
-    service: 'Microsoft.Storage'
-  }
-]
-
-var defaultNetworkSecurityGroupRules = [
-  {
-    name: 'allow_ssh'
-    properties: {
-      description: 'Allow SSH access from anywhere'
-      access: 'Allow'
-      priority: 100
-      protocol: 'Tcp'
-      direction: 'Inbound'
-      sourcePortRange: '*'
-      sourceAddressPrefix: '*'
-      destinationPortRange: '22'
-      destinationAddressPrefix: '*'
-    }
-  }
-  {
-    name: 'allow_rdp'
-    properties: {
-      description: 'Allow RDP access from anywhere'
-      access: 'Allow'
-      priority: 200
-      protocol: 'Tcp'
-      direction: 'Inbound'
-      sourcePortRange: '*'
-      sourceAddressPrefix: '*'
-      destinationPortRange: '3389'
-      destinationAddressPrefix: '*'
-    }
-  }
-]
-
 module logStorage './storageAccount.bicep' = {
   name: 'deploy-hub-log-storage-${nowUtc}'
   params: {
@@ -157,6 +106,7 @@ module virtualNetwork './virtualNetwork.bicep' = {
 
     addressPrefix: virtualNetworkAddressPrefix
 
+    // Delegated subnets
     subnets: [
       {
         name: firewallClientSubnetName

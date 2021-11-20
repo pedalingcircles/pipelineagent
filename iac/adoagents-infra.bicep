@@ -3,14 +3,14 @@ targetScope = 'subscription'
 
 @description('Used to identify environment types for naming resources.')
 @allowed([
-  'ephemeral'   // Short lived environments used for smoke testing and PR approvals
-  'sandbox'     // Used for experimental work and it not part of the promotion process
-  'integration' // The first integration environment. Typically the first environment deployed off of the trunk branch.
-  'development' // The main environment used by developers and engineers to validate, debug, showcase, and collaborate on the solution.
+  'ephemeral'   // Used for short lived environments used for smoke testing, PRs, feature teams, etc. 
+  'sandbox'     // Used for experimental work that's not part of the promotion process.
+  'integration' // The first integration environment. Typically the first environment deployed off of a trunk branch.
+  'development' // The main environment used by developers and engineers to validate, debug, showcase, and collaborate on the solution being built.
   'demo'        // The demo environment. This is used to showcase to customers, the internal team, of leadership. It can optionally be used for sprint demos.
   'test'        // The funtional testing environment
   'acceptance'  // User acceptance testing (aka UAT)
-  'staging'     // A mirroried or similiar version of production. Typically all settings match including SKUs and configuration 
+  'staging'     // A mirrored or similiar version of production. Typically all settings match including SKUs and configuration 
   'production'  // The live production environment
 ])
 param environmentType string
@@ -29,6 +29,7 @@ param organization string
 @description('The timestamp for deployment names.')
 param nowUtc string = utcNow()
 
+// Variable used internally to just map long names to short names
 var environmentTypeMap = {
   ephemeral: 'eph'
   sandbox: 'sbx'
@@ -41,24 +42,26 @@ var environmentTypeMap = {
   production: 'prd'
 }
 var environmentTypeShort = environmentTypeMap[environmentType]
+
+// Unique ID is scoped so that it can be unique enough to support multiple "environments" but 
+// not unique to the deployment run. If you need to support additioanl conflic resolution with resource 
+// naming then this value can be updated.
 var uniqueId = uniqueString('${workloadShort}${environmentType}${organization}${subscription().subscriptionId}')
+
+// Used as a convention when naming resources. This is generally an affix values and 
+// maybe have a prefix and suffix when combined to name any resource. There is a 
+// regular and short name values due to certain Azure naming restriction which
+// may require shorter name.
 var resourceNamePlaceholder = '${workload}[delimiterplaceholder]${environmentType}[delimiterplaceholder]${uniqueId}'
 var resourceNamePlaceholderShort = '${workloadShort}[delimiterplaceholder]${environmentTypeShort}[delimiterplaceholder]${uniqueId}'
-
-// resource group names
-var hubResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-hub'
-var agentResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-agent'
-var imageBuilderResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-imagebuilder'
-var imageResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-image'
-var operationsResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-operations'
 
 // subscription ids. They could all potentially be different
 param hubSubscriptionId string = subscription().subscriptionId
 param agentSubscriptionId string = subscription().subscriptionId
-param imageBuilderubscriptionId string = subscription().subscriptionId
 param imageSubscriptionId string = subscription().subscriptionId
 param imageBuilderSubscriptionId string = subscription().subscriptionId
 param operationsSubscriptionId string = subscription().subscriptionId
+param identitySubscriptionId string = subscription().subscriptionId
 
 // locations. They could all potentially be different
 param hubLocation string = deployment().location
@@ -66,11 +69,177 @@ param agentLocation string = deployment().location
 param imageBuilderLocation string = deployment().location
 param imageLocation string = deployment().location
 param operationsLocation string = deployment().location
+param identityLocation string = deployment().location
+
+// resource group names
+var hubResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-hub'
+var agentResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-agent'
+var imageBuilderResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-imagebuilder'
+var imageResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-image'
+var operationsResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-operations'
+var identityResourceGroupName ='rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-identity'
+
+// Tags the the various components and resources
+var defaultTags = {
+  'environmentType': environmentType
+  'org': organization
+  'workload': workload
+}
+param hubTags object = {
+  'component': 'hub'
+}
+param agentTags object = {
+  'component': 'agent'
+}
+param imageBuilderTags object = {
+  'component': 'imagebuilder'
+}
+param imageTags object = {
+  'component': 'image'
+}
+param operationsTags object = {
+  'component': 'operations'
+}
+param identityTags object = {
+  'component': 'identity'
+}
+
+module hubResourceGroup './modules/resourceGroup.bicep' = {
+  name: 'deploy-rg-hub-${nowUtc}'
+  scope: subscription(hubSubscriptionId)
+  params: {
+    name: hubResourceGroupName
+    location: hubLocation
+    tags: union(hubTags,defaultTags)
+  }
+}
+
+var spokes = [
+  {
+    name: 'operations'
+    subscriptionId: operationsSubscriptionId
+    resourceGroupName: operationsResourceGroupName
+    location: operationsLocation
+    logStorageAccountName: operationsLogStorageAccountName
+    logStorageSkuName: operationsLogStorageSkuName
+    virtualNetworkName: operationsVirtualNetworkName
+    virtualNetworkAddressPrefix: operationsVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: operationsVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: operationsVirtualNetworkDiagnosticsMetrics
+    networkSecurityGroupName: operationsNetworkSecurityGroupName
+    networkSecurityGroupRules: operationsNetworkSecurityGroupRules
+    networkSecurityGroupDiagnosticsLogs: operationsNetworkSecurityGroupDiagnosticsLogs
+    networkSecurityGroupDiagnosticsMetrics: operationsNetworkSecurityGroupDiagnosticsMetrics
+    subnetName: operationsSubnetName
+    subnetAddressPrefix: operationsSubnetAddressPrefix
+    subnetServiceEndpoints: operationsSubnetServiceEndpoints
+    tags: union(operationsTags,defaultTags)
+  }
+  {
+    name: 'agent'
+    subscriptionId: agentSubscriptionId
+    resourceGroupName: agentResourceGroupName
+    location: agentLocation
+    logStorageAccountName: agentLogStorageAccountName
+    logStorageSkuName: agentLogStorageSkuName
+    virtualNetworkName: agentVirtualNetworkName
+    virtualNetworkAddressPrefix: agentVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: agentVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: agentVirtualNetworkDiagnosticsMetrics
+    networkSecurityGroupName: agentNetworkSecurityGroupName
+    networkSecurityGroupRules: agentNetworkSecurityGroupRules
+    networkSecurityGroupDiagnosticsLogs: agentNetworkSecurityGroupDiagnosticsLogs
+    networkSecurityGroupDiagnosticsMetrics: agentNetworkSecurityGroupDiagnosticsMetrics
+    subnetName: agentSubnetName
+    subnetAddressPrefix: agentSubnetAddressPrefix
+    subnetServiceEndpoints: agentSubnetServiceEndpoints
+    tags: union(agentTags,defaultTags)
+  }
+  {
+    name: 'image'
+    subscriptionId: imageSubscriptionId
+    resourceGroupName: imageResourceGroupName
+    location: imageLocation
+    logStorageAccountName: imageLogStorageAccountName
+    logStorageSkuName: imageLogStorageSkuName
+    virtualNetworkName: imageVirtualNetworkName
+    virtualNetworkAddressPrefix: imageVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: imageVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: imageVirtualNetworkDiagnosticsMetrics
+    networkSecurityGroupName: imageNetworkSecurityGroupName
+    networkSecurityGroupRules: imageNetworkSecurityGroupRules
+    networkSecurityGroupDiagnosticsLogs: imageNetworkSecurityGroupDiagnosticsLogs
+    networkSecurityGroupDiagnosticsMetrics: imageNetworkSecurityGroupDiagnosticsMetrics
+    subnetName: imageSubnetName
+    subnetAddressPrefix: imageSubnetAddressPrefix
+    subnetServiceEndpoints: imageSubnetServiceEndpoints
+    tags: union(imageTags,defaultTags)
+  }
+  {
+    name: 'imagebuilder'
+    subscriptionId: imageBuilderSubscriptionId
+    resourceGroupName: imageBuilderResourceGroupName
+    location: imageBuilderLocation
+    logStorageAccountName: imageBuilderLogStorageAccountName
+    logStorageSkuName: imageBuilderLogStorageSkuName
+    virtualNetworkName: imageBuilderVirtualNetworkName
+    virtualNetworkAddressPrefix: imageBuilderVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: imageBuilderVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: imageBuilderVirtualNetworkDiagnosticsMetrics
+    networkSecurityGroupName: imageBuilderNetworkSecurityGroupName
+    networkSecurityGroupRules: imageBuilderNetworkSecurityGroupRules
+    networkSecurityGroupDiagnosticsLogs: imageBuilderNetworkSecurityGroupDiagnosticsLogs
+    networkSecurityGroupDiagnosticsMetrics: imageBuilderNetworkSecurityGroupDiagnosticsMetrics
+    subnetName: imageBuilderSubnetName
+    subnetAddressPrefix: imageBuilderSubnetAddressPrefix
+    subnetServiceEndpoints: imageBuilderSubnetServiceEndpoints
+    tags: union(imageBuilderTags,defaultTags)
+  }
+  {
+    name: 'identity'
+    subscriptionId: identitySubscriptionId
+    resourceGroupName: identityResourceGroupName
+    location: identityLocation
+    logStorageAccountName: identityLogStorageAccountName
+    logStorageSkuName: identityLogStorageSkuName
+    virtualNetworkName: identityVirtualNetworkName
+    virtualNetworkAddressPrefix: identityVirtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: identityVirtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: identityVirtualNetworkDiagnosticsMetrics
+    networkSecurityGroupName: identityNetworkSecurityGroupName
+    networkSecurityGroupRules: identityNetworkSecurityGroupRules
+    networkSecurityGroupDiagnosticsLogs: identityNetworkSecurityGroupDiagnosticsLogs
+    networkSecurityGroupDiagnosticsMetrics: identityNetworkSecurityGroupDiagnosticsMetrics
+    subnetName: identitySubnetName
+    subnetAddressPrefix: identitySubnetAddressPrefix
+    subnetServiceEndpoints: identitySubnetServiceEndpoints
+    tags: union(identityTags,defaultTags)
+
+  }
+]
+
+module spokeResourceGroups './modules/resourceGroup.bicep' = [for spoke in spokes: {
+  name: 'deploy-rg-${spoke.name}-${nowUtc}'
+  scope: subscription(spoke.subscriptionId)
+  params: {
+    name: spoke.resourceGroupName
+    location: spoke.location
+    tags: spoke.tags
+  }
+}]
+
+
+
+
+
 
 // Log analytics workspace settings
 param logAnalyticsWorkspaceRetentionInDays int = 30
 param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
 param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
+
+@description('When set to "True", enables Microsoft Sentinel within the ADO Agent pipelines Log Analytics workspace.')
+param deploySentinel bool = false
 
 var sharedImageGalleryName = take('sig.${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '.')}', 80)
 
@@ -86,30 +255,84 @@ param hubVirtualNetworkDiagnosticsLogs array = []
 param hubVirtualNetworkDiagnosticsMetrics array = []
 param hubNetworkSecurityGroupName string = 'nsg-hub'
 param hubNetworkSecurityGroupRules array = []
+param hubNetworkSecurityGroupDiagnosticsLogs array = [
+  {
+    category: 'NetworkSecurityGroupEvent'
+    enabled: true
+  }
+  {
+    category: 'NetworkSecurityGroupRuleCounter'
+    enabled: true
+  }
+]
+param hubNetworkSecurityGroupDiagnosticsMetrics array = []
 param hubSubnetName string = 'snet-hub'
 param hubSubnetAddressPrefix string = '10.0.100.128/27'
 param hubSubnetServiceEndpoints array = []
 
-param firewallName string = 'firewall'
 param firewallSkuTier string = 'Premium'
+param firewallName string = 'firewall'
+param firewallManagementSubnetAddressPrefix string = '10.0.100.64/26'
+param firewallClientSubnetAddressPrefix string = '10.0.100.0/26'
 param firewallPolicyName string = 'firewall-policy'
 param firewallThreatIntelMode string = 'Alert'
-param firewallClientIpConfigurationName string = 'firewall-client-ip-config'
+param firewallDiagnosticsLogs array = [
+  {
+    category: 'AzureFirewallApplicationRule'
+    enabled: true
+  }
+  {
+    category: 'AzureFirewallNetworkRule'
+    enabled: true
+  }
+  {
+    category: 'AzureFirewallDnsProxy'
+    enabled: true
+  }
+]
+param firewallDiagnosticsMetrics array = [
+  {
+    category: 'AllMetrics'
+    enabled: true
+  }
+]
 var firewallClientSubnetName = 'AzureFirewallSubnet' //this must be 'AzureFirewallSubnet'
-param firewallClientSubnetAddressPrefix string = '10.0.100.0/26'
+param firewallClientIpConfigurationName string = 'firewall-client-ip-config'
 param firewallClientSubnetServiceEndpoints array = []
 param firewallClientPublicIPAddressName string = 'firewall-client-public-ip'
 param firewallClientPublicIPAddressSkuName string = 'Standard'
 param firewallClientPublicIpAllocationMethod string = 'Static'
 param firewallClientPublicIPAddressAvailabilityZones array = []
-param firewallManagementIpConfigurationName string = 'firewall-management-ip-config'
 var firewallManagementSubnetName = 'AzureFirewallManagementSubnet' //this must be 'AzureFirewallManagementSubnet'
-param firewallManagementSubnetAddressPrefix string = '10.0.100.64/26'
+param firewallManagementIpConfigurationName string = 'firewall-management-ip-config'
 param firewallManagementSubnetServiceEndpoints array = []
 param firewallManagementPublicIPAddressName string = 'firewall-management-public-ip'
 param firewallManagementPublicIPAddressSkuName string = 'Standard'
 param firewallManagementPublicIpAllocationMethod string = 'Static'
 param firewallManagementPublicIPAddressAvailabilityZones array = []
+param publicIPAddressDiagnosticsLogs array = [
+  {
+    category: 'DDoSProtectionNotifications'
+    enabled: true
+  }
+  {
+    category: 'DDoSMitigationFlowLogs'
+    enabled: true
+  }
+  {
+    category: 'DDoSMitigationReports'
+    enabled: true
+  }
+]
+param publicIPAddressDiagnosticsMetrics array = [
+  {
+    category: 'AllMetrics'
+    enabled: true
+  }
+]
+
+
+
 
 var operationsLogStorageAccountName = take('stopslogs${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param operationsLogStorageSkuName string = hubLogStorageSkuName
@@ -118,7 +341,11 @@ param operationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
 param operationsVirtualNetworkDiagnosticsLogs array = []
 param operationsVirtualNetworkDiagnosticsMetrics array = []
 param operationsNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'operations')
+param operationsNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
+param operationsNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param operationsNetworkSecurityGroupRules array = []
+
+
 param operationsSubnetName string = replace(hubSubnetName, 'hub', 'operations')
 param operationsSubnetAddressPrefix string = '10.0.115.0/27'
 param operationsSubnetServiceEndpoints array = []
@@ -131,6 +358,8 @@ param imageVirtualNetworkAddressPrefix string = '10.0.120.0/26'
 param imageVirtualNetworkDiagnosticsLogs array = []
 param imageVirtualNetworkDiagnosticsMetrics array = []
 param imageNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'image')
+param imageNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
+param imageNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param imageNetworkSecurityGroupRules array = []
 param imageSubnetName string = replace(hubSubnetName, 'hub', 'packer')
 param imageSubnetAddressPrefix string = '10.0.120.0/28'
@@ -144,6 +373,8 @@ param agentVirtualNetworkAddressPrefix string = '10.1.0.0/16'
 param agentVirtualNetworkDiagnosticsLogs array = []
 param agentVirtualNetworkDiagnosticsMetrics array = []
 param agentNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'agent')
+param agentNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
+param agentNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param agentNetworkSecurityGroupRules array = []
 param agentSubnetName string = replace(hubSubnetName, 'hub', 'agent')
 param agentSubnetAddressPrefix string = '10.1.100.0/24'
@@ -157,19 +388,43 @@ param imageBuilderVirtualNetworkAddressPrefix string = '10.0.130.0/24'
 param imageBuilderVirtualNetworkDiagnosticsLogs array = []
 param imageBuilderVirtualNetworkDiagnosticsMetrics array = []
 param imageBuilderNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'imagebuilder')
+param imageBuilderNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
+param imageBuilderNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param imageBuilderNetworkSecurityGroupRules array = []
 param imageBuilderSubnetName string = replace(hubSubnetName, 'hub', 'imagebuilder')
 param imageBuilderSubnetAddressPrefix string = '10.0.130.0/25'
 param imageBuilderSubnetServiceEndpoints array = []
 
+// identity spoke networking
+var identityLogStorageAccountName = take('stimgbldr${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
+param identityLogStorageSkuName string = hubLogStorageSkuName
+param identityVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'identity')
+param identityVirtualNetworkAddressPrefix string = '10.0.130.0/24'
+param identityVirtualNetworkDiagnosticsLogs array = []
+param identityVirtualNetworkDiagnosticsMetrics array = []
+param identityNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'identity')
+param identityNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
+param identityNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
+param identityNetworkSecurityGroupRules array = []
+param identitySubnetName string = replace(hubSubnetName, 'hub', 'identity')
+param identitySubnetAddressPrefix string = '10.0.130.0/25'
+param identitySubnetServiceEndpoints array = []
+
 @allowed([
   'NIST'
   'IL5' // Gov cloud only, trying to deploy IL5 in AzureCloud will switch to NIST
   'CMMC'
-  ''
 ])
 @description('Built-in policy assignments to assign, default is none. [NIST/IL5/CMMC] IL5 is only availalbe for GOV cloud and will switch to NIST if tried in AzureCloud.')
-param policy string = ''
+param policy string = 'NIST'
+
+param deployPolicy bool = false
+
+@description('Email address of the contact, in the form of john@doe.com')
+param emailSecurityContact string = ''
+
+param deployASC bool = false
+
 
 // Key vault deployment not currently working
 param deployAgentKeyVault bool = false
@@ -181,87 +436,44 @@ param bastionHostPublicIPAddressSkuName string = 'Standard'
 param bastionHostPublicIPAddressAllocationMethod string = 'Static'
 param bastionHostPublicIPAddressAvailabilityZones array = []
 param bastionHostIPConfigurationName string = 'bastionHostIPConfiguration'
-param hubTags object = {
-  'environmentType': environmentType
-  'org': organization
-  'workload': workload
-  'component': 'hub'
-}
-param agentTags object = {
-  'environmentType': environmentType
-  'org': organization
-  'workload': workload
-  'component': 'agent'
-}
-param imageBuilderTags object = {
-  'environmentType': environmentType
-  'org': organization
-  'workload': workload
-  'component': 'imagebuilder'
-}
-param imageTags object = {
-  'environmentType': environmentType
-  'org': organization
-  'workload': workload
-  'component': 'image'
-}
-param operationsTags object = {
-  'environmentType': environmentType
-  'org': organization
-  'workload': workload
-  'component': 'operations'
-}
+
 
 var agentKeyVaultName = take('kv-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 24)
 
-module hubResourceGroup './modules/resourceGroup.bicep' = {
-  name: 'deploy-hub-rg-${nowUtc}'
-  scope: subscription(hubSubscriptionId)
-  params: {
-    name: hubResourceGroupName
-    location: hubLocation
-    tags: hubTags
-  }
-}
 
-module agentResourceGroup './modules/resourceGroup.bicep' = {
-  name: 'deploy-agent-rg-${nowUtc}'
-  scope: subscription(agentSubscriptionId)
-  params: {
-    name: agentResourceGroupName
-    location: agentLocation
-    tags: agentTags
-  }
-}
 
-module imageBuilderResourceGroup './modules/resourceGroup.bicep' = {
-  name: 'deploy-imagebuilder-rg-${nowUtc}'
-  scope: subscription(imageBuilderubscriptionId)
-  params: {
-    name: imageBuilderResourceGroupName
-    location: imageBuilderLocation
-    tags: imageBuilderTags
-  }
-}
-module imageResourceGroup './modules/resourceGroup.bicep' = {
-  name: 'deploy-image-rg-${nowUtc}'
-  scope: subscription(imageSubscriptionId)
-  params: {
-    name: imageResourceGroupName
-    location: imageLocation
-    tags: imageTags
-  }
-}
 
-module operationsResourceGroup './modules/resourceGroup.bicep' = {
-  name: 'deploy-operations-rg-${nowUtc}'
-  scope: subscription(operationsSubscriptionId)
-  params: {
-    name: operationsResourceGroupName
-    location: operationsLocation
-    tags: operationsTags
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 module logAnalyticsWorkspace './modules/logAnalyticsWorkspace.bicep' = {
   name: 'deploy-laws-${nowUtc}'
@@ -269,19 +481,19 @@ module logAnalyticsWorkspace './modules/logAnalyticsWorkspace.bicep' = {
   params: {
     name: logAnalyticsWorkspaceName
     location: operationsLocation
-    tags: operationsTags
-
+    tags: union(operationsTags,defaultTags)
+    deploySentinel: deploySentinel
     retentionInDays: logAnalyticsWorkspaceRetentionInDays
     skuName: logAnalyticsWorkspaceSkuName
     workspaceCappingDailyQuotaGb: logAnalyticsWorkspaceCappingDailyQuotaGb
   }
   dependsOn: [
-    operationsResourceGroup
+    spokeResourceGroups
   ]
 }
 
-module hub './modules/hubNetwork.bicep' = {
-  name: 'deploy-hub-${nowUtc}'
+module hubNetwork './modules/hubNetwork.bicep' = {
+  name: 'deploy-vnet-hub-${nowUtc}'
   scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
   params: {
     location: hubLocation
@@ -290,6 +502,7 @@ module hub './modules/hubNetwork.bicep' = {
     logStorageAccountName: hubLogStorageAccountName
     logStorageSkuName: hubLogStorageSkuName
 
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
 
     virtualNetworkName: hubVirtualNetworkName
@@ -299,6 +512,8 @@ module hub './modules/hubNetwork.bicep' = {
 
     networkSecurityGroupName: hubNetworkSecurityGroupName
     networkSecurityGroupRules: hubNetworkSecurityGroupRules
+    networkSecurityGroupDiagnosticsLogs: hubNetworkSecurityGroupDiagnosticsLogs
+    networkSecurityGroupDiagnosticsMetrics: hubNetworkSecurityGroupDiagnosticsMetrics
 
     subnetName: hubSubnetName
     subnetAddressPrefix: hubSubnetAddressPrefix
@@ -308,6 +523,8 @@ module hub './modules/hubNetwork.bicep' = {
     firewallSkuTier: firewallSkuTier
     firewallPolicyName: firewallPolicyName
     firewallThreatIntelMode: firewallThreatIntelMode
+    firewallDiagnosticsLogs: firewallDiagnosticsLogs
+    firewallDiagnosticsMetrics: firewallDiagnosticsMetrics
     firewallClientIpConfigurationName: firewallClientIpConfigurationName
     firewallClientSubnetName: firewallClientSubnetName
     firewallClientSubnetAddressPrefix: firewallClientSubnetAddressPrefix
@@ -332,187 +549,66 @@ module hub './modules/hubNetwork.bicep' = {
     bastionHostPublicIPAddressAllocationMethod: bastionHostPublicIPAddressAllocationMethod
     bastionHostPublicIPAddressAvailabilityZones: bastionHostPublicIPAddressAvailabilityZones
     bastionHostIPConfigurationName: bastionHostIPConfigurationName
+
+    publicIPAddressDiagnosticsLogs: publicIPAddressDiagnosticsLogs
+    publicIPAddressDiagnosticsMetrics: publicIPAddressDiagnosticsMetrics
   }
 }
 
-module operations './modules/spokeNetwork.bicep' = {
-  name: 'deploy-operations-spoke-${nowUtc}'
-  scope: resourceGroup(operationsSubscriptionId, operationsResourceGroupName)
+module spokeNetworks './modules/spokeNetwork.bicep' = [ for spoke in spokes: {
+  name: 'deploy-vnet-${spoke.name}-${nowUtc}'
+  scope: resourceGroup(spoke.subscriptionId, spoke.resourceGroupName)
   params: {
-    location: operationsLocation
-    tags: operationsTags
+    location: spoke.location
+    tags: spoke.tags
 
-    logStorageAccountName: operationsLogStorageAccountName
-    logStorageSkuName: operationsLogStorageSkuName
+    logStorageAccountName: spoke.logStorageAccountName
+    logStorageSkuName: spoke.logStorageSkuName
 
     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
 
-    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
+    firewallPrivateIPAddress: hubNetwork.outputs.firewallPrivateIPAddress
 
-    virtualNetworkName: operationsVirtualNetworkName
-    virtualNetworkAddressPrefix: operationsVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: operationsVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: operationsVirtualNetworkDiagnosticsMetrics
+    virtualNetworkName: spoke.virtualNetworkName
+    virtualNetworkAddressPrefix: spoke.virtualNetworkAddressPrefix
+    virtualNetworkDiagnosticsLogs: spoke.virtualNetworkDiagnosticsLogs
+    virtualNetworkDiagnosticsMetrics: spoke.virtualNetworkDiagnosticsMetrics
 
-    networkSecurityGroupName: operationsNetworkSecurityGroupName
-    networkSecurityGroupRules: operationsNetworkSecurityGroupRules
+    networkSecurityGroupName: spoke.networkSecurityGroupName
+    networkSecurityGroupRules: spoke.networkSecurityGroupRules
+    networkSecurityGroupDiagnosticsLogs: spoke.networkSecurityGroupDiagnosticsLogs
+    networkSecurityGroupDiagnosticsMetrics: spoke.networkSecurityGroupDiagnosticsMetrics
 
-    subnetName: operationsSubnetName
-    subnetAddressPrefix: operationsSubnetAddressPrefix
-    subnetServiceEndpoints: operationsSubnetServiceEndpoints
+    subnetName: spoke.subnetName
+    subnetAddressPrefix: spoke.subnetAddressPrefix
+    subnetServiceEndpoints: spoke.subnetServiceEndpoints
   }
-}
-
-// agent spoke
-module agent './modules/spokeNetwork.bicep' = {
-  name: 'deploy-agent-spoke-${nowUtc}'
-  scope: resourceGroup(agentSubscriptionId, agentResourceGroupName)
-  params: {
-    location: agentLocation
-    tags: agentTags
-
-    logStorageAccountName: agentLogStorageAccountName
-    logStorageSkuName: agentLogStorageSkuName
-
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
-
-    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
-
-    virtualNetworkName: agentVirtualNetworkName
-    virtualNetworkAddressPrefix: agentVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: agentVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: agentVirtualNetworkDiagnosticsMetrics
-
-    networkSecurityGroupName: agentNetworkSecurityGroupName
-    networkSecurityGroupRules: agentNetworkSecurityGroupRules
-
-    subnetName: agentSubnetName
-    subnetAddressPrefix: agentSubnetAddressPrefix
-    subnetServiceEndpoints: agentSubnetServiceEndpoints
-  }
-}
-
-module image './modules/spokeNetwork.bicep' = {
-  name: 'deploy-image-spoke-${nowUtc}'
-  scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
-  params: {
-    location: imageLocation
-    tags: imageTags
-
-    logStorageAccountName: imageLogStorageAccountName
-    logStorageSkuName: imageLogStorageSkuName
-
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
-
-    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
-
-    virtualNetworkName: imageVirtualNetworkName
-    virtualNetworkAddressPrefix: imageVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: imageVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: imageVirtualNetworkDiagnosticsMetrics
-
-    networkSecurityGroupName: imageNetworkSecurityGroupName
-    networkSecurityGroupRules: imageNetworkSecurityGroupRules
-
-    subnetName: imageSubnetName
-    subnetAddressPrefix: imageSubnetAddressPrefix
-    subnetServiceEndpoints: imageSubnetServiceEndpoints
-  }
-}
-
-module imageBuilder './modules/spokeNetwork.bicep' = {
-  name: 'deploy-imagebuilder-spoke-${nowUtc}'
-  scope: resourceGroup(imageBuilderSubscriptionId, imageBuilderResourceGroupName)
-  params: {
-    location: imageBuilderLocation
-    tags: imageBuilderTags
-
-    logStorageAccountName: imageBuilderLogStorageAccountName
-    logStorageSkuName: imageBuilderLogStorageSkuName
-
-    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspace.outputs.id
-
-    firewallPrivateIPAddress: hub.outputs.firewallPrivateIPAddress
-
-    virtualNetworkName: imageBuilderVirtualNetworkName
-    virtualNetworkAddressPrefix: imageBuilderVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: imageBuilderVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: imageBuilderVirtualNetworkDiagnosticsMetrics
-
-    networkSecurityGroupName: imageBuilderNetworkSecurityGroupName
-    networkSecurityGroupRules: imageBuilderNetworkSecurityGroupRules
-
-    subnetName: imageBuilderSubnetName
-    subnetAddressPrefix: imageBuilderSubnetAddressPrefix
-    subnetServiceEndpoints: imageBuilderSubnetServiceEndpoints
-  }
-}
+}]
 
 module hubVirtualNetworkPeerings './modules/hubNetworkPeerings.bicep' = {
-  name: 'deploy-hub-peerings-${nowUtc}'
-  scope: subscription(hubSubscriptionId)
+  name: 'deploy-vnet-peerings-hub-${nowUtc}'
+  scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
   params: {
-    hubResourceGroupName: hubResourceGroup.outputs.name
-    hubVirtualNetworkName: hub.outputs.virtualNetworkName
-    imageVirtualNetworkName: image.outputs.virtualNetworkName
-    imageBuilderVirtualNetworkName: imageBuilder.outputs.virtualNetworkName
-    imageVirtualNetworkResourceId: image.outputs.virtualNetworkResourceId
-    imageBuilderVirtualNetworkResourceId: imageBuilder.outputs.virtualNetworkResourceId
-    agentVirtualNetworkName: agent.outputs.virtualNetworkName
-    agentVirtualNetworkResourceId: agent.outputs.virtualNetworkResourceId
-    operationsVirtualNetworkName: operations.outputs.virtualNetworkName
-    operationsVirtualNetworkResourceId: operations.outputs.virtualNetworkResourceId
+    hubVirtualNetworkName: hubNetwork.outputs.virtualNetworkName
+    spokes: [ for (spoke, i) in spokes: {
+      type: spoke.name
+      virtualNetworkName: spokeNetworks[i].outputs.virtualNetworkName
+      virtualNetworkResourceId: spokeNetworks[i].outputs.virtualNetworkResourceId
+    }]
   }
 }
 
-module operationsVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
-  name: 'deploy-operations-peerings-${nowUtc}'
-  scope: subscription(operationsSubscriptionId)
+module spokeVirtualNetworkPeerings './modules/spokeNetworkPeering.bicep' = [ for (spoke, i) in spokes: {
+  name: 'deploy-vnet-peerings-${spoke.name}-${nowUtc}'
+  scope: subscription(spoke.subscriptionId)
   params: {
-    spokeResourceGroupName: operationsResourceGroup.outputs.name
-    spokeVirtualNetworkName: operations.outputs.virtualNetworkName
-
-    hubVirtualNetworkName: hub.outputs.virtualNetworkName
-    hubVirtualNetworkResourceId: hub.outputs.virtualNetworkResourceId
+    spokeName: spoke.name
+    spokeResourceGroupName: spoke.resourceGroupName
+    spokeVirtualNetworkName: spokeNetworks[i].outputs.virtualNetworkName
+    hubVirtualNetworkName: hubNetwork.outputs.virtualNetworkName
+    hubVirtualNetworkResourceId: hubNetwork.outputs.virtualNetworkResourceId
   }
-}
-
-module agentVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
-  name: 'deploy-agent-peerings-${nowUtc}'
-  scope: subscription(agentSubscriptionId)
-  params: {
-    spokeResourceGroupName: agentResourceGroup.outputs.name
-    spokeVirtualNetworkName: agent.outputs.virtualNetworkName
-
-    hubVirtualNetworkName: hub.outputs.virtualNetworkName
-    hubVirtualNetworkResourceId: hub.outputs.virtualNetworkResourceId
-  }
-}
-
-module imageVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
-  name: 'deploy-image-peerings-${nowUtc}'
-  scope: subscription(imageSubscriptionId)
-  params: {
-    spokeResourceGroupName: imageResourceGroup.outputs.name
-    spokeVirtualNetworkName: image.outputs.virtualNetworkName
-
-    hubVirtualNetworkName: hub.outputs.virtualNetworkName
-    hubVirtualNetworkResourceId: hub.outputs.virtualNetworkResourceId
-  }
-}
-
-module imageBuilderVirtualNetworkPeering './modules/spokeNetworkPeering.bicep' = {
-  name: 'deploy-imagebuilder-peerings-${nowUtc}'
-  scope: subscription(imageBuilderSubscriptionId)
-  params: {
-    spokeResourceGroupName: imageBuilderResourceGroup.outputs.name
-    spokeVirtualNetworkName: imageBuilder.outputs.virtualNetworkName
-
-    hubVirtualNetworkName: hub.outputs.virtualNetworkName
-    hubVirtualNetworkResourceId: hub.outputs.virtualNetworkResourceId
-  }
-}
-
+}]
 
 module hubPolicyAssignment './modules/policyAssignment.bicep' = {
   name: 'assign-policy-hub-${nowUtc}'
@@ -520,99 +616,78 @@ module hubPolicyAssignment './modules/policyAssignment.bicep' = {
   params: {
     builtInAssignment: policy
     logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+    logAnalyticsWorkspaceResourceGroupName: logAnalyticsWorkspace.outputs.name
     operationsSubscriptionId: operationsSubscriptionId
   }
 }
 
-module operationsPolicyAssignment './modules/policyAssignment.bicep' = {
-  name: 'assign-policy-operations-${nowUtc}'
-  scope: resourceGroup(operationsSubscriptionId, operationsResourceGroupName)
+module spokePolicyAssignments './modules/policyAssignment.bicep' = [ for spoke in spokes: if(deployPolicy) {
+  name: 'assign-policy-${spoke.name}-${nowUtc}'
+  scope: resourceGroup(spoke.subscriptionId, spoke.resourceGroupName)
   params: {
     builtInAssignment: policy
     logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
+    logAnalyticsWorkspaceResourceGroupName: logAnalyticsWorkspace.outputs.resourceGroupName
     operationsSubscriptionId: operationsSubscriptionId
   }
-}
+}]
 
-module agentPolicyAssignment './modules/policyAssignment.bicep' = {
-  name: 'assign-policy-agent-${nowUtc}'
-  scope: resourceGroup(agentSubscriptionId, agentResourceGroupName)
-  params: {
-    builtInAssignment: policy
-    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
-    operationsSubscriptionId: operationsSubscriptionId
-  }
-}
-
-module imagePolicyAssignment './modules/policyAssignment.bicep' = {
-  name: 'assign-policy-image-${nowUtc}'
-  scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
-  params: {
-    builtInAssignment: policy
-    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
-    operationsSubscriptionId: operationsSubscriptionId
-  }
-}
-
-module imageBuilderPolicyAssignment './modules/policyAssignment.bicep' = {
-  name: 'assign-policy-imagebuilder-${nowUtc}'
-  scope: resourceGroup(imageBuilderSubscriptionId, imageBuilderResourceGroupName)
-  params: {
-    builtInAssignment: policy
-    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: operationsResourceGroup.outputs.name
-    operationsSubscriptionId: operationsSubscriptionId
-  }
-}
-
-module hubSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = {
+module hubSubscriptionActivityLogging './modules/centralLogging.bicep' = {
   name: 'activity-logs-hub-${nowUtc}'
   scope: subscription(hubSubscriptionId)
   params: {
     diagnosticSettingName: 'log-hub-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
   }
+  dependsOn: [
+    hubNetwork
+  ]
 }
 
-module operationsSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != operationsSubscriptionId) {
-  name: 'activity-logs-operations-${nowUtc}'
+module spokeSubscriptionActivityLogging './modules/centralLogging.bicep' = [ for spoke in spokes: if(spoke.subscriptionId != hubSubscriptionId) {
+  name: 'activity-logs-${spoke.name}-${nowUtc}'
+  scope: subscription(spoke.subscriptionId)
+  params: {
+    diagnosticSettingName: 'log-${spoke.name}-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+  }
+  dependsOn: [
+    spokeNetworks
+  ]
+}]
+
+module logAnalyticsDiagnosticLogging './modules/logAnalyticsDiagnosticLogging.bicep' = {
+  name: 'deploy-diagnostic-logging-LAWS'
+  scope: resourceGroup(operationsSubscriptionId, operationsResourceGroupName)
+  params: {
+    diagnosticStorageAccountName: operationsLogStorageAccountName
+    logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
+  }
+  dependsOn: [
+    hubNetwork
+    spokeNetworks
+  ]
+}
+
+// security center per subscription if different per hub/spoke
+
+module hubSecurityCenter './modules/securityCenter.bicep' = if(deployASC) {
+  name: 'set-hub-sub-security-center'
+  scope: subscription(hubSubscriptionId)
+  params: {
+    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+    emailSecurityContact: emailSecurityContact
+  }
+}
+
+module spokeSecurityCenter './modules/securityCenter.bicep' = [ for spoke in spokes: if( (deployASC) && (spoke.subscriptionId != hubSubscriptionId) ) {
+  name: 'set-${spoke.name}-sub-security-center'
   scope: subscription(operationsSubscriptionId)
   params: {
-    diagnosticSettingName: 'log-operations-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
     logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
+    emailSecurityContact: emailSecurityContact
   }
-}
-
-module agentSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != agentSubscriptionId) {
-  name: 'activity-logs-agent-${nowUtc}'
-  scope: subscription(agentSubscriptionId)
-  params: {
-    diagnosticSettingName: 'log-agent-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-  }
-}
-
-module imageSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != imageSubscriptionId) {
-  name: 'activity-logs-image-${nowUtc}'
-  scope: subscription(imageSubscriptionId)
-  params: {
-    diagnosticSettingName: 'log-image-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-  }
-}
-
-module imageBuilderSubscriptionCreateActivityLogging './modules/centralLogging.bicep' = if(hubSubscriptionId != imageBuilderSubscriptionId) {
-  name: 'activity-logs-imagebuilder-${nowUtc}'
-  scope: subscription(imageBuilderSubscriptionId)
-  params: {
-    diagnosticSettingName: 'log-imagebuilder-sub-activity-to-${logAnalyticsWorkspace.outputs.name}'
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-  }
-}
+}]
 
 module sharedImageGallery './modules/sharedImageGallery.bicep' = {
   name: 'deploy-sharedimagegallery-${nowUtc}'
@@ -623,7 +698,7 @@ module sharedImageGallery './modules/sharedImageGallery.bicep' = {
     tags: imageTags
   }
   dependsOn: [
-    imageResourceGroup
+    spokeNetworks
   ]
 }
 
@@ -640,34 +715,41 @@ module agentKeyVault './modules/keyVault.bicep' = if(deployAgentKeyVault) {
     tenantId: subscription().tenantId
   }
   dependsOn: [
-    agentResourceGroup
+    spokeNetworks
   ]
 }
 
 // outputs
-output hubSubscriptionId string = hubSubscriptionId
-output hubResourceGroupName string = hubResourceGroup.outputs.name
-output hubResourceGroupResourceId string = hubResourceGroup.outputs.id
-output hubVirtualNetworkName string = hub.outputs.virtualNetworkName
-output hubVirtualNetworkResourceId string = hub.outputs.virtualNetworkResourceId
-output hubSubnetName string = hub.outputs.subnetName
-output hubSubnetResourceId string = hub.outputs.subnetResourceId
-output hubSubnetAddressPrefix string = hub.outputs.subnetAddressPrefix
-output hubNetworkSecurityGroupName string = hub.outputs.networkSecurityGroupName
-output hubNetworkSecurityGroupResourceId string = hub.outputs.networkSecurityGroupResourceId
-output hubFirewallPrivateIPAddress string = hub.outputs.firewallPrivateIPAddress
+
+output firewallPrivateIPAddress string = hubNetwork.outputs.firewallPrivateIPAddress
+
+output hub object = {
+  subscriptionId: hubSubscriptionId
+  resourceGroupName: hubResourceGroup.outputs.name
+  resourceGroupResourceId: hubResourceGroup.outputs.id
+  virtualNetworkName: hubNetwork.outputs.virtualNetworkName
+  virtualNetworkResourceId: hubNetwork.outputs.virtualNetworkResourceId
+  subnetName: hubNetwork.outputs.subnetName
+  subnetResourceId: hubNetwork.outputs.subnetResourceId
+  subnetAddressPrefix: hubNetwork.outputs.subnetAddressPrefix
+  networkSecurityGroupName: hubNetwork.outputs.networkSecurityGroupName
+  networkSecurityGroupResourceId: hubNetwork.outputs.networkSecurityGroupResourceId
+}
 
 output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.outputs.name
-output logAnalyticsWorkspaceResourceId string = logAnalyticsWorkspace.outputs.id
-output firewallPrivateIPAddress string = hub.outputs.firewallPrivateIPAddress
 
-output operationsSubscriptionId string = operationsSubscriptionId
-output operationsResourceGroupName string = operationsResourceGroup.outputs.name
-output operationsResourceGroupResourceId string = operationsResourceGroup.outputs.id
-output operationsVirtualNetworkName string = operations.outputs.virtualNetworkName
-output operationsVirtualNetworkResourceId string = operations.outputs.virtualNetworkResourceId
-output operationsSubnetName string = operations.outputs.subnetName
-output operationsSubnetResourceId string = operations.outputs.subnetResourceId
-output operationsSubnetAddressPrefix string = operations.outputs.subnetAddressPrefix
-output operationsNetworkSecurityGroupName string = operations.outputs.networkSecurityGroupName
-output operationsNetworkSecurityGroupResourceId string = operations.outputs.networkSecurityGroupResourceId
+output logAnalyticsWorkspaceResourceId string = logAnalyticsWorkspace.outputs.id
+
+output spokes array = [for (spoke, i) in spokes: {
+  name: spoke.name
+  subscriptionId: spoke.subscriptionId
+  resourceGroupName: spokeResourceGroups[i].outputs.name
+  resourceGroupId: spokeResourceGroups[i].outputs.id
+  virtualNetworkName: spokeNetworks[i].outputs.virtualNetworkName
+  virtualNetworkResourceId: spokeNetworks[i].outputs.virtualNetworkResourceId
+  subnetName: spokeNetworks[i].outputs.subnetName
+  subnetResourceId: spokeNetworks[i].outputs.subnetResourceId
+  subnetAddressPrefix: spokeNetworks[i].outputs.subnetAddressPrefix
+  networkSecurityGroupName: spokeNetworks[i].outputs.networkSecurityGroupName
+  networkSecurityGroupResourceId: spokeNetworks[i].outputs.networkSecurityGroupResourceId
+}]
