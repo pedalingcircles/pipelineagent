@@ -230,10 +230,8 @@ module spokeResourceGroups './modules/resourceGroup.bicep' = [for spoke in spoke
 
 
 
-
-
-
 // Log analytics workspace settings
+var logAnalyticsWorkspaceName = take('log-operations-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 63)
 param logAnalyticsWorkspaceRetentionInDays int = 30
 param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
 param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
@@ -241,10 +239,9 @@ param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
 @description('When set to "True", enables Microsoft Sentinel within the ADO Agent pipelines Log Analytics workspace.')
 param deploySentinel bool = false
 
-var sharedImageGalleryName = take('sig.${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '.')}', 80)
 
-// taking 63 minus the literal characters (15) = 48
-var logAnalyticsWorkspaceName = take('log-operations-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 63)
+
+
 
 // hub networking
 var hubLogStorageAccountName = take('sthublogs${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
@@ -310,6 +307,7 @@ param firewallManagementPublicIPAddressName string = 'firewall-management-public
 param firewallManagementPublicIPAddressSkuName string = 'Standard'
 param firewallManagementPublicIpAllocationMethod string = 'Static'
 param firewallManagementPublicIPAddressAvailabilityZones array = []
+
 param publicIPAddressDiagnosticsLogs array = [
   {
     category: 'DDoSProtectionNotifications'
@@ -331,9 +329,7 @@ param publicIPAddressDiagnosticsMetrics array = [
   }
 ]
 
-
-
-
+// operations spoke networking
 var operationsLogStorageAccountName = take('stops${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param operationsLogStorageSkuName string = hubLogStorageSkuName
 param operationsVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'operations')
@@ -344,8 +340,6 @@ param operationsNetworkSecurityGroupName string = replace(hubNetworkSecurityGrou
 param operationsNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
 param operationsNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param operationsNetworkSecurityGroupRules array = []
-
-
 param operationsSubnetName string = replace(hubSubnetName, 'hub', 'operations')
 param operationsSubnetAddressPrefix string = '10.0.115.0/27'
 param operationsSubnetServiceEndpoints array = []
@@ -410,6 +404,7 @@ param identitySubnetName string = replace(hubSubnetName, 'hub', 'identity')
 param identitySubnetAddressPrefix string = '10.0.140.0/25'
 param identitySubnetServiceEndpoints array = []
 
+
 @allowed([
   'NIST'
   'IL5' // Gov cloud only, trying to deploy IL5 in AzureCloud will switch to NIST
@@ -428,6 +423,7 @@ param deployASC bool = false
 
 // Key vault deployment not currently working
 param deployAgentKeyVault bool = false
+var agentKeyVaultName = take('kv-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 24)
 
 param bastionHostName string = 'bastionHost'
 param bastionHostSubnetAddressPrefix string = '10.0.100.160/27'
@@ -436,43 +432,6 @@ param bastionHostPublicIPAddressSkuName string = 'Standard'
 param bastionHostPublicIPAddressAllocationMethod string = 'Static'
 param bastionHostPublicIPAddressAvailabilityZones array = []
 param bastionHostIPConfigurationName string = 'bastionHostIPConfiguration'
-
-
-var agentKeyVaultName = take('kv-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 24)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 module logAnalyticsWorkspace './modules/logAnalyticsWorkspace.bicep' = {
@@ -688,6 +647,8 @@ module spokeSecurityCenter './modules/securityCenter.bicep' = [ for spoke in spo
     emailSecurityContact: emailSecurityContact
   }
 }]
+
+var sharedImageGalleryName = take('sig.${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '.')}', 80)
 
 module sharedImageGallery './modules/sharedImageGallery.bicep' = {
   name: 'deploy-sharedimagegallery-${nowUtc}'
