@@ -334,7 +334,7 @@ param publicIPAddressDiagnosticsMetrics array = [
 
 
 
-var operationsLogStorageAccountName = take('stopslogs${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
+var operationsLogStorageAccountName = take('stops${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param operationsLogStorageSkuName string = hubLogStorageSkuName
 param operationsVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'operations')
 param operationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
@@ -351,7 +351,7 @@ param operationsSubnetAddressPrefix string = '10.0.115.0/27'
 param operationsSubnetServiceEndpoints array = []
 
 // image spoke networking
-var imageLogStorageAccountName = take('stimage${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
+var imageLogStorageAccountName = take('stimg${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param imageLogStorageSkuName string = hubLogStorageSkuName
 param imageVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'image')
 param imageVirtualNetworkAddressPrefix string = '10.0.120.0/26'
@@ -366,7 +366,7 @@ param imageSubnetAddressPrefix string = '10.0.120.0/28'
 param imageSubnetServiceEndpoints array = []
 
 // agent spoke networking
-var agentLogStorageAccountName = take('stagent${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
+var agentLogStorageAccountName = take('stagnt${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param agentLogStorageSkuName string = hubLogStorageSkuName
 param agentVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'agent')
 param agentVirtualNetworkAddressPrefix string = '10.1.0.0/16'
@@ -396,7 +396,7 @@ param imageBuilderSubnetAddressPrefix string = '10.0.130.0/25'
 param imageBuilderSubnetServiceEndpoints array = []
 
 // identity spoke networking
-var identityLogStorageAccountName = take('stimgbldr${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
+var identityLogStorageAccountName = take('stid${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param identityLogStorageSkuName string = hubLogStorageSkuName
 param identityVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'identity')
 param identityVirtualNetworkAddressPrefix string = '10.0.130.0/24'
