@@ -5,8 +5,11 @@
 ])
 @description('[NIST/IL5/CMMC] Built-in policy assignments to assign, default is NIST. IL5 is only available for AzureUsGovernment and will switch to NIST if tried in AzureCloud.')
 param builtInAssignment string = 'NIST'
+
 param logAnalyticsWorkspaceName string
+
 param logAnalyticsWorkspaceResourceGroupName string
+
 param operationsSubscriptionId string
 
 @description('Starts a policy remediation for the VM Agent policies in hub RG. Set to false by default since this is time consuming in deployment.')

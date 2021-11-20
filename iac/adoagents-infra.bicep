@@ -616,7 +616,7 @@ module hubPolicyAssignment './modules/policyAssignment.bicep' = {
   params: {
     builtInAssignment: policy
     logAnalyticsWorkspaceName: logAnalyticsWorkspace.outputs.name
-    logAnalyticsWorkspaceResourceGroupName: logAnalyticsWorkspace.outputs.name
+    logAnalyticsWorkspaceResourceGroupName: logAnalyticsWorkspace.outputs.resourceGroupName
     operationsSubscriptionId: operationsSubscriptionId
   }
 }
