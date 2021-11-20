@@ -399,7 +399,7 @@ param imageBuilderSubnetServiceEndpoints array = []
 var identityLogStorageAccountName = take('stid${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param identityLogStorageSkuName string = hubLogStorageSkuName
 param identityVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'identity')
-param identityVirtualNetworkAddressPrefix string = '10.0.130.0/24'
+param identityVirtualNetworkAddressPrefix string = '10.0.140.0/24'
 param identityVirtualNetworkDiagnosticsLogs array = []
 param identityVirtualNetworkDiagnosticsMetrics array = []
 param identityNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'identity')
@@ -407,7 +407,7 @@ param identityNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGrou
 param identityNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param identityNetworkSecurityGroupRules array = []
 param identitySubnetName string = replace(hubSubnetName, 'hub', 'identity')
-param identitySubnetAddressPrefix string = '10.0.130.0/25'
+param identitySubnetAddressPrefix string = '10.0.140.0/25'
 param identitySubnetServiceEndpoints array = []
 
 @allowed([
