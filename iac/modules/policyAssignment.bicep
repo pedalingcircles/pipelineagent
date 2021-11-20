@@ -39,6 +39,8 @@ var agentVmAssignmentName = 'Deploy VM Agents ${resourceGroup().name}'
 var contributorRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')
 var lawsReaderRoleDefinitionId = resourceId('Microsoft.Authorization/roleDefinitions', '92aaf0da-9dab-42b6-94a3-d43ce8d16293')
 
+var roleAssignemntDeploymentName = take('role-assignemnt-${resourceGroup().name}', 64)
+
 // assign policy to resource group
 resource assignment 'Microsoft.Authorization/policyAssignments@2020-09-01' = {
   name: assignmentName
@@ -116,7 +118,7 @@ resource vmPolicyRoleAssignment 'Microsoft.Authorization/roleAssignments@2020-04
   }
 
 module roleAssignment 'roleAssignment.bicep' = {
-  name: 'Assign-Laws-Role-Policy-${resourceGroup().name}'
+  name: roleAssignemntDeploymentName
   scope: resourceGroup(operationsSubscriptionId, logAnalyticsWorkspaceResourceGroupName)
   params: {
     targetResourceId: logAnalyticsWorkspace.id
