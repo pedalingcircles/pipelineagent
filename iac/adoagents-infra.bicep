@@ -228,19 +228,13 @@ module spokeResourceGroups './modules/resourceGroup.bicep' = [for spoke in spoke
   }
 }]
 
-
-
 // Log analytics workspace settings
 var logAnalyticsWorkspaceName = take('log-operations-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 63)
 param logAnalyticsWorkspaceRetentionInDays int = 30
 param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
 param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
-
 @description('When set to "True", enables Microsoft Sentinel within the ADO Agent pipelines Log Analytics workspace.')
 param deploySentinel bool = false
-
-
-
 
 
 // hub networking
@@ -266,7 +260,6 @@ param hubNetworkSecurityGroupDiagnosticsMetrics array = []
 param hubSubnetName string = 'snet-hub'
 param hubSubnetAddressPrefix string = '10.0.100.128/27'
 param hubSubnetServiceEndpoints array = []
-
 param firewallSkuTier string = 'Premium'
 param firewallName string = 'firewall'
 param firewallManagementSubnetAddressPrefix string = '10.0.100.64/26'
@@ -307,7 +300,6 @@ param firewallManagementPublicIPAddressName string = 'firewall-management-public
 param firewallManagementPublicIPAddressSkuName string = 'Standard'
 param firewallManagementPublicIpAllocationMethod string = 'Static'
 param firewallManagementPublicIPAddressAvailabilityZones array = []
-
 param publicIPAddressDiagnosticsLogs array = [
   {
     category: 'DDoSProtectionNotifications'
@@ -332,75 +324,75 @@ param publicIPAddressDiagnosticsMetrics array = [
 // operations spoke networking
 var operationsLogStorageAccountName = take('stops${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param operationsLogStorageSkuName string = hubLogStorageSkuName
-param operationsVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'operations')
+param operationsVirtualNetworkName string = 'vnet-operations'
 param operationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
 param operationsVirtualNetworkDiagnosticsLogs array = []
 param operationsVirtualNetworkDiagnosticsMetrics array = []
-param operationsNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'operations')
+param operationsNetworkSecurityGroupName string = 'nsg-operations'
 param operationsNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
 param operationsNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param operationsNetworkSecurityGroupRules array = []
-param operationsSubnetName string = replace(hubSubnetName, 'hub', 'operations')
+param operationsSubnetName string = 'snet-operations'
 param operationsSubnetAddressPrefix string = '10.0.115.0/27'
 param operationsSubnetServiceEndpoints array = []
 
 // image spoke networking
 var imageLogStorageAccountName = take('stimg${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param imageLogStorageSkuName string = hubLogStorageSkuName
-param imageVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'image')
+param imageVirtualNetworkName string = 'vnet-image'
 param imageVirtualNetworkAddressPrefix string = '10.0.120.0/26'
 param imageVirtualNetworkDiagnosticsLogs array = []
 param imageVirtualNetworkDiagnosticsMetrics array = []
-param imageNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'image')
+param imageNetworkSecurityGroupName string = 'nsg-image'
 param imageNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
 param imageNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param imageNetworkSecurityGroupRules array = []
-param imageSubnetName string = replace(hubSubnetName, 'hub', 'packer')
+param imageSubnetName string = 'snet-packer'
 param imageSubnetAddressPrefix string = '10.0.120.0/28'
 param imageSubnetServiceEndpoints array = []
 
 // agent spoke networking
 var agentLogStorageAccountName = take('stagnt${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param agentLogStorageSkuName string = hubLogStorageSkuName
-param agentVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'agent')
+param agentVirtualNetworkName string = 'vnet-agent'
 param agentVirtualNetworkAddressPrefix string = '10.1.0.0/16'
 param agentVirtualNetworkDiagnosticsLogs array = []
 param agentVirtualNetworkDiagnosticsMetrics array = []
-param agentNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'agent')
+param agentNetworkSecurityGroupName string = 'nsg-agent'
 param agentNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
 param agentNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param agentNetworkSecurityGroupRules array = []
-param agentSubnetName string = replace(hubSubnetName, 'hub', 'agent')
+param agentSubnetName string = 'snet-agent'
 param agentSubnetAddressPrefix string = '10.1.100.0/24'
 param agentSubnetServiceEndpoints array = []
 
 // imagebuilding spoke networking
 var imageBuilderLogStorageAccountName = take('stimgbldr${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param imageBuilderLogStorageSkuName string = hubLogStorageSkuName
-param imageBuilderVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'imagebuilder')
+param imageBuilderVirtualNetworkName string = 'vnet-imagebuilder'
 param imageBuilderVirtualNetworkAddressPrefix string = '10.0.130.0/24'
 param imageBuilderVirtualNetworkDiagnosticsLogs array = []
 param imageBuilderVirtualNetworkDiagnosticsMetrics array = []
-param imageBuilderNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'imagebuilder')
+param imageBuilderNetworkSecurityGroupName string = 'nsg-imagebuilder'
 param imageBuilderNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
 param imageBuilderNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param imageBuilderNetworkSecurityGroupRules array = []
-param imageBuilderSubnetName string = replace(hubSubnetName, 'hub', 'imagebuilder')
+param imageBuilderSubnetName string = 'snet-imagebuilder'
 param imageBuilderSubnetAddressPrefix string = '10.0.130.0/25'
 param imageBuilderSubnetServiceEndpoints array = []
 
 // identity spoke networking
 var identityLogStorageAccountName = take('stid${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param identityLogStorageSkuName string = hubLogStorageSkuName
-param identityVirtualNetworkName string = replace(hubVirtualNetworkName, 'hub', 'identity')
+param identityVirtualNetworkName string = 'vnet-identity'
 param identityVirtualNetworkAddressPrefix string = '10.0.140.0/24'
 param identityVirtualNetworkDiagnosticsLogs array = []
 param identityVirtualNetworkDiagnosticsMetrics array = []
-param identityNetworkSecurityGroupName string = replace(hubNetworkSecurityGroupName, 'hub', 'identity')
+param identityNetworkSecurityGroupName string = 'nsg-identity'
 param identityNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
 param identityNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param identityNetworkSecurityGroupRules array = []
-param identitySubnetName string = replace(hubSubnetName, 'hub', 'identity')
+param identitySubnetName string = 'snet-identity'
 param identitySubnetAddressPrefix string = '10.0.140.0/25'
 param identitySubnetServiceEndpoints array = []
 
