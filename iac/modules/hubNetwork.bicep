@@ -1,6 +1,8 @@
 param location string = resourceGroup().location
 param tags object = {}
 
+param deployPrivateLink bool = false
+
 param logStorageAccountName string
 param logStorageSkuName string
 
@@ -51,11 +53,6 @@ param firewallManagementPublicIPAddressAvailabilityZones array
 
 param publicIPAddressDiagnosticsLogs array
 param publicIPAddressDiagnosticsMetrics array
-
-param supportedClouds array = [
-  'AzureCloud'
-  'AzureUSGovernment'
-]
 
 
 param bastionHostName string
@@ -236,9 +233,12 @@ module firewall './firewall.bicep' = {
     logs: firewallDiagnosticsLogs
     metrics: firewallDiagnosticsMetrics
   }
+  dependsOn: [
+    virtualNetwork
+  ]
 }
 
-module azureMonitorPrivateLink './privateLink.bicep' = if ( contains(supportedClouds, environment().name) ){
+module azureMonitorPrivateLink './privateLink.bicep' = if (deployPrivateLink){
   name: 'azure-monitor-private-link'
   params: {
     logAnalyticsWorkspaceName: logAnalyticsWorkspaceName

@@ -236,7 +236,6 @@ param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
 @description('When set to "True", enables Microsoft Sentinel within the ADO Agent pipelines Log Analytics workspace.')
 param deploySentinel bool = false
 
-
 // hub networking
 var hubLogStorageAccountName = take('sthublogs${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param hubLogStorageSkuName string = 'Standard_GRS'
