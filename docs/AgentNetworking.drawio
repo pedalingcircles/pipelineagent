@@ -1,1 +1,25 @@
-<mxfile host="app.diagrams.net" modified="2021-11-30T21:26:40.092Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36 Edg/96.0.1054.34" etag="9phCeaQRVBIHHzPltjSi" version="14.5.1" type="github"><diagram id="2FPGRWfn0oSbGv6B2Uy0" name="Page-1">rZTBbqMwEIafhmMrwCFKjiXptpe2h0jdva0cPIBV40HGFJKnXxMGCE2jttJewP5mbI//f8Bjm6J9MLzMn1CA8kJftB7bemEYBCvmXh05EPEjIpmRgtgEdvIIQyLRWgqoZokWUVlZzmGCWkNiZ4wbg808LUU1P7XkGVyAXcLVJf0thc17uor8iT+CzHI6OfR9ihR8SCZQ5Vxgc4bYvcc2BtH2o6LdgOrUG3Tp1/26Eh0LM6DtdxYsI/569yd62R+W+uWBp8e7wL8ZZH7nqqYbU7X2MEhgsNYCul0Cj8VNLi3sSp500ca57lhuC0VhbhIykblZKpXaoELj5hq1w3FlDb7BAL2QRev9QqxdRPAqH4+hssBYaK9eOBhldA0IWIA1B5fSjl70S6j3FiuaN5ORiyWx/MxEtiDIqXmyce9JXzcgiX8id/C13Lwq+0ZOZdvJca5uiVLbU1FR7EXbTm8lM+1A4kQBp2gsi1NHxylqS04E4cS3sshc6Uru3ZMfawPdlTTYBs2b1F3sVRpbc/X3uYfVbfWefbTnuoufWP4/vAw+eLm+9JKx2+jSzPDnXrrp9FmeYmd/N3b/Dw==</diagram></mxfile>
+<mxfile host="app.diagrams.net" modified="2021-11-30T21:30:58.315Z" agent="5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.55 Safari/537.36 Edg/96.0.1054.34" etag="gVZz_0krsQE8ywa-KK5G" version="14.5.1" type="github">
+  <diagram id="2FPGRWfn0oSbGv6B2Uy0" name="Page-1">
+    <mxGraphModel dx="1183" dy="1053" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="2000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="65aVAX5Oby6nOGafzA10-10" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=3;fillColor=none;strokeColor=#59b4d9;dashed=1;" parent="1" vertex="1">
+          <mxGeometry x="200" y="480" width="460" height="340" as="geometry" />
+        </mxCell>
+        <mxCell id="65aVAX5Oby6nOGafzA10-11" value="" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/azure2/networking/Virtual_Networks.svg;dashed=1;strokeColor=#59b4d9;fillColor=none;" parent="1" vertex="1">
+          <mxGeometry x="210" y="490" width="33.5" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vsSHJpZLa6uk3VKadDih-1" value="hub-vnet (10.0.0.1/16)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="243.5" y="490" width="250" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vsSHJpZLa6uk3VKadDih-2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#c7c7c7;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="220" y="570" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="vsSHJpZLa6uk3VKadDih-3" value="" style="aspect=fixed;html=1;points=[];align=center;image;fontSize=12;image=img/lib/mscae/Azure_Firewall.svg;strokeColor=#c7c7c7;fillColor=#f0f0f0;" vertex="1" parent="1">
+          <mxGeometry x="265" y="585" width="30" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
