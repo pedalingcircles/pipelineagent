@@ -1,8 +1,8 @@
 #!/bin/bash -e
 ##########################################################
 ##  File:  provision-adoagents-infra.sh
-##  Desc:  Uses Azure CLI to call a bicep file (template) 
-##         to provision ADO agent infrastructure
+##  Desc:  Uses Bicep/ARM templates to provision ADO 
+##         agent infrastructure. 
 ##########################################################
 
 ORGANIZATION_NAME=$1
@@ -10,6 +10,7 @@ LOCATION=$2
 SUBSCRIPTION=$3
 ENVIRONMENT_TYPE=$4
 TEMPLATE_FILE_PATH=$5
+WHAT_IF=${6-0}
 
 # print usage to the console
 function usage() 
@@ -53,12 +54,31 @@ if [ -z "$TEMPLATE_FILE_PATH" ]; then
   exit 1
 fi
 
-az deployment sub create \
-  --name deploy-adoagent-baseline-$(date -u +"%Y%m%dT%H%M%SZ") \
-  --no-prompt true \
-  --location $LOCATION \
-  --subscription $SUBSCRIPTION \
-  --template-file $TEMPLATE_FILE_PATH \
-  --parameters \
-      environmentType=$ENVIRONMENT_TYPE \
-      organization=$ORGANIZATION_NAME
+if [ $WHAT_IF -eq 0 ]; then
+  echo "Running deployment operation"
+  az deployment sub create \
+    --name deploy-adoagent-baseline-$(date -u +"%Y%m%dT%H%M%SZ") \
+    --no-prompt true \
+    --location $LOCATION \
+    --subscription $SUBSCRIPTION \
+    --template-file $TEMPLATE_FILE_PATH \
+    --parameters \
+        environmentType=$ENVIRONMENT_TYPE \
+        organization=$ORGANIZATION_NAME
+else
+  echo "Running what-if operation"
+  az deployment sub what-if \
+    --name deploy-adoagent-baseline-$(date -u +"%Y%m%dT%H%M%SZ") \
+    --no-prompt true \
+    --location $LOCATION \
+    --subscription $SUBSCRIPTION \
+    --template-file $TEMPLATE_FILE_PATH \
+    --parameters \
+        environmentType=$ENVIRONMENT_TYPE \
+        organization=$ORGANIZATION_NAME
+fi
+
+
+
+
+

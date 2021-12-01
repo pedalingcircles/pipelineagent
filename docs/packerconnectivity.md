@@ -29,3 +29,9 @@ sample log snippet
 ==> azure-arm: Resolving packages.microsoft.com (packages.microsoft.com)... 13.90.21.104 </br>
 ==> azure-arm: Connecting to packages.microsoft.com (packages.microsoft.com)|13.90.21.104|:443... failed: Connection timed out.
 </span>
+
+
+
+Packer needs ownership of the resource group
+
+Packer needs [join permissions](https://docs.microsoft.com/en-us/azure/virtual-network/virtual-network-manage-subnet#permissions) to the existing subnet. 
