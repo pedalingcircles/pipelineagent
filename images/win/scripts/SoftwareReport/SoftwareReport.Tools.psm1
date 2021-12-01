@@ -61,6 +61,11 @@ function Get-DockerComposeVersion {
     return "Docker-compose $dockerComposeVersion"
 }
 
+function Get-DockerWincredVersion {
+    $dockerCredVersion = $(docker-credential-wincred version)
+    return "Docker-wincred $dockerCredVersion"
+}
+
 function Get-GitVersion {
     $(git version) -match "git version (?<version>\d+\.\d+\.\d+)" | Out-Null
     $gitVersion = $Matches.Version
@@ -156,6 +161,12 @@ function Get-WinAppDriver {
     return "WinAppDriver $winAppDriverVersion"
 }
 
+function Get-WixVersion {
+    $regKey = "HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*"
+    $installedApplications = Get-ItemProperty -Path $regKey
+    return ($installedApplications | Where-Object { $_.BundleCachePath -imatch ".*\\WiX\d*\.exe$" } | Select-Object -First 1).DisplayName
+}
+
 function Get-ZstdVersion {
     $(zstd --version) -match "v(?<version>\d+\.\d+\.\d+)" | Out-Null
     $zstdVersion = $Matches.Version
@@ -236,6 +247,11 @@ function Get-StackVersion {
 
 function Get-GoogleCloudSDKVersion {
     (gcloud --version) -match "Google Cloud SDK"
+}
+
+function Get-ServiceFabricSDKVersion {
+    $serviceFabricSDKVersion = Get-ItemPropertyValue 'HKLM:\SOFTWARE\Microsoft\Service Fabric\' -Name FabricVersion
+    return "Service Fabric SDK $serviceFabricSDKVersion"
 }
 
 function Get-NewmanVersion {
