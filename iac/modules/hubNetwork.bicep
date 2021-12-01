@@ -1,9 +1,12 @@
 param location string = resourceGroup().location
 param tags object = {}
 
+param deployPrivateLink bool = false
+
 param logStorageAccountName string
 param logStorageSkuName string
 
+param logAnalyticsWorkspaceName string
 param logAnalyticsWorkspaceResourceId string
 
 param virtualNetworkName string
@@ -13,6 +16,8 @@ param virtualNetworkDiagnosticsMetrics array
 
 param networkSecurityGroupName string
 param networkSecurityGroupRules array
+param networkSecurityGroupDiagnosticsLogs array
+param networkSecurityGroupDiagnosticsMetrics array
 
 param subnetName string
 param subnetAddressPrefix string
@@ -27,6 +32,8 @@ param firewallName string
 param firewallSkuTier string
 param firewallPolicyName string
 param firewallThreatIntelMode string
+param firewallDiagnosticsLogs array
+param firewallDiagnosticsMetrics array
 param firewallClientIpConfigurationName string
 param firewallClientSubnetName string
 param firewallClientSubnetAddressPrefix string
@@ -44,62 +51,24 @@ param firewallManagementPublicIPAddressSkuName string
 param firewallManagementPublicIpAllocationMethod string
 param firewallManagementPublicIPAddressAvailabilityZones array
 
+param publicIPAddressDiagnosticsLogs array
+param publicIPAddressDiagnosticsMetrics array
+
+
+param bastionHostName string
+param bastionHostSubnetAddressPrefix string
+param bastionHostPublicIPAddressName string
+param bastionHostPublicIPAddressSkuName string
+param bastionHostPublicIPAddressAllocationMethod string = 'Static'
+param bastionHostPublicIPAddressAvailabilityZones array
+param bastionHostIPConfigurationName string
+
 param nowUtc string = utcNow()
 
-// 'VMProtectionAlerts' is not supported in AzureUsGovernment
-var defaultVirtualNewtorkDiagnosticsLogs = [
-  {
-    category: 'VMProtectionAlerts'
-    enabled: true
-  }
-]
-
-var defaultVirtualNetworkDiagnosticsMetrics = [
-  {
-    category: 'AllMetrics'
-    enabled: true
-  }
-]
-
-var defaultSubnetServiceEndpoints = [
-  {
-    service: 'Microsoft.Storage'
-  }
-]
-
-var defaultNetworkSecurityGroupRules = [
-  {
-    name: 'allow_ssh'
-    properties: {
-      description: 'Allow SSH access from anywhere'
-      access: 'Allow'
-      priority: 100
-      protocol: 'Tcp'
-      direction: 'Inbound'
-      sourcePortRange: '*'
-      sourceAddressPrefix: '*'
-      destinationPortRange: '22'
-      destinationAddressPrefix: '*'
-    }
-  }
-  {
-    name: 'allow_rdp'
-    properties: {
-      description: 'Allow RDP access from anywhere'
-      access: 'Allow'
-      priority: 200
-      protocol: 'Tcp'
-      direction: 'Inbound'
-      sourcePortRange: '*'
-      sourceAddressPrefix: '*'
-      destinationPortRange: '3389'
-      destinationAddressPrefix: '*'
-    }
-  }
-]
+var azureBastionSubnetName = 'AzureBastionSubnet' // The subnet name for Azure Bastion Hosts must be 'AzureBastionSubnet'
 
 module logStorage './storageAccount.bicep' = {
-  name: 'deploy-log-storage-${nowUtc}'
+  name: 'deploy-hub-log-storage-${nowUtc}'
   params: {
     storageAccountName: logStorageAccountName
     location: location
@@ -109,18 +78,24 @@ module logStorage './storageAccount.bicep' = {
 }
 
 module networkSecurityGroup './networkSecurityGroup.bicep' = {
-  name: 'deploy-nsg-${nowUtc}'
+  name: 'deploy-hub-nsg-${nowUtc}'
   params: {
     name: networkSecurityGroupName
     location: location
     tags: tags
 
-    securityRules: empty(networkSecurityGroupRules) ? defaultNetworkSecurityGroupRules : networkSecurityGroupRules
+    securityRules: networkSecurityGroupRules
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: networkSecurityGroupDiagnosticsLogs
+    metrics: networkSecurityGroupDiagnosticsMetrics
   }
 }
 
 module virtualNetwork './virtualNetwork.bicep' = {
-  name: 'deploy-vnet-${nowUtc}'
+  name: 'deploy-hub-vnet-${nowUtc}'
   params: {
     name: virtualNetworkName
     location: location
@@ -128,9 +103,7 @@ module virtualNetwork './virtualNetwork.bicep' = {
 
     addressPrefix: virtualNetworkAddressPrefix
 
-    diagnosticsLogs: empty(virtualNetworkDiagnosticsLogs) ? defaultVirtualNewtorkDiagnosticsLogs : virtualNetworkDiagnosticsLogs
-    diagnosticsMetrics: empty(virtualNetworkDiagnosticsMetrics) ? defaultVirtualNetworkDiagnosticsMetrics : virtualNetworkDiagnosticsMetrics
-
+    // Delegated subnets
     subnets: [
       {
         name: firewallClientSubnetName
@@ -146,10 +119,19 @@ module virtualNetwork './virtualNetwork.bicep' = {
           serviceEndpoints: firewallManagementSubnetServiceEndpoints
         }
       }
+      {
+        name: azureBastionSubnetName
+        properties: {
+          addressPrefix: bastionHostSubnetAddressPrefix
+        }
+      }
     ]
 
     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
     logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: virtualNetworkDiagnosticsLogs
+    metrics: virtualNetworkDiagnosticsMetrics
   }
 }
 
@@ -177,7 +159,9 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
     routeTable: {
       id: routeTable.outputs.id
     }
-    serviceEndpoints: empty(subnetServiceEndpoints) ? defaultSubnetServiceEndpoints : subnetServiceEndpoints
+    serviceEndpoints: subnetServiceEndpoints
+    privateEndpointNetworkPolicies: 'Disabled'
+    privateLinkServiceNetworkPolicies: 'Enabled'
   }
   dependsOn: [
     virtualNetwork
@@ -195,6 +179,12 @@ module firewallClientPublicIPAddress './publicIPAddress.bicep' = {
     skuName: firewallClientPublicIPAddressSkuName
     publicIpAllocationMethod: firewallClientPublicIpAllocationMethod
     availabilityZones: firewallClientPublicIPAddressAvailabilityZones
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: publicIPAddressDiagnosticsLogs
+    metrics: publicIPAddressDiagnosticsMetrics
   }
 }
 
@@ -208,6 +198,12 @@ module firewallManagementPublicIPAddress './publicIPAddress.bicep' = {
     skuName: firewallManagementPublicIPAddressSkuName
     publicIpAllocationMethod: firewallManagementPublicIpAllocationMethod
     availabilityZones: firewallManagementPublicIPAddressAvailabilityZones
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: publicIPAddressDiagnosticsLogs
+    metrics: publicIPAddressDiagnosticsMetrics
   }
 }
 
@@ -230,7 +226,49 @@ module firewall './firewall.bicep' = {
     managementIpConfigurationName: firewallManagementIpConfigurationName
     managementIpConfigurationSubnetResourceId: '${virtualNetwork.outputs.id}/subnets/${firewallManagementSubnetName}'
     managementIpConfigurationPublicIPAddressResourceId: firewallManagementPublicIPAddress.outputs.id
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: firewallDiagnosticsLogs
+    metrics: firewallDiagnosticsMetrics
   }
+  dependsOn: [
+    virtualNetwork
+  ]
+}
+
+module azureMonitorPrivateLink './privateLink.bicep' = if (deployPrivateLink){
+  name: 'azure-monitor-private-link'
+  params: {
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    privateEndpointSubnetName: subnetName
+    privateEndpointVnetName: virtualNetwork.outputs.name
+    tags: tags
+  }
+  dependsOn: [
+    subnet
+  ]
+}
+
+module bastionHost './bastionHost.bicep' = {
+  name: 'deploy-remote-access-bastionhost-${nowUtc}'
+  params: {
+    name: bastionHostName
+    location: location
+    tags: tags
+    virtualNetworkName: virtualNetworkName
+    subnetName: azureBastionSubnetName
+    publicIPAddressName: bastionHostPublicIPAddressName
+    publicIPAddressSkuName: bastionHostPublicIPAddressSkuName
+    publicIPAddressAllocationMethod: bastionHostPublicIPAddressAllocationMethod
+    publicIPAddressAvailabilityZones: bastionHostPublicIPAddressAvailabilityZones
+    ipConfigurationName: bastionHostIPConfigurationName
+  }
+  dependsOn: [
+    virtualNetwork
+  ]
 }
 
 output virtualNetworkName string = virtualNetwork.outputs.name

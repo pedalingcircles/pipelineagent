@@ -1,6 +1,6 @@
 #!/bin/bash
-# Create a service principle 
-# and a certificate to be used in ADO.
+# Create a service principle and a certificate 
+# to be used in ADO as a service connection.
 
 # This script uses openssl, Azure CLI, the Azure DevOps extension, and jq
 # https://www.openssl.org/
@@ -66,5 +66,3 @@ az devops service-endpoint azurerm create \
     --azure-rm-service-principal-certificate-path $certPath
 
 # remove pem ?
-
-echo completed

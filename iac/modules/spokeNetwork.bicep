@@ -16,6 +16,9 @@ param virtualNetworkDiagnosticsMetrics array
 param networkSecurityGroupName string
 param networkSecurityGroupRules array
 
+param networkSecurityGroupDiagnosticsLogs array
+param networkSecurityGroupDiagnosticsMetrics array
+
 param subnetName string
 param subnetAddressPrefix string
 param subnetServiceEndpoints array
@@ -27,58 +30,6 @@ param routeTableRouteNextHopIpAddress string = firewallPrivateIPAddress
 param routeTableRouteNextHopType string = 'VirtualAppliance'
 
 param nowUtc string = utcNow()
-
-var defaultVirtualNetworkDiagnosticsLogs = [
-  // TODO: 'VMProtectionAlerts' is not supported in AzureUsGovernment
-  // {
-  //   category: 'VMProtectionAlerts'
-  //   enabled: true
-  // }
-]
-
-var defaultVirtualNetworkDiagnosticsMetrics = [
-  {
-    category: 'AllMetrics'
-    enabled: true
-  }
-]
-
-var defaultSubnetServiceEndpoints = [
-  {
-    service: 'Microsoft.Storage'
-  }
-]
-
-var defaultNetworkSecurityGroupRules = [
-  {
-    name: 'allow_ssh'
-    properties: {
-      description: 'Allow SSH access from anywhere'
-      access: 'Allow'
-      priority: 100
-      protocol: 'Tcp'
-      direction: 'Inbound'
-      sourcePortRange: '*'
-      sourceAddressPrefix: '*'
-      destinationPortRange: '22'
-      destinationAddressPrefix: '*'
-    }
-  }
-  {
-    name: 'allow_rdp'
-    properties: {
-      description: 'Allow RDP access from anywhere'
-      access: 'Allow'
-      priority: 200
-      protocol: 'Tcp'
-      direction: 'Inbound'
-      sourcePortRange: '*'
-      sourceAddressPrefix: '*'
-      destinationPortRange: '3389'
-      destinationAddressPrefix: '*'
-    }
-  }
-]
 
 module logStorage './storageAccount.bicep' = {
   name: 'deploy-log-storage-${nowUtc}'
@@ -97,7 +48,13 @@ module networkSecurityGroup './networkSecurityGroup.bicep' = {
     location: location
     tags: tags
 
-    securityRules: empty(networkSecurityGroupRules) ? defaultNetworkSecurityGroupRules : networkSecurityGroupRules
+    securityRules: networkSecurityGroupRules
+
+    logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
+    logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: networkSecurityGroupDiagnosticsLogs
+    metrics: networkSecurityGroupDiagnosticsMetrics
   }
 }
 
@@ -124,9 +81,6 @@ module virtualNetwork './virtualNetwork.bicep' = {
 
     addressPrefix: virtualNetworkAddressPrefix
 
-    diagnosticsLogs: empty(virtualNetworkDiagnosticsLogs) ? defaultVirtualNetworkDiagnosticsLogs : virtualNetworkDiagnosticsLogs
-    diagnosticsMetrics: empty(virtualNetworkDiagnosticsMetrics) ? defaultVirtualNetworkDiagnosticsMetrics : virtualNetworkDiagnosticsMetrics
-
     subnets: [
       {
         name: subnetName
@@ -138,13 +92,16 @@ module virtualNetwork './virtualNetwork.bicep' = {
           routeTable: {
             id: routeTable.outputs.id
           }
-          serviceEndpoints: empty(subnetServiceEndpoints) ? defaultSubnetServiceEndpoints : subnetServiceEndpoints
+          serviceEndpoints: subnetServiceEndpoints
         }
       }
     ]
 
     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
     logStorageAccountResourceId: logStorage.outputs.id
+
+    logs: virtualNetworkDiagnosticsLogs
+    metrics: virtualNetworkDiagnosticsMetrics
   }
 }
 

@@ -63,17 +63,17 @@
             "name": "New-Image.ps1 Windows",
             "type": "PowerShell",
             "request": "launch",
-            "script": "${workspaceFolder}/helpers/New-Image.ps1",
-            "cwd": "${workspaceFolder}/helpers/New-Image.ps1",
-            "args": ["-SubscriptionId cbadc96b-2923-4459-bb2d-b237af7f84d6", "-ResourceGroupName contoso-agentimages", "-ImageGenerationRepositoryRoot ${workspaceFolder}", "-ImageType Windows2019", "-AzureLocation 'East US 2'", "-ServicePrincipalClientId <serviceprincipleclientidgoeshere>", "-ServicePrincipalObjectId <serviceprincipleobjectidgoeshere>", "-ServicePrincipalClientSecret <serviceprinciplesecretgoeshere>", "-TenantId <aadtenentidgoeshere>", "-StorageAccountName stcontosoagentimages"]
+            "script": "${workspaceFolder}/scripts/New-Image.ps1",
+            "cwd": "${workspaceFolder}",
+            "args": ["-SubscriptionId cbadc96b-2923-4459-bb2d-b237af7f84d6", "-ResourceGroupName contoso-agentimages", "-ImageGenerationRepositoryRoot ${workspaceFolder}", "-ImageType Windows2019", "-AzureLocation 'East US 2'", "-ServicePrincipalClientId <serviceprincipleclientidgoeshere>", "-ServicePrincipalObjectId <serviceprincipleobjectidgoeshere>", "-ServicePrincipalClientSecret <serviceprinciplesecretgoeshere>", "-TenantId <aadtenentidgoeshere>", "-StorageAccountName stimagepasbxqkoyna36i6fb"]
         },
         {
             "name": "New-Image.ps1 Linux",
             "type": "PowerShell",
             "request": "launch",
-            "script": "${workspaceFolder}/helpers/New-PackerImage.ps1",
-            "cwd": "${workspaceFolder}/helpers/New-Image.ps1",
-            "args": ["-SubscriptionId cbadc96b-2923-4459-bb2d-b237af7f84d6", "-BuildResourceGroupName mijohns-packer-builder", "-ResourceGroupName msft-aware-imagegen-agent-ci", "-ImageGenerationRepositoryRoot ${workspaceFolder}", "-ImageType Ubuntu2004", "-ServicePrincipalClientId <serviceprincipleclientidgoeshere>", "-ServicePrincipalObjectId <serviceprincipleobjectidgoeshere>", "-ServicePrincipalClientSecret <serviceprinciplesecretgoeshere>", "-TenantId <aadtenentidgoeshere>", "-StorageAccountName stcontosoagentimages"]
+            "script": "${workspaceFolder}/scripts/New-PackerImage.ps1",
+            "cwd": "${workspaceFolder}",
+            "args": ["-SubscriptionId cbadc96b-2923-4459-bb2d-b237af7f84d6", "-BuildResourceGroupName rg-pipelineagent-sandbox-qkoyna36i6fbu-imagebuilder", "-CaptureContainerName images", "-ResourceGroupName rg-pipelineagent-sandbox-qkoyna36i6fbu-image", "-ImageGenerationRepositoryRoot ${workspaceFolder}/.virtual-environments", "-ImageType Ubuntu2004", "-ServicePrincipalClientId $ServicePrincipalClientId", "-ServicePrincipalObjectId $ServicePrincipalObjectId", "-ServicePrincipalClientSecret $ServicePrincipalClientSecret", "-TenantId $TenantId", "-StorageAccountName stimagepasbxqkoyna36i6fb"]
         },
         {
             "name": "ConvertTo-ManagedImage.ps1",
@@ -98,14 +98,6 @@
             "script": "${workspaceFolder}/scripts/Remove-IntermediateImageResources.ps1",
             "cwd": "${file}",
             "args": ["-DestinationContainerName system", "-WorkingContainerName images", "-Prefix Microsoft.Compute/Images/images/23792", "-StorageAccountName contosopackerbuilder001"]
-        },
-        {
-            "name": "CreateAzureVMFromPackerTemplate",
-            "type": "PowerShell",
-            "request": "launch",
-            "script": "${workspaceFolder}/.virtual-environments/helpers/CreateAzureVMFromPackerTemplate.ps1",
-            "cwd": "${file}",
-            "args": ["-DestinationContainerName system", "-WorkingContainerName images", "-Prefix Microsoft.Compute/Images/images/24000", "-StorageAccountName stmijohnsimages001"]
         }
     ]
 }
