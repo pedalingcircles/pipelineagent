@@ -194,6 +194,7 @@ var spokes = [
     subnetAddressPrefix: imageBuilderSubnetAddressPrefix
     subnetServiceEndpoints: imageBuilderSubnetServiceEndpoints
     tags: union(imageBuilderTags,defaultTags)
+    deployRouteTable: false
   }
   {
     name: 'identity'
@@ -214,7 +215,6 @@ var spokes = [
     subnetAddressPrefix: identitySubnetAddressPrefix
     subnetServiceEndpoints: identitySubnetServiceEndpoints
     tags: union(identityTags,defaultTags)
-
   }
 ]
 
@@ -254,7 +254,7 @@ param hubNetworkSecurityGroupDiagnosticsLogs array = [
     category: 'NetworkSecurityGroupRuleCounter'
     enabled: true
   }
-]
+] 
 param hubNetworkSecurityGroupDiagnosticsMetrics array = []
 param hubSubnetName string = 'snet-hub'
 param hubSubnetAddressPrefix string = '10.0.100.128/27'
@@ -375,7 +375,27 @@ param imageBuilderVirtualNetworkDiagnosticsMetrics array = []
 param imageBuilderNetworkSecurityGroupName string = 'nsg-imagebuilder'
 param imageBuilderNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
 param imageBuilderNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
-param imageBuilderNetworkSecurityGroupRules array = []
+param imageBuilderNetworkSecurityGroupRules array = [
+  {
+    name: 'Remote'
+    properties: {
+      access: 'Allow'
+      description: 'Allows Packer to SSH into ephemerial VM resources to create disk images.'
+      destinationAddressPrefix: '10.0.130.0/25'
+      destinationAddressPrefixes: []
+      destinationPortRange: '22'
+      destinationPortRanges: []
+      direction: 'Inbound'
+      priority: 100
+      protocol: 'Tcp'
+      sourceAddressPrefix: '174.51.169.244'
+      sourceAddressPrefixes: []
+      sourcePortRange: '22'
+      sourcePortRanges: []
+    }
+    type: 'SSH'
+  }
+]
 param imageBuilderSubnetName string = 'snet-imagebuilder'
 param imageBuilderSubnetAddressPrefix string = '10.0.130.0/25'
 param imageBuilderSubnetServiceEndpoints array = []
@@ -532,6 +552,8 @@ module spokeNetworks './modules/spokeNetwork.bicep' = [ for spoke in spokes: {
     subnetName: spoke.subnetName
     subnetAddressPrefix: spoke.subnetAddressPrefix
     subnetServiceEndpoints: spoke.subnetServiceEndpoints
+
+    deployRouteTable: spoke.deployRouteTable ?? true
   }
 }]
 

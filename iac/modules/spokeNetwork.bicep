@@ -23,6 +23,7 @@ param subnetName string
 param subnetAddressPrefix string
 param subnetServiceEndpoints array
 
+param deployRouteTable bool = true
 param routeTableName string = '${subnetName}-routetable'
 param routeTableRouteName string = 'default_route'
 param routeTableRouteAddressPrefix string = '0.0.0.0/0'
@@ -58,7 +59,7 @@ module networkSecurityGroup './networkSecurityGroup.bicep' = {
   }
 }
 
-module routeTable './routeTable.bicep' = {
+module routeTable './routeTable.bicep' = if (deployRouteTable) {
   name: 'deploy-routetable-${nowUtc}'
   params: {
     name: routeTableName
