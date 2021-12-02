@@ -5,22 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "bashdb",
-            "request": "launch",
-            "name": "provision-virtualmachine.sh",
-            "cwd": "${workspaceFolder}",
-            "program": "${workspaceFolder}/scripts/provision-virtualmachine.sh",
-            "args": ["contoso","eastus2","cbadc96b-2923-4459-bb2d-b237af7f84d6","sandbox","/mnt/c/Users/mijohns/Source/repos/byvrate/pipelineagent/iac/templates/agents-virtualmachine.bicep","~/.ssh/vmagent-priv-key.pub","rg-pipelineagent-sandbox-u63kxyluy6fdo-agent","rg-contoso-images","sig.contoso.images","ubuntu2004","1.0.54","nsg-agent","vnet-agent","snet-agent","stagentpasbxu63kxyluy6fd","scriptextensions", "001"]
-        },
-        {
-            "type": "bashdb",
-            "request": "launch",
-            "name": "Bash-Debug (select script from list of sh files)",
-            "cwd": "${workspaceFolder}",
-            "program": "${command:SelectScriptName}",
-            "args": ["stagentpasbxu63kxyluy6fd", "scriptextensions",  "001", "/mnt/c/Users/mijohns/Source/repos/byvrate/pipelineagent/scripts/agentinstallers"]
-        },
-        {
             "name": "PowerShell Launch Current File",
             "type": "PowerShell",
             "request": "launch",
@@ -60,20 +44,12 @@
             "args": ["-ResourceGroupName rg-contoso-agents", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/iac/templates/agents-vmimage.bicep", "-TemplateParameterFilePath ${workspaceFolder}/iac/templates/agents-vmimage.parameters.sbx.json"]
         },
         {
-            "name": "New-Image.ps1 Windows",
-            "type": "PowerShell",
-            "request": "launch",
-            "script": "${workspaceFolder}/scripts/New-Image.ps1",
-            "cwd": "${workspaceFolder}",
-            "args": ["-SubscriptionId cbadc96b-2923-4459-bb2d-b237af7f84d6", "-ResourceGroupName contoso-agentimages", "-ImageGenerationRepositoryRoot ${workspaceFolder}", "-ImageType Windows2019", "-AzureLocation 'East US 2'", "-ServicePrincipalClientId <serviceprincipleclientidgoeshere>", "-ServicePrincipalObjectId <serviceprincipleobjectidgoeshere>", "-ServicePrincipalClientSecret <serviceprinciplesecretgoeshere>", "-TenantId <aadtenentidgoeshere>", "-StorageAccountName stimagepasbxqkoyna36i6fb"]
-        },
-        {
-            "name": "New-Image.ps1 Linux",
+            "name": "New-PackerImage.ps1",
             "type": "PowerShell",
             "request": "launch",
             "script": "${workspaceFolder}/scripts/New-PackerImage.ps1",
             "cwd": "${workspaceFolder}",
-            "args": ["-SubscriptionId cbadc96b-2923-4459-bb2d-b237af7f84d6", "-BuildResourceGroupName rg-pipelineagent-sandbox-qkoyna36i6fbu-imagebuilder", "-CaptureContainerName images", "-ResourceGroupName rg-pipelineagent-sandbox-qkoyna36i6fbu-image", "-ImageGenerationRepositoryRoot ${workspaceFolder}/.virtual-environments", "-ImageType Ubuntu2004", "-ServicePrincipalClientId $ServicePrincipalClientId", "-ServicePrincipalObjectId $ServicePrincipalObjectId", "-ServicePrincipalClientSecret $ServicePrincipalClientSecret", "-TenantId $TenantId", "-StorageAccountName stimagepasbxqkoyna36i6fb"]
+            "args": ["-SubscriptionId $SubscriptionId", "-BuildResourceGroupName $BuildResourceGroupName", "-ResourceGroupName $ResourceGroupName", "-ImageGenerationRepositoryRoot ${workspaceFolder}/.virtual-environments", "-ImageType $ImageType", "-ServicePrincipalClientId $ServicePrincipalClientId", "-ServicePrincipalClientSecret $ServicePrincipalClientSecret", "-TenantId $TenantId", "-StorageAccountName $StorageAccountName", "-VnetName $VnetName", "-VnetResourceGroupName $VnetResourceGroupName", "-VnetSubnetName $VnetSubnetName"]
         },
         {
             "name": "ConvertTo-ManagedImage.ps1",
