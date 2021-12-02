@@ -346,7 +346,7 @@ param imageNetworkSecurityGroupName string = 'nsg-image'
 param imageNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
 param imageNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param imageNetworkSecurityGroupRules array = []
-param imageSubnetName string = 'snet-packer'
+param imageSubnetName string = 'snet-image'
 param imageSubnetAddressPrefix string = '10.0.120.0/28'
 param imageSubnetServiceEndpoints array = []
 
