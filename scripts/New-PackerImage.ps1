@@ -49,6 +49,11 @@ The Azure subscription Id where resources will be created.
 .PARAMETER VnetSubnetName
     The sbunet name in the pre-existing virtual network for the VM.
 
+.PARAMETER PublicIp
+    A switch when if set, sets Packer to use a public IP address when building
+    images. This is generally only used to support building images from a 
+    localhost machine sitting outside of networking.
+
 .NOTES
 Set SecureString parameters with the following snippet
     ConvertTo-SecureString $password -AsPlainText -Force
@@ -105,7 +110,9 @@ param(
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [string]$VnetSubnetName
+    [string]$VnetSubnetName,
+
+    [switch]$PublicIp
 )
 
 switch ($ImageType) {
@@ -131,6 +138,11 @@ switch ($ImageType) {
 
 $imageTemplatePath = [IO.Path]::Combine($ImageGenerationRepositoryRoot, "images", $relativeTemplatePath)
 
+$publicIpPackerSettings = "false"
+if ($PublicIp) {
+    $publicIpPackerSettings = "true"
+}
+
 if (-not (Test-Path $imageTemplatePath)) {
     Write-Host "##vso[task.logissue type=error]Template for image '$ImageType' doesn't exist on path '$imageTemplatePath'"
 }
@@ -140,6 +152,7 @@ if (-not ($packerBinary)) {
     Write-Host "##vso[task.logissue type=error]'packer' binary is not found on PATH"
     throw "'packer' binary is not found on PATH"
 }
+
 
 $env:PACKER_LOG=1
 $dateStamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssK")
@@ -156,6 +169,7 @@ $env:PACKER_LOG_PATH="packerlog-$($dateStamp).txt"
     -var "virtual_network_name=$($VnetName)" `
     -var "virtual_network_resource_group_name=$($VnetResourceGroupName)" `
     -var "virtual_network_subnet_name=$($VnetSubnetName)" `
+    -var "private_virtual_network_with_public_ip=$($publicIpPackerSettings)" `
     $imageTemplatePath
 
 Write-Host "Packer build completed"
