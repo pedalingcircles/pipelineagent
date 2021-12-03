@@ -46,6 +46,12 @@ Parameter file
 az deployment group what-if --resource-group mijohns-vnet-sbx --subscription cbadc96b-2923-4459-bb2d-b237af7f84d6 --template-file iac/contoso-net-template.bicep --parameters iac/contoso-net-template.parameters.sbx.json
 ```
 
+## Subnet calculator
+
+This is used to divide up Vnets into Subnets
+[Visual Subnet Calculator](https://www.davidc.net/sites/default/subnets/subnets.html)
+
+
 ## Agent Software
 
 It's a challenge to both automatically find the correct software endpoint, but also download it as well as install it.
