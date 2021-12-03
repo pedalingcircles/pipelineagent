@@ -134,6 +134,7 @@ var spokes = [
     subnetAddressPrefix: operationsSubnetAddressPrefix
     subnetServiceEndpoints: operationsSubnetServiceEndpoints
     tags: union(operationsTags,defaultTags)
+    deployRouteTable: true
   }
   {
     name: 'agent'
@@ -154,6 +155,7 @@ var spokes = [
     subnetAddressPrefix: agentSubnetAddressPrefix
     subnetServiceEndpoints: agentSubnetServiceEndpoints
     tags: union(agentTags,defaultTags)
+    deployRouteTable: true
   }
   {
     name: 'image'
@@ -174,6 +176,7 @@ var spokes = [
     subnetAddressPrefix: imageSubnetAddressPrefix
     subnetServiceEndpoints: imageSubnetServiceEndpoints
     tags: union(imageTags,defaultTags)
+    deployRouteTable: true
   }
   {
     name: 'imagebuilder'
@@ -215,6 +218,7 @@ var spokes = [
     subnetAddressPrefix: identitySubnetAddressPrefix
     subnetServiceEndpoints: identitySubnetServiceEndpoints
     tags: union(identityTags,defaultTags)
+    deployRouteTable: true
   }
 ]
 
@@ -553,7 +557,7 @@ module spokeNetworks './modules/spokeNetwork.bicep' = [ for spoke in spokes: {
     subnetAddressPrefix: spoke.subnetAddressPrefix
     subnetServiceEndpoints: spoke.subnetServiceEndpoints
 
-    deployRouteTable: spoke.deployRouteTable ?? true
+    deployRouteTable: spoke.deployRouteTable
   }
 }]
 
