@@ -392,9 +392,9 @@ param imageBuilderNetworkSecurityGroupRules array = [
       direction: 'Inbound'
       priority: 100
       protocol: 'Tcp'
-      sourceAddressPrefix: '174.51.169.244'
+      sourceAddressPrefix: '0.0.0.0'
       sourceAddressPrefixes: []
-      sourcePortRange: '22'
+      sourcePortRange: '*'
       sourcePortRanges: []
     }
     type: 'SSH'
