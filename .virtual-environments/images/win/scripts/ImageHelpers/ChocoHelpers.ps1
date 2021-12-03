@@ -57,10 +57,7 @@ function Get-LatestChocoPackageVersion {
     $incrementedVersion = $versionNumbers -join "."
     $filterQuery = "`$filter=(Id eq '$PackageName') and (IsPrerelease eq false) and (Version ge '$TargetVersion') and (Version lt '$incrementedVersion')"
     $latestVersion = (Send-RequestToChocolateyPackages -FilterQuery $filterQuery).properties.Version |
-<<<<<<< HEAD
-=======
         Where-Object {$_ -Like "$TargetVersion.*" -or $_ -eq $TargetVersion} |
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
         Sort-Object {[version]$_} |
         Select-Object -Last 1
 

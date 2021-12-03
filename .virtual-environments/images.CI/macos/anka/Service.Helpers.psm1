@@ -232,8 +232,6 @@ function Show-StringWithFormat {
     }
 }
 
-<<<<<<< HEAD
-=======
 function Remove-CurrentBetaSeed {
     param(
         [Parameter(Mandatory)]
@@ -245,7 +243,6 @@ function Remove-CurrentBetaSeed {
     Invoke-SSHPassCommand -HostName $HostName -Command $command | Out-String
 }
 
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 function Test-AutoLogon {
     param(
         [Parameter(Mandatory)]

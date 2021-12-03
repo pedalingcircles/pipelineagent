@@ -281,11 +281,7 @@
         "binary_name": "selenium-server"
     },
     "node": {
-<<<<<<< HEAD
-        "default": "14"
-=======
         "default": "16"
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
     },
     "node_modules": [
         {
@@ -339,11 +335,8 @@
     ],
     "mongodb": {
         "version": "5.0"
-<<<<<<< HEAD
-=======
     },
     "postgresql": {
         "version": "14"
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
     }
 }

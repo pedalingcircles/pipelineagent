@@ -5,9 +5,6 @@
 
 Choco-Install -PackageName wixtoolset -ArgumentList "--force"
 
-<<<<<<< HEAD
-Invoke-PesterTests -TestFile "Tools" -TestName "WiX"
-=======
 if (Test-IsWin19)
 {
     $extensionUrl = "https://wixtoolset.gallerycdn.vsassets.io/extensions/wixtoolset/wixtoolsetvisualstudio2019extension/1.0.0.4/1563296438961/Votive2019.vsix"
@@ -28,4 +25,3 @@ if (-not (Test-IsWin22))
 }
 
 Invoke-PesterTests -TestFile "Wix"
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000

@@ -331,11 +331,7 @@
         "default": "1.15"
     },
     "node": {
-<<<<<<< HEAD
-        "default": "14",
-=======
         "default": "16",
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
         "nvm_versions": [
             "12",
             "14",
@@ -345,10 +341,6 @@
     "llvm": {
         "version": "13"
     },
-<<<<<<< HEAD
-    "mongodb": {
-        "version": "5.0"
-=======
     "php": {
         "version": "8.1"
     },
@@ -357,6 +349,5 @@
     },
     "postgresql": {
         "version": "14"
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
     }
 }

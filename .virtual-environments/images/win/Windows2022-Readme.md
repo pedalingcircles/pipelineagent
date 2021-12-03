@@ -1,26 +1,12 @@
 | Announcements |
 |-|
-<<<<<<< HEAD
-=======
 | [Windows Server 2022 with Visual Studio 2022 is generally available starting from November, 15](https://github.com/actions/virtual-environments/issues/4488) |
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 | [[all OSs] Default Nodejs version will be set to 16 on November, 29](https://github.com/actions/virtual-environments/issues/4446) |
-| [[all OSs] Selenium server version will be upgraded from 3 to 4 on November, 15](https://github.com/actions/virtual-environments/issues/4376) |
-| [[All OSs] Node.js version 10 will be removed from the images on November, 15](https://github.com/actions/virtual-environments/issues/4356) |
 | [Windows-2016 environment will be removed on March 15, 2022](https://github.com/actions/virtual-environments/issues/4312) |
-<<<<<<< HEAD
-| [[All OSs] Go versions less than 1.15 will be removed on November, 8](https://github.com/actions/virtual-environments/issues/4311) |
-| [(Public Beta) Windows Server 2022 with Visual Studio 2022 is now available](https://github.com/actions/virtual-environments/issues/3949) |
 ***
 # Microsoft Windows Server 2022 Datacenter
 - OS Version: 10.0.20348 Build 350
-- Image Version: 20211109.2
-=======
-***
-# Microsoft Windows Server 2022 Datacenter
-- OS Version: 10.0.20348 Build 350
-- Image Version: 20211122.0
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
+- Image Version: 20211130.3
 
 ## Enabled windows optional features
 - Windows Subsystem for Linux [WSLv1]
@@ -29,41 +15,25 @@
 ### Language and Runtime
 - Bash 4.4.23(1)-release
 - Go 1.16.10
-<<<<<<< HEAD
-- Julia 1.6.3
-- Kotlin 1.5.31
-- LLVM 13.0.0
-- Node 14.18.1
-- PHP 8.0.10
-- Python 3.9.8
-=======
 - Julia 1.6.4
-- Kotlin 1.6.0
+- Kotlin 1.5.32
 - LLVM 13.0.0
-- Node 14.18.1
+- Node 16.13.0
 - PHP 8.0.13
 - Python 3.9.9
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
-- Ruby 3.0.2p107
+- Ruby 3.0.3p157
 
 ### Package Management
 - Chocolatey 0.11.3
-- Composer 2.1.12
+- Composer 2.1.14
 - Helm 3.7.1
-<<<<<<< HEAD
-=======
 - Miniconda 4.10.3 (pre-installed on the image but not added to PATH)
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
-- NPM 6.14.15
+- NPM 8.1.0
 - NuGet 6.0.0.280
 - pip 21.3.1 (python 3.9)
 - Pipx 0.16.4
-- RubyGems 3.2.22
-<<<<<<< HEAD
-- Vcpkg  (build from master \<70033db>)
-=======
-- Vcpkg  (build from master \<653912591>)
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
+- RubyGems 3.2.32
+- Vcpkg  (build from master \<c1c6eb92e>)
 - Yarn 1.22.17
 
 #### Environment variables
@@ -78,49 +48,31 @@
 - sbt 1.5.5
 
 ### Tools
-- 7zip 21.05
+- 7zip 21.06
 - aria2 1.36.0
 - azcopy 10.13.0
 - Bazel 4.2.1
 - Bazelisk 1.10.1
 - Bicep 0.4.1008
 - Cabal 3.6.2.0
-<<<<<<< HEAD
-- CMake 3.21.4
-- CodeQL Action Bundle 2.7.0
-- Docker 20.10.7
-- Docker-compose 1.29.2
-- ghc 9.2.1
-- Git 2.33.1
-- Git LFS 3.0.1
-- jq 1.6
-- Kind 0.11.1
-- Kubectl 1.22.3
-=======
 - CMake 3.22.0
 - CodeQL Action Bundle 2.7.2
 - Docker 20.10.7
 - Docker-compose 1.29.2
 - Docker-wincred 0.6.4
 - ghc 9.2.1
-- Git 2.34.0
+- Git 2.34.1
 - Git LFS 3.0.2
 - jq 1.6
 - Kind 0.11.1
 - Kubectl 1.22.4
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 - Mercurial 5.0
 - Mingw-w64 8.1.0
 - Newman 5.3.0
 - NSIS v3.06.1
 - OpenSSL 1.1.1
-<<<<<<< HEAD
-- Packer 1.7.6
-- Pulumi v3.17.0
-=======
 - Packer 1.7.8
-- Pulumi v3.18.0
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
+- Pulumi v3.18.1
 - R 4.1.2
 - Stack 2.7.3
 - Subversion (SVN) 1.14.1
@@ -132,13 +84,9 @@
 - zstd 1.5.0
 
 ### CLI Tools
-- Alibaba Cloud CLI 3.0.99
-<<<<<<< HEAD
-- AWS CLI 2.3.4
-=======
-- AWS CLI 2.4.0
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
-- AWS SAM CLI 1.35.0
+- Alibaba Cloud CLI 3.0.100
+- AWS CLI 2.4.2
+- AWS SAM CLI 1.36.0
 - AWS Session Manager CLI 1.2.279.0
 - Azure CLI 2.30.0
 - Azure DevOps CLI extension 0.22.0
@@ -152,7 +100,7 @@
 - Rustup 1.24.3
 
 #### Packages
-- bindgen 0.59.1
+- bindgen 0.59.2
 - cargo-audit 0.16.0
 - cargo-outdated v0.10.2
 - cbindgen 0.20.0
@@ -160,32 +108,14 @@
 - Rustfmt 1.4.37
 
 ### Browsers and webdrivers
-<<<<<<< HEAD
-- Google Chrome 95.0.4638.69
-- Chrome Driver 95.0.4638.69
-- Microsoft Edge 95.0.1020.44
-- Microsoft Edge Driver 95.0.1020.44
-- Mozilla Firefox 94.0.1
-- Gecko Driver 0.30.0
-- IE Driver 3.150.1.1
-- Selenium server 3.141.59
-
-#### Environment variables
-| Name              | Value                                      |
-| ----------------- | ------------------------------------------ |
-| CHROMEWEBDRIVER   | C:\SeleniumWebDrivers\ChromeDriver         |
-| EDGEWEBDRIVER     | C:\SeleniumWebDrivers\EdgeDriver           |
-| GECKOWEBDRIVER    | C:\SeleniumWebDrivers\GeckoDriver          |
-| SELENIUM_JAR_PATH | C:\selenium\selenium-server-standalone.jar |
-=======
 - Google Chrome 96.0.4664.45
 - Chrome Driver 96.0.4664.45
-- Microsoft Edge 96.0.1054.29
-- Microsoft Edge Driver 96.0.1054.29
+- Microsoft Edge 96.0.1054.34
+- Microsoft Edge Driver 96.0.1054.34
 - Mozilla Firefox 94.0.2
 - Gecko Driver 0.30.0
 - IE Driver 3.150.1.1
-- Selenium server 4.0.0
+- Selenium server 4.1.0
 
 #### Environment variables
 | Name              | Value                              |
@@ -194,7 +124,6 @@
 | EDGEWEBDRIVER     | C:\SeleniumWebDrivers\EdgeDriver   |
 | GECKOWEBDRIVER    | C:\SeleniumWebDrivers\GeckoDriver  |
 | SELENIUM_JAR_PATH | C:\selenium\selenium-server.jar    |
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 
 ### Java
 | Version             | Vendor          | Environment Variable |
@@ -230,10 +159,6 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 #### Node
 | Version | Architecture |
 | ------- | ------------ |
-<<<<<<< HEAD
-| 10.24.1 | x64          |
-=======
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 | 12.22.7 | x64          |
 | 14.18.1 | x64          |
 | 16.13.0 | x64          |
@@ -244,19 +169,15 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 | ------- | ------------ |
 | 3.7.9   | x64, x86     |
 | 3.8.10  | x64, x86     |
-<<<<<<< HEAD
-| 3.9.8 (Default) | x64, x86     |
-=======
 | 3.9.9 (Default) | x64, x86     |
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 | 3.10.0  | x64, x86     |
 
 
 #### Ruby
 | Version | Architecture |
 | ------- | ------------ |
-| 2.7.4   | x64          |
-| 3.0.2 (Default) | x64          |
+| 2.7.5   | x64          |
+| 3.0.3 (Default) | x64          |
 
 
 #### PyPy
@@ -285,22 +206,14 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 #### MongoDB
 | Version | ServiceName | ServiceStatus | ServiceStartType |
 | ------- | ----------- | ------------- | ---------------- |
-<<<<<<< HEAD
-| 5.1.0.0 | MongoDB     | Running       | Automatic        |
-=======
 | 5.0.4.0 | MongoDB     | Running       | Automatic        |
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 
 
 
 ### Database tools
 - Azure CosmosDb Emulator 2.14.4.0
 - DacFx 15.0.5282.3
-<<<<<<< HEAD
 - MySQL 8.0.26.0
-=======
-- MySQL 8.0.27.0
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 - SQLPS 1.0
 
 
@@ -311,15 +224,9 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 | Nginx  | 1.21.4  | C:\tools\nginx-1.21.4\conf\nginx.conf | nginx       | Stopped       | 80         |
 
 ### Visual Studio Enterprise 2022
-<<<<<<< HEAD
-| Name                          | Version       | Path                                                     |
-| ----------------------------- | ------------- | -------------------------------------------------------- |
-| Visual Studio Enterprise 2022 | 17.0.31903.59 | C:\Program Files\Microsoft Visual Studio\2022\Enterprise |
-=======
 | Name                          | Version        | Path                                                     |
 | ----------------------------- | -------------- | -------------------------------------------------------- |
 | Visual Studio Enterprise 2022 | 17.0.31912.275 | C:\Program Files\Microsoft Visual Studio\2022\Enterprise |
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 
 #### Workloads, components and extensions:
 
@@ -362,17 +269,11 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 | Microsoft.Net.ComponentGroup.4.8.DeveloperTools                           | 17.0.31804.368 |
 | Microsoft.Net.ComponentGroup.DevelopmentPrerequisites                     | 17.0.31804.368 |
 | Microsoft.Net.ComponentGroup.TargetingPacks.Common                        | 17.0.31804.368 |
-<<<<<<< HEAD
-| Microsoft.NetCore.Component.DevelopmentTools                              | 17.0.31804.368 |
-| Microsoft.NetCore.Component.Runtime.6.0                                   | 17.0.31902.203 |
-| Microsoft.NetCore.Component.SDK                                           | 17.0.31902.203 |
-=======
 | microsoft.net.runtime.mono.tooling                                        | 6.0.21.52210   |
 | microsoft.net.sdk.emscripten                                              | 6.0.5.2003     |
 | Microsoft.NetCore.Component.DevelopmentTools                              | 17.0.31804.368 |
 | Microsoft.NetCore.Component.Runtime.6.0                                   | 17.0.31902.203 |
 | Microsoft.NetCore.Component.SDK                                           | 17.0.31912.81  |
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 | Microsoft.NetCore.Component.Web                                           | 17.0.31804.368 |
 | Microsoft.VisualStudio.Component.AppInsights.Tools                        | 17.0.31804.368 |
 | Microsoft.VisualStudio.Component.AspNet                                   | 17.0.31804.368 |
@@ -511,10 +412,7 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 | Microsoft.VisualStudio.Workload.Python                                    | 17.0.31804.368 |
 | Microsoft.VisualStudio.Workload.Universal                                 | 17.0.31804.368 |
 | Microsoft.VisualStudio.Workload.VisualStudioExtension                     | 17.0.31804.368 |
-<<<<<<< HEAD
-=======
 | wasm.tools                                                                | 6.0.21.52210   |
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
 
 #### Microsoft Visual C++:
 
@@ -567,7 +465,7 @@ All other versions are saved but not installed.
 | ------------------ | ---------------- |
 | DockerMsftProvider | 1.0.0.8          |
 | MarkdownPS         | 1.9              |
-| Microsoft.Graph    | 1.8.0            |
+| Microsoft.Graph    | 1.9.0            |
 | Pester             | 3.4.0<br>5.3.1   |
 | PowerShellGet      | 1.0.0.1<br>2.2.5 |
 | PSScriptAnalyzer   | 1.20.0           |
@@ -579,7 +477,7 @@ All other versions are saved but not installed.
 | Package Name               | Version                                                                                                                            |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Android Command Line Tools | 4.0                                                                                                                                |
-| Android Emulator           | 30.9.5                                                                                                                             |
+| Android Emulator           | 31.1.4                                                                                                                             |
 | Android SDK Build-tools    | 31.0.0<br>30.0.0 30.0.1 30.0.2 30.0.3<br>29.0.0 29.0.1 29.0.2 29.0.3<br>28.0.0 28.0.1 28.0.2 28.0.3<br>27.0.0 27.0.1 27.0.2 27.0.3 |
 | Android SDK Platforms      | android-31 (rev 1)<br>android-30 (rev 3)<br>android-29 (rev 5)<br>android-28 (rev 6)<br>android-27 (rev 3)                         |
 | Android SDK Platform-Tools | 31.0.3                                                                                                                             |

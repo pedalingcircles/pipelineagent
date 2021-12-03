@@ -12,17 +12,10 @@
             "6.12.0.140"
         ],
         "ios-versions": [
-<<<<<<< HEAD
-            "15.2.0.1", "15.0.0.6"
-        ],
-        "mac-versions": [
-            "8.2.0.1", "7.14.0.27"
-=======
             "15.2.0.17", "15.0.0.6"
         ],
         "mac-versions": [
             "8.2.0.17", "7.14.0.27"
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
         ],
         "android-versions": [
             "12.0.0.3", "11.3.0.4"
@@ -91,8 +84,10 @@
             "aria2",
             "azure-cli",
             "bazelisk",
+            "carthage",
             "cmake",
             "gh",
+            "gnupg",
             "gnu-tar",
             "kotlin",
             "libpq",
@@ -181,6 +176,7 @@
         "rubygems": [
             "xcode-install",
             "cocoapods",
+            "nomad-cli",
             "xcpretty",
             "bundler",
             "fastlane",
@@ -191,21 +187,16 @@
         "default": "1.17"
     },
     "node": {
-<<<<<<< HEAD
-        "default": "14",
-=======
         "default": "16",
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
         "nvm_versions": [
             "12",
             "14",
             "16"
         ]
     },
-<<<<<<< HEAD
-    "mongodb": {
-        "version": "5.0"
-=======
+    "llvm": {
+        "version": "13"
+    },
     "php": {
         "version": "8.1"
     },
@@ -214,6 +205,5 @@
     },
     "postgresql": {
         "version": "14"
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
     }
 }

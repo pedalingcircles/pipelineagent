@@ -419,15 +419,6 @@
         ]
     },
     "node": {
-<<<<<<< HEAD
-        "default": "14"
-    },
-    "Mysql": {
-        "version": "5.7"
-    },
-    "mongodb": {
-        "version": "5.0"
-=======
         "default": "16"
     },
     "mysql": {
@@ -445,6 +436,5 @@
     },
     "postgresql": {
         "version": "14"
->>>>>>> 465bca504c21fc19e0cc7245e0ab7c0f1eac6000
     }
 }
