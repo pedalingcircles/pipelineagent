@@ -381,7 +381,7 @@ param imageBuilderNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurity
 param imageBuilderNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param imageBuilderNetworkSecurityGroupRules array = [
   {
-    name: 'Remote'
+    name: 'AllowRemoteAccess'
     properties: {
       access: 'Allow'
       description: 'Allows Packer to SSH into ephemerial VM resources to create disk images.'
