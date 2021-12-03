@@ -16,7 +16,7 @@
 The Azure subscription Id where resources will be created.
 
 .PARAMETER BuildResourceGroupName
-    An existing resource group to run the build in.
+    An existing resource group to run the Packer Image build in.
 
 .PARAMETER ResourceGroupName
     Resource group under which the final artifact will be stored (storage account location).
