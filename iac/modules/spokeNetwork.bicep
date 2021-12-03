@@ -23,7 +23,6 @@ param subnetName string
 param subnetAddressPrefix string
 param subnetServiceEndpoints array
 
-param deployRouteTable bool = true
 param routeTableName string = '${subnetName}-routetable'
 param routeTableRouteName string = 'default_route'
 param routeTableRouteAddressPrefix string = '0.0.0.0/0'
@@ -31,6 +30,21 @@ param routeTableRouteNextHopIpAddress string = firewallPrivateIPAddress
 param routeTableRouteNextHopType string = 'VirtualAppliance'
 
 param nowUtc string = utcNow()
+
+param deployRouteTable bool = true
+var routeTableSetting = deployRouteTable ? {
+  routeTable: {
+    id: routeTable.outputs.id
+  }
+} : {}
+var defaultSubnetProperties = {
+  addressPrefix: subnetAddressPrefix
+  networkSecurityGroup: {
+    id: networkSecurityGroup.outputs.id
+  }
+  serviceEndpoints: subnetServiceEndpoints
+}
+var subnetProperties = union(defaultSubnetProperties, routeTableSetting)
 
 module logStorage './storageAccount.bicep' = {
   name: 'deploy-log-storage-${nowUtc}'
@@ -79,28 +93,15 @@ module virtualNetwork './virtualNetwork.bicep' = {
     name: virtualNetworkName
     location: location
     tags: tags
-
     addressPrefix: virtualNetworkAddressPrefix
-
     subnets: [
       {
         name: subnetName
-        properties: {
-          addressPrefix: subnetAddressPrefix
-          networkSecurityGroup: {
-            id: networkSecurityGroup.outputs.id
-          }
-          routeTable: {
-            id: routeTable.outputs.id
-          }
-          serviceEndpoints: subnetServiceEndpoints
-        }
+        properties: subnetProperties
       }
     ]
-
     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
     logStorageAccountResourceId: logStorage.outputs.id
-
     logs: virtualNetworkDiagnosticsLogs
     metrics: virtualNetworkDiagnosticsMetrics
   }
