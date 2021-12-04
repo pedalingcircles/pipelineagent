@@ -35,6 +35,9 @@ resource bastionHost 'Microsoft.Network/bastionHosts@2021-02-01' = {
   name: name
   location: location
   tags: tags
+  sku: {
+    name: 'Standard'
+  }
   properties: {
     ipConfigurations: [
       {
