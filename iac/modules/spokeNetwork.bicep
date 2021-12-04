@@ -113,4 +113,5 @@ output subnetName string = virtualNetwork.outputs.subnets[0].name
 output subnetAddressPrefix string = virtualNetwork.outputs.subnets[0].properties.addressPrefix
 output subnetResourceId string = virtualNetwork.outputs.subnets[0].id
 output networkSecurityGroupName string = networkSecurityGroup.outputs.name
-output networkSecurityGroupResourceId string =  networkSecurityGroup.outputs.id
+output networkSecurityGroupResourceId string = networkSecurityGroup.outputs.id
+output storageAccountResourceId string = logStorage.outputs.id
