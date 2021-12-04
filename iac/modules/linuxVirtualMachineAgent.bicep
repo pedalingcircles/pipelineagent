@@ -1,25 +1,82 @@
-param name string
+@description('The virtual machine name.')
+param vmName string
+
+@description('The network interface name.')
+param nicName string
+
+@description('The location for the VMs and NICs.')
 param location string
-param tags object = {}
 
-param networkInterfaceName string
+@description('Tags for the VM machines and associated resources like disks.')
+param vmTags object = {}
 
-param vmSize string
-param osDiskCreateOption string
-param osDiskType string
-param vmImagePublisher string
-param vmImageOffer string
-param vmImageSku string
-param vmImageVersion string
-param adminUsername string
+@description('Tags for the NICs.')
+param nicTags object = {}
+
+@description('IP address allocation method.')
 @allowed([
-  'sshPublicKey'
-  'password'
+  'Dynamic'
+  'Static'
 ])
-param authenticationType string
+param privateIPAddressAllocationMethod string = 'Dynamic'
+
+@description('The IP configuration name.')
+param ipConfigurationName string
+
+@description('The Azure DevOps (ADO) agent pool name.')
+param agentPool string
+
 @secure()
+@description('The personal access token (PAT) used to setup the agent in the agent pool in ADO.')
+param pat string
+
+@description('The URL of the ADO organization.')
+param orgUrl string
+
+@description('The agent version tag used to identify the agent software release. Optional. Use "latest" to specificy latest of specific tag otherwise. e.g. "v2.194.0')
+param agentVersionTag string = 'latest'
+
+@description('Specifies the size of the virtual machine.')
+param vmSize string
+
+@description('Specifies the storage account type for the managed disk.')
+param osDiskType string
+
+@description('Specifies the name of the administrator account.')
+param adminUsername string
+
+@description('The SSH RSA public key file as a string. Use "ssh-keygen -t rsa -b 2048" to generate your SSH key pairs.')
 @minLength(14)
-param adminPasswordOrKey string
+param adminPublicKey  string
+
+@description('The existing Shared Image Gallery name.')
+param existingSharedImageGalleryName string
+
+@description('The existing image resource group name.')
+param existingImageResourceGroupName string
+
+@description('The number of VMs to provision.')
+param vmCount int = 2
+
+@description('The image definition to use. This value is in the Shared Image Gallery')
+param imageDefinitionName string
+
+@description('The image definition version ot use.')
+param imageDefinitionVersion string
+
+@description('The existing subnet name in the virtual network that hosts the VMs.')
+param existingSubnetName string
+
+@description('The existing network security group name in the virtual network that hosts the VMs.')
+param existingNetworkSecurityGroupName string
+
+@description('The existing virtual network name that hosts the VMs.')
+param existingVnetName string
+
+@description('The existing storage account name used by the VMs.')
+param existingStorageAccountName string
+
+param containerName string = 'scriptextensions'
 
 var linuxConfiguration = {
   disablePasswordAuthentication: true
@@ -27,120 +84,125 @@ var linuxConfiguration = {
     publicKeys: [
       {
         path: '/home/${adminUsername}/.ssh/authorized_keys'
-        keyData: adminPasswordOrKey
+        keyData: adminPublicKey
       }
     ]
   }
 }
-param logAnalyticsWorkspaceId string
 
-resource networkInterface 'Microsoft.Network/networkInterfaces@2021-02-01' existing = {
-  name: networkInterfaceName
+param scriptExtensionScriptUris array 
+
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' existing = {
+  name: existingSubnetName
 }
 
-resource virtualMachine 'Microsoft.Compute/virtualMachines@2020-06-01' = {
-  name: name
-  location: location
-  tags: tags
+resource vnet 'Microsoft.Network/virtualNetworks@2020-11-01' existing = {
+  name: existingVnetName
+}
 
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2021-02-01' existing = {
+  name: existingNetworkSecurityGroupName
+}
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' existing = {
+  name: existingStorageAccountName
+}
+
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2021-04-01' = {
+  parent: storageAccount
+  name: 'default'
+}
+
+resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
+  parent: blobService
+  name: containerName
+}
+
+resource networkInterface 'Microsoft.Network/networkInterfaces@2020-11-01' = [for i in range(0, vmCount): {
+  name: '${nicName}-${format('{0:000}', i)}'
+  location: location
+  tags: nicTags
+
+  properties: {
+    ipConfigurations: [
+      {
+        name: ipConfigurationName
+        properties: {
+          subnet: {
+            id: '${vnet.id}/subnets/${subnet.name}'
+          }
+          primary: true
+          privateIPAddressVersion: 'IPv4'
+          privateIPAllocationMethod: privateIPAddressAllocationMethod
+        }
+      }
+    ]
+    networkSecurityGroup: {
+      id: networkSecurityGroup.id
+    }
+  }
+}]
+
+resource sharedImageGallery 'Microsoft.Compute/galleries@2020-09-30' existing = {
+  name: existingSharedImageGalleryName
+  scope: resourceGroup(existingImageResourceGroupName)
+}
+
+resource virtualMachine 'Microsoft.Compute/virtualMachines@2021-03-01' = [for i in range(0, vmCount): {
+  name: '${vmName}${i}'
+  location: location
+  tags: vmTags
   properties: {
     hardwareProfile: {
       vmSize: vmSize
     }
     storageProfile: {
       osDisk: {
-        createOption: osDiskCreateOption
+        createOption: 'FromImage'
         managedDisk: {
           storageAccountType: osDiskType
         }
       }
       imageReference: {
-        publisher: vmImagePublisher
-        offer: vmImageOffer
-        sku: vmImageSku
-        version: vmImageVersion
+        id: '${sharedImageGallery.id}/images/${imageDefinitionName}/versions/${imageDefinitionVersion}'
       }
     }
     networkProfile: {
       networkInterfaces: [
         {
-          id: networkInterface.id
+          id: networkInterface[i].id
         }
       ]
     }
     osProfile: {
-      computerName: name
+      computerName: '${vmName}${i}'
       adminUsername: adminUsername
-      adminPassword: adminPasswordOrKey
-      linuxConfiguration: ((authenticationType == 'password') ? null : linuxConfiguration)
+      linuxConfiguration: linuxConfiguration
     }
   }
-}
+}]
 
-resource networkWatcher 'Microsoft.Compute/virtualMachines/extensions@2020-06-01' = {
-  name: '${virtualMachine.name}/Microsoft.Azure.NetworkWatcher'
+resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01' = [for i in range(0,vmCount):  {
+  name: '${virtualMachine[i].name}/agentextension'
   location: location
+  tags: vmTags
   properties: {
-    publisher: 'Microsoft.Azure.NetworkWatcher'
-    type: 'NetworkWatcherAgentLinux'
-    typeHandlerVersion: '1.4'
-  }
-  dependsOn: [
-    virtualMachine
-    policyExtension
-  ]
-}
-
-resource policyExtension 'Microsoft.Compute/virtualMachines/extensions@2020-06-01' = {
-  name: '${virtualMachine.name}/Microsoft.Azure.AzurePolicyforLinux'
-  location: location
-  properties: {
-    publisher: 'Microsoft.GuestConfiguration'
-    type: 'ConfigurationforLinux'
-    typeHandlerVersion: '1.0'
+    publisher: 'Microsoft.Azure.Extensions'
+    type: 'CustomScript'
+    typeHandlerVersion: '2.1'
     autoUpgradeMinorVersion: true
-    enableAutomaticUpgrade: true
-  }
-  dependsOn: [
-    virtualMachine
-  ]
-}
-
-resource omsExtension 'Microsoft.Compute/virtualMachines/extensions@2020-06-01' = {
-  name: '${virtualMachine.name}/OMSExtension'
-  location: location
-  properties: {
-    publisher: 'Microsoft.EnterpriseCloud.Monitoring'
-    type: 'OmsAgentForLinux'
-    typeHandlerVersion: '1.13'
     settings: {
-      workspaceId: reference(logAnalyticsWorkspaceId , '2015-11-01-preview').customerId
-      stopOnMultipleConnections: true
-    }
-    protectedSettings: {
-      workspaceKey: listKeys(logAnalyticsWorkspaceId , '2015-11-01-preview').primarySharedKey
+      fileUris: scriptExtensionScriptUris
+      commandToExecute: 'sudo ./installer-agent-extension.sh ${adminUsername} ${agentPool} ${pat} ${orgUrl} ${agentVersionTag}'
     }
   }
-  dependsOn: [
-    virtualMachine
-    networkWatcher
-  ]
-}
+}]
 
-resource dependencyAgent 'Microsoft.Compute/virtualMachines/extensions@2020-06-01' = {
-  name: '${virtualMachine.name}/DependencyAgentLinux'
-  location: location
-  properties: {
-    publisher: 'Microsoft.Azure.Monitoring.DependencyAgent'
-    type: 'DependencyAgentLinux'
-    typeHandlerVersion: '9.5'
-    autoUpgradeMinorVersion: true
-  }
-  dependsOn: [
-    virtualMachine
-    omsExtension
-  ]
-}
-
+output vmCountStop int = vmCount
+output nicInfo array = [for i in range(0, vmCount): {
+  id: networkInterface[i].id
+  name: networkInterface[i].name
+}]
 output adminUsername string = adminUsername
-output authenticationType string = authenticationType
+output authenticationType string = 'sshPublicKey'
+output containerName string = containerName
