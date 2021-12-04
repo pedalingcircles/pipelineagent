@@ -25,9 +25,9 @@ var bundle = (environment().name != 'AzureUSGovernment' ? [
 param enableAutoProvisioning bool = true
 var autoProvisioning = enableAutoProvisioning ? 'On' : 'Off'
 
-@description('Turn security policy settings On or Off.')
-param enableSecuritySettings bool = true
-var securitySettings = enableSecuritySettings ? 'On' : 'Off'
+//@description('Turn security policy settings On or Off.')
+//param enableSecuritySettings bool = true
+//var securitySettings = enableSecuritySettings ? 'On' : 'Off'
 
 @description('Specify the ID of your custom Log Analytics workspace to collect ASC data.')
 param logAnalyticsWorkspaceId string
@@ -70,30 +70,31 @@ resource securityNotifications 'Microsoft.Security/securityContacts@2017-08-01-p
   }
 }
 
-resource securityPoliciesDefault 'Microsoft.Security/policies@2015-06-01-preview' = {
-  name: 'default'
-  properties: {
-    policyLevel: 'Subscription'
-    name: 'default'
-    unique: 'Off'
-    logCollection: 'On'
-    recommendations: {
-      patch: securitySettings
-      baseline: securitySettings
-      antimalware: securitySettings
-      diskEncryption: securitySettings
-      acls: securitySettings
-      nsgs: securitySettings
-      waf: securitySettings
-      sqlAuditing: securitySettings
-      sqlTde: securitySettings
-      ngfw: securitySettings
-      vulnerabilityAssessment: securitySettings
-      storageEncryption: securitySettings
-      jitNetworkAccess: securitySettings
-    }
-    pricingConfiguration: {
-      selectedPricingTier: 'Standard'
-    }
-  }
-}
+// template doesn't seem to exist and get warnings
+// resource securityPoliciesDefault 'Microsoft.Security/policies@2015-06-01-preview' = {
+//   name: 'default'
+//   properties: {
+//     policyLevel: 'Subscription'
+//     name: 'default'
+//     unique: 'Off'
+//     logCollection: 'On'
+//     recommendations: {
+//       patch: securitySettings
+//       baseline: securitySettings
+//       antimalware: securitySettings
+//       diskEncryption: securitySettings
+//       acls: securitySettings
+//       nsgs: securitySettings
+//       waf: securitySettings
+//       sqlAuditing: securitySettings
+//       sqlTde: securitySettings
+//       ngfw: securitySettings
+//       vulnerabilityAssessment: securitySettings
+//       storageEncryption: securitySettings
+//       jitNetworkAccess: securitySettings
+//     }
+//     pricingConfiguration: {
+//       selectedPricingTier: 'Standard'
+//     }
+//   }
+// }

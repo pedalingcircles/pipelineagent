@@ -1,15 +1,12 @@
 | Announcements |
 |-|
+| [Windows Server 2022 with Visual Studio 2022 is generally available starting from November, 15](https://github.com/actions/virtual-environments/issues/4488) |
 | [[all OSs] Default Nodejs version will be set to 16 on November, 29](https://github.com/actions/virtual-environments/issues/4446) |
-| [[all OSs] Selenium server version will be upgraded from 3 to 4 on November, 15](https://github.com/actions/virtual-environments/issues/4376) |
-| [[All OSs] Node.js version 10 will be removed from the images on November, 15](https://github.com/actions/virtual-environments/issues/4356) |
 | [Windows-2016 environment will be removed on March 15, 2022](https://github.com/actions/virtual-environments/issues/4312) |
-| [[All OSs] Go versions less than 1.15 will be removed on November, 8](https://github.com/actions/virtual-environments/issues/4311) |
-| [(Public Beta) Windows Server 2022 with Visual Studio 2022 is now available](https://github.com/actions/virtual-environments/issues/3949) |
 ***
 # Microsoft Windows Server 2019 Datacenter
 - OS Version: 10.0.17763 Build 2300
-- Image Version: 20211110.1
+- Image Version: 20211229.2
 
 ## Enabled windows optional features
 - Windows Subsystem for Linux [WSLv1]
@@ -18,12 +15,12 @@
 ### Language and Runtime
 - Bash 4.4.23(1)-release
 - Go 1.15.15
-- Julia 1.6.3
-- Kotlin 1.5.31
+- Julia 1.6.4
+- Kotlin 1.5.32
 - LLVM 13.0.0
-- Node 14.18.1
+- Node 16.13.0
 - Perl 5.32.1
-- PHP 8.0.10
+- PHP 8.0.13
 - Python 3.7.9
 - Ruby 2.5.9p229
 
@@ -32,12 +29,12 @@
 - Composer 2.1.12
 - Helm 3.7.1
 - Miniconda 4.10.3 (pre-installed on the image but not added to PATH)
-- NPM 6.14.15
+- NPM 8.1.0
 - NuGet 6.0.0.280
 - pip 21.3.1 (python 3.7)
 - Pipx 0.16.4
 - RubyGems 2.7.6.3
-- Vcpkg  (build from master \<70033db>)
+- Vcpkg  (build from master \<60a8f7971>)
 - Yarn 1.22.17
 
 #### Environment variables
@@ -49,37 +46,39 @@
 ### Project Management
 - Ant 1.10.12
 - Gradle 7.2
-- Maven 3.8.3
+- Maven 3.8.4
 - sbt 1.5.5
 
 ### Tools
-- 7zip 19.00
+- 7zip 21.06
 - aria2 1.36.0
 - azcopy 10.13.0
 - Bazel 4.2.1
 - Bazelisk 1.10.1
 - Bicep 0.4.1008
 - Cabal 3.6.2.0
-- CMake 3.21.4
-- CodeQL Action Bundle 2.7.0
+- CMake 3.22.0
+- CodeQL Action Bundle 2.7.2
 - Docker 20.10.7
 - Docker-compose 1.29.2
+- Docker-wincred 0.6.4
 - ghc 9.2.1
-- Git 2.33.1
-- Git LFS 3.0.1
-- Google Cloud SDK 364.0.0
+- Git 2.34.1
+- Git LFS 3.0.2
+- Google Cloud SDK 365.0.1
 - InnoSetup 6.2.0
 - jq 1.6
 - Kind 0.11.1
-- Kubectl 1.22.3
+- Kubectl 1.22.4
 - Mercurial 5.0
 - Mingw-w64 8.1.0
 - Newman 5.3.0
 - NSIS v3.06.1
 - OpenSSL 1.1.1
-- Packer 1.7.6
-- Pulumi v3.17.1
+- Packer 1.7.8
+- Pulumi v3.18.1
 - R 4.1.2
+- Service Fabric SDK 8.2.1235.9590
 - Stack 2.7.3
 - Subversion (SVN) 1.14.1
 - Swig 4.0.2
@@ -90,8 +89,8 @@
 
 ### CLI Tools
 - Alibaba Cloud CLI 3.0.99
-- AWS CLI 2.3.5
-- AWS SAM CLI 1.35.0
+- AWS CLI 2.4.2
+- AWS SAM CLI 1.36.0
 - AWS Session Manager CLI 1.2.279.0
 - Azure CLI 2.30.0
 - Azure DevOps CLI extension 0.22.0
@@ -106,30 +105,30 @@
 - Rustup 1.24.3
 
 #### Packages
-- bindgen 0.59.1
-- cargo-audit 0.15.2
-- cargo-outdated v0.9.18
+- bindgen 0.59.2
+- cargo-audit 0.16.0
+- cargo-outdated v0.10.2
 - cbindgen 0.20.0
 - Clippy 0.1.56
 - Rustfmt 1.4.37
 
 ### Browsers and webdrivers
-- Google Chrome 95.0.4638.69
-- Chrome Driver 95.0.4638.69
-- Microsoft Edge 95.0.1020.44
-- Microsoft Edge Driver 95.0.1020.44
-- Mozilla Firefox 94.0.1
+- Google Chrome 96.0.4664.45
+- Chrome Driver 96.0.4664.45
+- Microsoft Edge 96.0.1054.34
+- Microsoft Edge Driver 96.0.1054.34
+- Mozilla Firefox 94.0.2
 - Gecko Driver 0.30.0
 - IE Driver 3.150.1.1
-- Selenium server 3.141.59
+- Selenium server 4.1.0
 
 #### Environment variables
-| Name              | Value                                      |
-| ----------------- | ------------------------------------------ |
-| CHROMEWEBDRIVER   | C:\SeleniumWebDrivers\ChromeDriver         |
-| EDGEWEBDRIVER     | C:\SeleniumWebDrivers\EdgeDriver           |
-| GECKOWEBDRIVER    | C:\SeleniumWebDrivers\GeckoDriver          |
-| SELENIUM_JAR_PATH | C:\selenium\selenium-server-standalone.jar |
+| Name              | Value                              |
+| ----------------- | ---------------------------------- |
+| CHROMEWEBDRIVER   | C:\SeleniumWebDrivers\ChromeDriver |
+| EDGEWEBDRIVER     | C:\SeleniumWebDrivers\EdgeDriver   |
+| GECKOWEBDRIVER    | C:\SeleniumWebDrivers\GeckoDriver  |
+| SELENIUM_JAR_PATH | C:\selenium\selenium-server.jar    |
 
 ### Java
 | Version             | Vendor          | Environment Variable |
@@ -168,7 +167,6 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 #### Node
 | Version | Architecture |
 | ------- | ------------ |
-| 10.24.1 | x64          |
 | 12.22.7 | x64          |
 | 14.18.1 | x64          |
 | 16.13.0 | x64          |
@@ -182,7 +180,7 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 | 3.6.8   | x64, x86     |
 | 3.7.9 (Default) | x64, x86     |
 | 3.8.10  | x64, x86     |
-| 3.9.8   | x64, x86     |
+| 3.9.9   | x64, x86     |
 | 3.10.0  | x64, x86     |
 
 
@@ -191,9 +189,9 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 | ------- | ------------ |
 | 2.4.10  | x64          |
 | 2.5.9 (Default) | x64          |
-| 2.6.8   | x64          |
-| 2.7.4   | x64          |
-| 3.0.2   | x64          |
+| 2.6.9   | x64          |
+| 2.7.5   | x64          |
+| 3.0.3   | x64          |
 
 
 #### PyPy
@@ -211,7 +209,7 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 | Property             | Value                                                                                                                                |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | ServiceName          | postgresql-x64-14                                                                                                                    |
-| Version              | 14.0                                                                                                                                 |
+| Version              | 14.1                                                                                                                                 |
 | ServiceStatus        | Stopped                                                                                                                              |
 | ServiceStartType     | Disabled                                                                                                                             |
 | EnvironmentVariables | PGBIN=C:\Program Files\PostgreSQL\14\bin <br> PGDATA=C:\Program Files\PostgreSQL\14\data <br> PGROOT=C:\Program Files\PostgreSQL\14  |
@@ -223,14 +221,14 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 #### MongoDB
 | Version | ServiceName | ServiceStatus | ServiceStartType |
 | ------- | ----------- | ------------- | ---------------- |
-| 5.1.0.0 | MongoDB     | Running       | Automatic        |
+| 5.0.4.0 | MongoDB     | Running       | Automatic        |
 
 
 
 ### Database tools
 - Azure CosmosDb Emulator 2.14.4.0
 - DacFx 15.0.5282.3
-- MySQL 5.7.35.0
+- MySQL 5.7.36.0
 - SQLPS 1.0
 
 
@@ -243,13 +241,13 @@ Note: MSYS2 is pre-installed on image but not added to PATH.
 ### Visual Studio Enterprise 2019
 | Name                          | Version         | Path                                                           |
 | ----------------------------- | --------------- | -------------------------------------------------------------- |
-| Visual Studio Enterprise 2019 | 16.11.31829.152 | C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise |
+| Visual Studio Enterprise 2019 | 16.11.31911.196 | C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise |
 
 #### Workloads, components and extensions:
 
 | Package                                                                   | Version         |
 | ------------------------------------------------------------------------- | --------------- |
-| Component.Android.NDK.R16B                                                | 16.11.31827.77  |
+| Component.Android.NDK.R16B                                                | 16.11.31910.99  |
 | Component.Android.SDK25.Private                                           | 16.0.28625.61   |
 | Component.Android.SDK30                                                   | 16.10.31205.252 |
 | Component.Ant                                                             | 1.9.3.8         |
@@ -540,7 +538,7 @@ All other versions are saved but not installed.
 | ------------------ | ---------------- |
 | DockerMsftProvider | 1.0.0.8          |
 | MarkdownPS         | 1.9              |
-| Microsoft.Graph    | 1.8.0            |
+| Microsoft.Graph    | 1.9.0            |
 | Pester             | 3.4.0<br>5.3.1   |
 | PowerShellGet      | 1.0.0.1<br>2.2.5 |
 | PSScriptAnalyzer   | 1.20.0           |

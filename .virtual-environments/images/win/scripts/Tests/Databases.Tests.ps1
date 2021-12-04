@@ -51,11 +51,21 @@ Describe "PostgreSQL" {
             $StartType | Should -Be "Disabled"
         }
     }
+
+    Context "PostgreSQL version" {
+        It "PostgreSQL version should correspond to the version in the toolset" {
+            $toolsetVersion = (Get-ToolsetContent).postgresql.version
+            # Client version
+            (&$Env:PGBIN\psql --version).split()[-1] | Should -BeLike "$toolsetVersion*"
+            # Server version
+            (&$Env:PGBIN\pg_config --version).split()[-1] | Should -BeLike "$toolsetVersion*"
+        }
+    }
 }
 
 Describe "MySQL" {
     It "MySQL CLI" {
-        $MysqlMajorMinor = (Get-ToolsetContent).Mysql.version
-        mysql -V | Should -BeLike "*${MysqlMajorMinor}*"
+        $MysqlMajorVersion = (Get-ToolsetContent).mysql.major_version
+        mysql -V | Should -BeLike "*${MysqlMajorVersion}*"
     }
 }

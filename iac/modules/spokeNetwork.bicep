@@ -31,6 +31,21 @@ param routeTableRouteNextHopType string = 'VirtualAppliance'
 
 param nowUtc string = utcNow()
 
+param deployRouteTable bool = true
+var routeTableSetting = deployRouteTable ? {
+  routeTable: {
+    id: routeTable.outputs.id
+  }
+} : {}
+var defaultSubnetProperties = {
+  addressPrefix: subnetAddressPrefix
+  networkSecurityGroup: {
+    id: networkSecurityGroup.outputs.id
+  }
+  serviceEndpoints: subnetServiceEndpoints
+}
+var subnetProperties = union(defaultSubnetProperties, routeTableSetting)
+
 module logStorage './storageAccount.bicep' = {
   name: 'deploy-log-storage-${nowUtc}'
   params: {
@@ -58,7 +73,7 @@ module networkSecurityGroup './networkSecurityGroup.bicep' = {
   }
 }
 
-module routeTable './routeTable.bicep' = {
+module routeTable './routeTable.bicep' = if (deployRouteTable) {
   name: 'deploy-routetable-${nowUtc}'
   params: {
     name: routeTableName
@@ -78,28 +93,15 @@ module virtualNetwork './virtualNetwork.bicep' = {
     name: virtualNetworkName
     location: location
     tags: tags
-
     addressPrefix: virtualNetworkAddressPrefix
-
     subnets: [
       {
         name: subnetName
-        properties: {
-          addressPrefix: subnetAddressPrefix
-          networkSecurityGroup: {
-            id: networkSecurityGroup.outputs.id
-          }
-          routeTable: {
-            id: routeTable.outputs.id
-          }
-          serviceEndpoints: subnetServiceEndpoints
-        }
+        properties: subnetProperties
       }
     ]
-
     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
     logStorageAccountResourceId: logStorage.outputs.id
-
     logs: virtualNetworkDiagnosticsLogs
     metrics: virtualNetworkDiagnosticsMetrics
   }
@@ -111,4 +113,5 @@ output subnetName string = virtualNetwork.outputs.subnets[0].name
 output subnetAddressPrefix string = virtualNetwork.outputs.subnets[0].properties.addressPrefix
 output subnetResourceId string = virtualNetwork.outputs.subnets[0].id
 output networkSecurityGroupName string = networkSecurityGroup.outputs.name
-output networkSecurityGroupResourceId string =  networkSecurityGroup.outputs.id
+output networkSecurityGroupResourceId string = networkSecurityGroup.outputs.id
+output storageAccountResourceId string = logStorage.outputs.id

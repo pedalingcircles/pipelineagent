@@ -134,6 +134,7 @@ var spokes = [
     subnetAddressPrefix: operationsSubnetAddressPrefix
     subnetServiceEndpoints: operationsSubnetServiceEndpoints
     tags: union(operationsTags,defaultTags)
+    deployRouteTable: true
   }
   {
     name: 'agent'
@@ -154,6 +155,7 @@ var spokes = [
     subnetAddressPrefix: agentSubnetAddressPrefix
     subnetServiceEndpoints: agentSubnetServiceEndpoints
     tags: union(agentTags,defaultTags)
+    deployRouteTable: true
   }
   {
     name: 'image'
@@ -174,6 +176,7 @@ var spokes = [
     subnetAddressPrefix: imageSubnetAddressPrefix
     subnetServiceEndpoints: imageSubnetServiceEndpoints
     tags: union(imageTags,defaultTags)
+    deployRouteTable: true
   }
   {
     name: 'imagebuilder'
@@ -194,6 +197,7 @@ var spokes = [
     subnetAddressPrefix: imageBuilderSubnetAddressPrefix
     subnetServiceEndpoints: imageBuilderSubnetServiceEndpoints
     tags: union(imageBuilderTags,defaultTags)
+    deployRouteTable: false
   }
   {
     name: 'identity'
@@ -214,7 +218,7 @@ var spokes = [
     subnetAddressPrefix: identitySubnetAddressPrefix
     subnetServiceEndpoints: identitySubnetServiceEndpoints
     tags: union(identityTags,defaultTags)
-
+    deployRouteTable: true
   }
 ]
 
@@ -254,7 +258,7 @@ param hubNetworkSecurityGroupDiagnosticsLogs array = [
     category: 'NetworkSecurityGroupRuleCounter'
     enabled: true
   }
-]
+] 
 param hubNetworkSecurityGroupDiagnosticsMetrics array = []
 param hubSubnetName string = 'snet-hub'
 param hubSubnetAddressPrefix string = '10.0.100.128/27'
@@ -346,7 +350,7 @@ param imageNetworkSecurityGroupName string = 'nsg-image'
 param imageNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
 param imageNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param imageNetworkSecurityGroupRules array = []
-param imageSubnetName string = 'snet-packer'
+param imageSubnetName string = 'snet-image'
 param imageSubnetAddressPrefix string = '10.0.120.0/28'
 param imageSubnetServiceEndpoints array = []
 
@@ -375,7 +379,27 @@ param imageBuilderVirtualNetworkDiagnosticsMetrics array = []
 param imageBuilderNetworkSecurityGroupName string = 'nsg-imagebuilder'
 param imageBuilderNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
 param imageBuilderNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
-param imageBuilderNetworkSecurityGroupRules array = []
+param imageBuilderNetworkSecurityGroupRules array = [
+  {
+    name: 'AllowRemoteAccess'
+    properties: {
+      access: 'Allow'
+      description: 'Allows Packer to SSH into ephemerial VM resources to create disk images.'
+      destinationAddressPrefix: '10.0.130.0/25'
+      destinationAddressPrefixes: []
+      destinationPortRange: '22'
+      destinationPortRanges: []
+      direction: 'Inbound'
+      priority: 100
+      protocol: 'Tcp'
+      sourceAddressPrefix: '0.0.0.0'
+      sourceAddressPrefixes: []
+      sourcePortRange: '*'
+      sourcePortRanges: []
+    }
+    type: 'SSH'
+  }
+]
 param imageBuilderSubnetName string = 'snet-imagebuilder'
 param imageBuilderSubnetAddressPrefix string = '10.0.130.0/25'
 param imageBuilderSubnetServiceEndpoints array = []
@@ -532,6 +556,8 @@ module spokeNetworks './modules/spokeNetwork.bicep' = [ for spoke in spokes: {
     subnetName: spoke.subnetName
     subnetAddressPrefix: spoke.subnetAddressPrefix
     subnetServiceEndpoints: spoke.subnetServiceEndpoints
+
+    deployRouteTable: spoke.deployRouteTable
   }
 }]
 
@@ -648,6 +674,24 @@ module sharedImageGallery './modules/sharedImageGallery.bicep' = {
     name: sharedImageGalleryName
     location: imageLocation
     tags: imageTags
+  }
+  dependsOn: [
+    spokeNetworks
+  ]
+}
+
+
+module packerRoleAssignments './modules/packerRoleAssignments.bicep' = {
+  name: 'packer-roleassignments'
+  scope: resourceGroup(imageBuilderSubscriptionId, imageResourceGroupName)
+  params: {
+    imageSubscriptionId: imageSubscriptionId
+    imageBuilderSubscriptionId: imageBuilderSubscriptionId
+    imageResourceGroupName: imageResourceGroupName
+    imageBuilderResourceGroupName: imageBuilderResourceGroupName
+    imageStorageAccountResourceId: spokeNetworks[2].outputs.storageAccountResourceId
+    imageBuilderResourceGroupResourceId: spokeResourceGroups[3].outputs.id
+    principleId: '3becc050-82f2-4516-8c8e-7be9ff74623a'
   }
   dependsOn: [
     spokeNetworks

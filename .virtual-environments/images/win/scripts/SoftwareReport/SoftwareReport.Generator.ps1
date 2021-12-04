@@ -74,13 +74,10 @@ $markdown += New-MDHeader "Project Management" -Level 3
 $projectManagementTools = @(
     (Get-AntVersion),
     (Get-GradleVersion),
-    (Get-MavenVersion)
+    (Get-MavenVersion),
+    (Get-SbtVersion)
 )
-if ((Test-IsWin16) -or (Test-IsWin19)) {
-    $projectManagementTools += @(
-        (Get-SbtVersion)
-    )
-}
+
 $markdown += New-MDList -Style Unordered -Lines ($projectManagementTools | Sort-Object)
 
 $markdown += New-MDHeader "Tools" -Level 3
@@ -96,6 +93,7 @@ $toolsList = @(
     (Get-CodeQLBundleVersion),
     (Get-DockerVersion),
     (Get-DockerComposeVersion),
+    (Get-DockerWincredVersion),
     (Get-GHCVersion),
     (Get-GitVersion),
     (Get-GitLFSVersion),
@@ -122,7 +120,8 @@ $toolsList = @(
 )
 if ((Test-IsWin16) -or (Test-IsWin19)) {
     $toolsList += @(
-        (Get-GoogleCloudSDKVersion)
+        (Get-GoogleCloudSDKVersion),
+        (Get-ServiceFabricSDKVersion)
     )
 }
 $markdown += New-MDList -Style Unordered -Lines ($toolsList | Sort-Object)
@@ -190,32 +189,28 @@ $markdown += Get-ShellTarget
 $markdown += New-MDNewLine
 
 $markdown += New-MDHeader "MSYS2" -Level 3
-$markdown += Get-PacmanVersion
-$markdown += New-MDNewLine
+$markdown += "$(Get-PacmanVersion)" | New-MDList -Style Unordered
 $markdown += New-MDHeader "Notes:" -Level 5
-$markdown += @'
+$reportMsys64 = @'
 ```
 Location: C:\msys64
 
 Note: MSYS2 is pre-installed on image but not added to PATH.
 ```
 '@
-$markdown += New-MDNewLine
+$markdown += New-MDParagraph -Lines $reportMsys64
 
 if (Test-IsWin19)
 {
     $markdown += New-MDHeader "BizTalk Server" -Level 3
-    $markdown += Get-BizTalkVersion
-    $markdown += New-MDNewLine
+    $markdown += "$(Get-BizTalkVersion)" | New-MDList -Style Unordered
 }
 
 $markdown += New-MDHeader "Cached Tools" -Level 3
 $markdown += (Build-CachedToolsMarkdown)
-$markdown += New-MDNewLine
 
 $markdown += New-MDHeader "Databases" -Level 3
 $markdown += Build-DatabasesMarkdown
-$markdown += New-MDNewLine
 
 $markdown += New-MDHeader "Database tools" -Level 3
 $markdown += New-MDList -Style Unordered -Lines (@(
@@ -225,7 +220,6 @@ $markdown += New-MDList -Style Unordered -Lines (@(
     (Get-SQLPSVersion)
     ) | Sort-Object
 )
-$markdown += New-MDNewLine
 
 $markdown += Build-WebServersSection
 
@@ -235,12 +229,10 @@ $markdown += $vs | New-MDTable
 $markdown += New-MDNewLine
 
 $markdown += New-MDHeader "Workloads, components and extensions:" -Level 4
-$markdown += New-MDNewLine
 $markdown += ((Get-VisualStudioComponents) + (Get-VisualStudioExtensions)) | New-MDTable
 $markdown += New-MDNewLine
 
 $markdown += New-MDHeader "Microsoft Visual C++:" -Level 4
-$markdown += New-MDNewLine
 $markdown += Get-VisualCPPComponents | New-MDTable
 $markdown += New-MDNewLine
 
@@ -273,14 +265,14 @@ $markdown += New-MDList -Lines (Get-PowershellCoreVersion) -Style Unordered
 
 $markdown += New-MDHeader "Azure Powershell Modules" -Level 4
 $markdown += Get-PowerShellAzureModules | New-MDTable
-$markdown += @'
+$reportAzPwsh = @'
 ```
 Azure PowerShell module 2.1.0 and AzureRM PowerShell module 2.1.0 are installed
 and are available via 'Get-Module -ListAvailable'.
 All other versions are saved but not installed.
 ```
 '@
-$markdown += New-MDNewLine
+$markdown += New-MDParagraph -Lines $reportAzPwsh
 
 $markdown += New-MDHeader "Powershell Modules" -Level 4
 $markdown += Get-PowerShellModules | New-MDTable
@@ -299,7 +291,6 @@ $cachedImages = Get-CachedDockerImagesTableData
 if ($cachedImages) {
     $markdown += New-MDHeader "Cached Docker images" -Level 3
     $markdown += $cachedImages | New-MDTable
-    $markdown += New-MDNewLine
 }
 
 $markdown | Out-File -FilePath "C:\InstalledSoftware.md"

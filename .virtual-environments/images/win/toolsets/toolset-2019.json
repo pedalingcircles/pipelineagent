@@ -429,7 +429,6 @@
             { "name": "gitversion.portable" },
             { "name": "innosetup" },
             { "name": "jq" },
-            { "name": "llvm" },
             { "name": "NuGet.CommandLine" },
             {
                 "name": "openssl.light",
@@ -452,12 +451,22 @@
         ]
     },
     "node": {
-        "default": "14"
+        "default": "16"
     },
-    "Mysql": {
-        "version": "5.7"
+    "mysql": {
+        "major_version": "5.7",
+        "full_version": "5.7.36"
     },
     "mongodb": {
         "version": "5.0"
+    },
+    "php": {
+        "version": "8.0"
+    },
+    "llvm": {
+        "version": "13"
+    },
+    "postgresql": {
+        "version": "14"
     }
 }

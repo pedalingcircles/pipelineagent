@@ -111,9 +111,7 @@ function Get-NodeVersion {
 }
 
 function Get-ChocoVersion {
-    ($(choco version) | Out-String) -match "v(?<version>\d+\.\d+\.\d+)" | Out-Null
-    $chocoVersion = $Matches.Version
-    return "Chocolatey $chocoVersion"
+    return "Chocolatey $(choco --version)"
 }
 
 function Get-VcpkgVersion {
@@ -312,7 +310,7 @@ function Get-PacmanVersion {
     $rawVersion = & $pacmanPath --version
     $rawVersion.Split([System.Environment]::NewLine)[1] -match "\d+\.\d+(\.\d+)?" | Out-Null
     $pacmanVersion = $matches[0]
-    return "- Pacman $pacmanVersion"
+    return "Pacman $pacmanVersion"
 }
 
 function Get-YAMLLintVersion {
@@ -321,7 +319,7 @@ function Get-YAMLLintVersion {
 
 function Get-BizTalkVersion {
     $bizTalkReg = Get-ItemProperty "HKLM:\SOFTWARE\WOW6432Node\Microsoft\BizTalk Server\3.0"
-    return "- $($bizTalkReg.ProductName) $($bizTalkReg.ProductVersion) "
+    return "$($bizTalkReg.ProductName) $($bizTalkReg.ProductVersion)"
 }
 
 function Get-PipxVersion {

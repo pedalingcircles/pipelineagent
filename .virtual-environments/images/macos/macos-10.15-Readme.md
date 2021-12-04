@@ -1,56 +1,53 @@
 | Announcements |
 |-|
-| [[all OSs] Selenium server version will be upgraded from 3 to 4 on November, 15](https://github.com/actions/virtual-environments/issues/4376) |
-| [[All OSs] Node.js version 10 will be removed from the images on November, 15](https://github.com/actions/virtual-environments/issues/4356) |
-| [[macOS Big Sur] Xcode 13 beta will be removed and Xcode 13.1 set as default on November, 15](https://github.com/actions/virtual-environments/issues/4355) |
-| [[All OSs] Go versions less than 1.15 will be removed on November, 8](https://github.com/actions/virtual-environments/issues/4311) |
+| [[all OSs] Default Nodejs version will be set to 16 on November, 29](https://github.com/actions/virtual-environments/issues/4446) |
 | [macOS-latest workflows will use macOS-11](https://github.com/actions/virtual-environments/issues/4060) |
 ***
 # macOS 10.15 info
-- System Version: macOS 10.15.7 (19H1419)
+- System Version: macOS 10.15.7 (19H1519)
 - Kernel Version: Darwin 19.6.0
-- Image Version: 20211106.1
+- Image Version: 20211126.1
 
 ## Installed Software
 ### Language and Runtime
-- .NET SDK 2.1.302 2.1.403 2.1.507 2.1.607 2.1.701 2.1.818 3.1.101 3.1.201 3.1.302 3.1.414 5.0.102 5.0.202 5.0.302 5.0.402
+- .NET SDK 2.1.302 2.1.403 2.1.507 2.1.607 2.1.701 2.1.818 3.1.101 3.1.201 3.1.302 3.1.415 5.0.102 5.0.202 5.0.302 5.0.403
 - Bash 3.2.57(1)-release
 - Clang/LLVM 12.0.0 is default
 - Clang/LLVM 13.0.0 is available on `'$(brew --prefix llvm)/bin/clang'`
 - gcc-9 (Homebrew GCC 9.4.0) 9.4.0 - available by `gcc-9` alias
 - gcc-10 (Homebrew GCC 10.3.0) 10.3.0 - available by `gcc-10` alias
-- gcc-11 (Homebrew GCC 11.2.0_1) 11.2.0 - available by `gcc-11` alias
+- gcc-11 (Homebrew GCC 11.2.0_3) 11.2.0 - available by `gcc-11` alias
 - GNU Fortran (Homebrew GCC 9.4.0) 9.4.0 - available by `gfortran-9` alias
 - GNU Fortran (Homebrew GCC 10.3.0) 10.3.0 - available by `gfortran-10` alias
-- GNU Fortran (Homebrew GCC 11.2.0_1) 11.2.0 - available by `gfortran-11` alias
+- GNU Fortran (Homebrew GCC 11.2.0_3) 11.2.0 - available by `gfortran-11` alias
 - Go 1.15.15
-- julia 1.6.3
-- Kotlin 1.5.31-release-548
+- julia 1.6.4
+- Kotlin 1.6.0-release-798
 - MSBuild 16.9.0.22901 (from /Library/Frameworks/Mono.framework/Versions/6.12.0/lib/mono/msbuild/15.0/bin/MSBuild.dll)
-- Node.js v14.18.1
+- Node.js v16.13.0
 - NVM 0.39.0
-- NVM - Cached node versions: v10.24.1 v12.22.7 v14.18.1
+- NVM - Cached node versions: v12.22.7 v14.18.1 v16.13.0
 - Perl 5.34.0
-- PHP 8.0.12
+- PHP 8.0.13
 - Python 2.7.18
-- Python 3.9.7
+- Python 3.9.9
 - R 4.1.2
-- Ruby 2.7.4p191
+- Ruby 2.7.5p203
 
 ### Package Management
-- Bundler version 2.2.30
+- Bundler version 2.2.32
 - Carthage 0.38.0
 - CocoaPods 1.11.2
-- Composer 2.1.11
-- Homebrew 3.3.2
+- Composer 2.1.12
+- Homebrew 3.3.5
 - Miniconda 4.10.3
-- NPM 6.14.15
+- NPM 8.1.0
 - NuGet 5.9.0.7134
 - Pip 20.3.4 (python 2.7)
-- Pip 21.2.4 (python 3.9)
+- Pip 21.3.1 (python 3.9)
 - Pipx 0.16.4
-- RubyGems 3.2.30
-- Vcpkg 2021 (build from master \<d78a0b47b>)
+- RubyGems 3.2.32
+- Vcpkg 2021 (build from master \<b3cfaaf1b>)
 - Yarn 1.22.15
 
 #### Environment variables
@@ -61,8 +58,8 @@
 
 ### Project Management
 - Apache Ant(TM) 1.10.12
-- Apache Maven 3.8.3
-- Gradle 7.2
+- Apache Maven 3.8.4
+- Gradle 7.3
 - Sbt 1.5.5
 
 ### Utilities
@@ -72,11 +69,11 @@
 - bazel 4.2.1
 - bazelisk 1.10.1
 - bsdtar 3.3.2 - available by 'tar' alias
-- Curl 7.79.1
+- Curl 7.80.0
 - Git LFS: 3.0.2
-- Git: 2.33.1
+- Git: 2.34.1
 - GitHub CLI: 2.2.0
-- GNU parallel 20211022
+- GNU parallel 20211122
 - GNU Tar 1.34 - available by 'gtar' alias
 - GNU Wget 1.21.2
 - gpg (GnuPG) 2.3.3
@@ -86,31 +83,30 @@
 - mongo v5.0.3
 - mongod v5.0.3
 - Newman 5.3.0
-- OpenSSL 1.1.1l  24 Aug 2021 `(/usr/local/opt/openssl@1.1 -> /usr/local/Cellar/openssl@1.1/1.1.1l_1)`
+- OpenSSL 1.1.1l  24 Aug 2021 `(/usr/local/opt/openssl@1.1 -> ../Cellar/openssl@1.1/1.1.1l_1)`
 - Packer 1.7.8
-- PostgreSQL 14.0
-- psql (PostgreSQL) 14.0
+- PostgreSQL 14.1
+- psql (PostgreSQL) 14.1
 - Sox 14.4.2
 - Subversion (SVN) 1.14.1
 - Switchaudio-osx 1.1.0
 - Vagrant 2.2.19
-- virtualbox 6.1.28r147628
+- virtualbox 6.1.30r148432
 - zstd 1.5.0
 
-
 ### Tools
-- Aliyun CLI 3.0.97
-- App Center CLI 2.10.4
-- AWS CLI 2.3.4
-- AWS SAM CLI 1.35.0
+- Aliyun CLI 3.0.99
+- App Center CLI 2.10.6
+- AWS CLI 2.4.2
+- AWS SAM CLI 1.36.0
 - AWS Session Manager CLI 1.2.279.0
 - Azure CLI 2.30.0
 - Bicep CLI 0.4.1008
 - Cabal 3.6.2.0
-- Cmake 3.21.4
-- Fastlane 2.197.0
+- Cmake 3.22.0
+- Fastlane 2.198.1
 - GHC 9.2.1
-- GHCup 0.1.17.3
+- GHCup 0.1.17.4
 - Jazzy 0.14.1
 - Stack 2.7.3
 - SwiftFormat 0.48.18
@@ -122,20 +118,20 @@
 - yamllint 1.26.3
 
 ### Browsers
-- Safari 15.0 (15612.1.29.41.4)
-- SafariDriver 15.0 (15612.1.29.41.4)
-- Google Chrome 95.0.4638.69 
-- ChromeDriver 95.0.4638.54
-- Microsoft Edge 95.0.1020.44 
-- MSEdgeDriver 95.0.1020.44
-- Mozilla Firefox 94.0.1
+- Safari 15.1 (15612.2.9.1.30)
+- SafariDriver 15.1 (15612.2.9.1.30)
+- Google Chrome 96.0.4664.55 
+- ChromeDriver 96.0.4664.45
+- Microsoft Edge 96.0.1054.34 
+- MSEdgeDriver 96.0.1054.34
+- Mozilla Firefox 94.0.2
 - geckodriver 0.30.0
-- Selenium server 3.141.59_2
+- Selenium server 4.1.0
 
 #### Environment variables
 | Name            | Value                                         |
 | --------------- | --------------------------------------------- |
-| CHROMEWEBDRIVER | /usr/local/Caskroom/chromedriver/95.0.4638.54 |
+| CHROMEWEBDRIVER | /usr/local/Caskroom/chromedriver/96.0.4664.45 |
 | EDGEWEBDRIVER   | /usr/local/share/edge_driver                  |
 | GECKOWEBDRIVER  | /usr/local/opt/geckodriver/bin                |
 
@@ -153,9 +149,9 @@
 #### Ruby
 - 2.4.10
 - 2.5.9
-- 2.6.8
-- 2.7.4
-- 3.0.2
+- 2.6.9
+- 2.7.5
+- 3.0.3
 
 #### Python
 - 2.7.18
@@ -163,7 +159,7 @@
 - 3.6.15
 - 3.7.12
 - 3.8.12
-- 3.9.8
+- 3.9.9
 - 3.10.0
 
 #### PyPy
@@ -173,7 +169,6 @@
 - 3.8.12 [PyPy 7.3.7]
 
 #### Node.js
-- 10.24.1
 - 12.22.7
 - 14.18.1
 - 16.13.0
@@ -184,6 +179,7 @@
 | 1.15.15 (Default) | x64          | GOROOT_1_15_X64      |
 | 1.16.10 | x64          | GOROOT_1_16_X64      |
 | 1.17.3  | x64          | GOROOT_1_17_X64      |
+
 ### Rust Tools
 - Cargo 1.56.0
 - Rust 1.56.1
@@ -191,15 +187,15 @@
 - Rustup 1.24.3
 
 #### Packages
-- Bindgen 0.59.1
-- Cargo-audit 0.15.2
-- Cargo-outdated v0.9.17
+- Bindgen 0.59.2
+- Cargo-audit 0.16.0
+- Cargo-outdated v0.10.2
 - Cbindgen 0.20.0
 - Clippy 0.1.56
 - Rustfmt 1.4.37-stable
 
 ### PowerShell Tools
-- PowerShell 7.1.5
+- PowerShell 7.2.0
 
 #### PowerShell Modules
 | Module           | Version |
@@ -217,7 +213,7 @@
 
 ### Xamarin
 #### Visual Studio for Mac
-- 8.10.12.16
+- 8.10.14.17
 
 #### Xamarin bundles
 | symlink          | Xamarin.Mono | Xamarin.iOS | Xamarin.Mac | Xamarin.Android |
