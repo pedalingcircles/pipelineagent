@@ -1,8 +1,7 @@
 
 # Setting up Service Principles and Service Connections
 
-Setting up and configuring a service connection with the corresponding App Registration / Service Principal along with the proper 
-RBAC and Groups is critical to manaing and governening Azure Pipelines at scale. 
+Setting up and configuring a service connection with the corresponding App Registration / Service Principal along with the proper RBAC and Groups is critical to managing and governing Azure Pipelines at scale.
 
 # Role Based Access Control (RBAC)
 
@@ -16,9 +15,9 @@ under a specific application pool. The following are some common things to consi
 - Granularity of subscriptions and resource groups
 - Cost management
 
-The process of what level of access is needed is planned closely with
+The process of what level of access is needed and is planned closely with
 the delivery team of the app. Least proviledge will likely mean different things
-in the various environments that pipelines will be using. For example, a pipeline may need to
+in the various environments the pipelines will be using. For example, a pipeline may need to
 create and tear down resource groups at will to support developers and pull requests.
 However, high level subscriptions such as staging and production may have more restrictions
 such as not allowing the pipeline to create resource groups.

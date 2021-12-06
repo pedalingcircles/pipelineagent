@@ -43,7 +43,7 @@ az deployment group what-if --resource-group mijohns-vnet-sbx --subscription 000
 Parameter file
 
 ```azurecli
-az deployment group what-if --resource-group mijohns-vnet-sbx --subscription cbadc96b-2923-4459-bb2d-b237af7f84d6 --template-file iac/contoso-net-template.bicep --parameters iac/contoso-net-template.parameters.sbx.json
+az deployment group what-if --resource-group mijohns-vnet-sbx --subscription 00000000-0000-0000-0000-000000000000 --template-file iac/contoso-net-template.bicep --parameters iac/contoso-net-template.parameters.sbx.json
 ```
 
 ## Subnet calculator
