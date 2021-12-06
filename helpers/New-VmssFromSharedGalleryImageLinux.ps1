@@ -1,4 +1,4 @@
-$VmssResourceGroupName = "rg-mijohns-agents-sbx-eastus2-001"
+$VmssResourceGroupName = "rg-foo-agents-sbx-eastus2-001"
 $GalleryResourceGroupName = "rg-contoso-images"
 $SharedImageGalleryName = "sig.contoso.images"
 $ImageDefinitionName = "Ubuntu2004"
@@ -11,7 +11,7 @@ $Vnet = "vnet-agents"
 # Linux max is 1-64
 $MaxImageDefinitionNameLength = 51  # based on the total max for linux and other values used in the naming of the resource
 $VmssName = "vmss{0}{1}" -f ($ImageDefinitionName.Substring(0, [System.Math]::Min($MaxImageDefinitionNameLength, $ImageDefinitionName.Length))), $ImageDefinitionVersion
-$Subscription = "cbadc96b-2923-4459-bb2d-b237af7f84d6"
+$Subscription = "00000000-0000-0000-0000-000000000000"
 $ImageId = "/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Compute/galleries/{2}/images/{3}/versions/{4}" -f $Subscription, $GalleryResourceGroupName, $SharedImageGalleryName, $ImageDefinitionName, $ImageDefinitionVersion
 $VmSku = "Standard_DS3_v2"
 
