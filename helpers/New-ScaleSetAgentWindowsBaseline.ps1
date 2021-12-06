@@ -1,6 +1,6 @@
 # https://docs.microsoft.com/en-us/azure/virtual-machine-scale-sets/tutorial-use-custom-image-cli
 # https://docs.microsoft.com/en-us/azure/virtual-machines/windows/build-image-with-packer
-az account set -s cbadc96b-2923-4459-bb2d-b237af7f84d6
+az account set -s 00000000-0000-0000-0000-000000000000
 az group create --location westus --name vmssagents
 
 az vmss create `

@@ -4,4 +4,4 @@ az sig image-version create `
     --gallery-name contosoimagegallery `
     --gallery-image-definition AgentBuildv1 `
     --gallery-image-version 1.0.1 `
-    --managed-image /subscriptions/cbadc96b-2923-4459-bb2d-b237af7f84d6/resourceGroups/msft-aware-imagegen-agent-ci/providers/Microsoft.Compute/images/packer-Ubuntu2004-20210302.2
+    --managed-image /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/msft-aware-imagegen-agent-ci/providers/Microsoft.Compute/images/packer-Ubuntu2004-20210302.2
