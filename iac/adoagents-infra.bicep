@@ -665,13 +665,13 @@ module spokeSecurityCenter './modules/securityCenter.bicep' = [ for spoke in spo
   }
 }]
 
-var sharedImageGalleryName = take('sig.${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '.')}', 80)
+var computeGalleryName = take('cg.${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '.')}', 80)
 
-module sharedImageGallery './modules/sharedImageGallery.bicep' = {
-  name: 'deploy-sharedimagegallery-${nowUtc}'
+module computeGallery './modules/computeGallery.bicep' = {
+  name: 'deploy-computegallery-${nowUtc}'
   scope: resourceGroup(imageSubscriptionId, imageResourceGroupName)
   params: {
-    name: sharedImageGalleryName
+    name: computeGalleryName
     location: imageLocation
     tags: imageTags
   }
