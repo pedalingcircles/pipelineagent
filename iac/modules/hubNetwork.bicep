@@ -1,7 +1,7 @@
 param location string = resourceGroup().location
 param tags object = {}
 
-param deployPrivateLink bool = false
+param deployPrivateLink bool = true
 
 param logStorageAccountName string
 param logStorageSkuName string
@@ -125,6 +125,12 @@ module virtualNetwork './virtualNetwork.bicep' = {
           addressPrefix: bastionHostSubnetAddressPrefix
         }
       }
+      {
+        name: subnetName
+        properties: {
+          addressPrefix: subnetAddressPrefix
+        }
+      }
     ]
 
     logAnalyticsWorkspaceResourceId: logAnalyticsWorkspaceResourceId
@@ -141,7 +147,6 @@ module routeTable './routeTable.bicep' = {
     name: routeTableName
     location: location
     tags: tags
-
     routeName: routeTableRouteName
     routeAddressPrefix: routeTableRouteAddressPrefix
     routeNextHopIpAddress: firewall.outputs.privateIPAddress
@@ -160,7 +165,7 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
       id: routeTable.outputs.id
     }
     serviceEndpoints: subnetServiceEndpoints
-    privateEndpointNetworkPolicies: 'Disabled'
+    privateEndpointNetworkPolicies: 'Enabled'
     privateLinkServiceNetworkPolicies: 'Enabled'
   }
   dependsOn: [

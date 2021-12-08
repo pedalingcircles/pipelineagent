@@ -78,12 +78,12 @@ resource dnsZonePrivateLinkEndpoint 'Microsoft.Network/privateEndpoints/privateD
           privateDnsZoneId: privatelink_monitor_azure_com.id
         }
       }
-      {
-        name: 'oms'
-        properties: {
-          privateDnsZoneId: privatelink_oms_opinsights_azure_com.id
-        }
-      }
+      // {
+      //   name: 'oms'
+      //   properties: {
+      //     privateDnsZoneId: privatelink_oms_opinsights_azure_com.id
+      //   }
+      // }
       {
         name: 'ods'
         properties: {
@@ -110,7 +110,7 @@ resource dnsZonePrivateLinkEndpoint 'Microsoft.Network/privateEndpoints/privateD
 }
 var privateDnsZones_privatelink_monitor_azure_name = ( environment().name =~ 'AzureCloud' ? 'privatelink.monitor.azure.com' : 'privatelink.monitor.azure.us' ) 
 var privateDnsZones_privatelink_ods_opinsights_azure_name = ( environment().name =~ 'AzureCloud' ? 'privatelink.ods.opinsights.azure.com' : 'privatelink.ods.opinsights.azure.us' )
-var privateDnsZones_privatelink_oms_opinsights_azure_name = ( environment().name =~ 'AzureCloud' ? 'privatelink.oms.opinsights.azure.com' : 'privatelink.oms.opinsights.azure.us' )
+//var privateDnsZones_privatelink_oms_opinsights_azure_name = ( environment().name =~ 'AzureCloud' ? 'privatelink.oms.opinsights.azure.com' : 'privatelink.oms.opinsights.azure.us' )
 var privateDnsZones_privatelink_blob_core_cloudapi_net_name = ( environment().name =~ 'AzureCloud' ? 'privatelink.blob.${environment().suffixes.storage}' : 'privatelink.blob.core.usgovcloudapi.net' )
 var privateDnsZones_privatelink_agentsvc_azure_automation_name = ( environment().name =~ 'AzureCloud' ? 'privatelink.agentsvc.azure-automation.net' : 'privatelink.agentsvc.azure-automation.us' )
 
@@ -119,10 +119,10 @@ resource privatelink_monitor_azure_com 'Microsoft.Network/privateDnsZones@2018-0
   location: 'global'
 }
 
-resource privatelink_oms_opinsights_azure_com 'Microsoft.Network/privateDnsZones@2018-09-01' = {
-  name: privateDnsZones_privatelink_oms_opinsights_azure_name
-  location: 'global'
-}
+// resource privatelink_oms_opinsights_azure_com 'Microsoft.Network/privateDnsZones@2018-09-01' = {
+//   name: privateDnsZones_privatelink_oms_opinsights_azure_name
+//   location: 'global'
+// }
 
 resource privatelink_ods_opinsights_azure_com 'Microsoft.Network/privateDnsZones@2018-09-01' = {
   name: privateDnsZones_privatelink_ods_opinsights_azure_name
@@ -153,20 +153,20 @@ resource privatelink_monitor_azure_com_privatelink_monitor_azure_com_link 'Micro
   ]
 }
 
-resource privatelink_oms_opinsights_azure_com_privatelink_oms_opinsights_azure_com_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = {
-  name: '${privateDnsZones_privatelink_oms_opinsights_azure_name}/${privateDnsZones_privatelink_oms_opinsights_azure_name}-link'
-  location: 'global'
-  properties: {
-    registrationEnabled: false
-    virtualNetwork: {
-      id: resourceId(vnetSubscriptionId, vnetResourceGroup, 'Microsoft.Network/virtualNetworks', privateEndpointVnetName )
-    }
-  }
-  dependsOn: [
-    privatelink_oms_opinsights_azure_com
-    privatelink_monitor_azure_com_privatelink_monitor_azure_com_link
-  ]
-}
+// resource privatelink_oms_opinsights_azure_com_privatelink_oms_opinsights_azure_com_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = {
+//   name: '${privateDnsZones_privatelink_oms_opinsights_azure_name}/${privateDnsZones_privatelink_oms_opinsights_azure_name}-link'
+//   location: 'global'
+//   properties: {
+//     registrationEnabled: false
+//     virtualNetwork: {
+//       id: resourceId(vnetSubscriptionId, vnetResourceGroup, 'Microsoft.Network/virtualNetworks', privateEndpointVnetName )
+//     }
+//   }
+//   dependsOn: [
+//     privatelink_oms_opinsights_azure_com
+//     privatelink_monitor_azure_com_privatelink_monitor_azure_com_link
+//   ]
+// }
 
 resource privatelink_ods_opinsights_azure_com_privatelink_ods_opinsights_azure_com_link 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = {
   name: '${privateDnsZones_privatelink_ods_opinsights_azure_name}/${privateDnsZones_privatelink_ods_opinsights_azure_name}-link'
@@ -179,7 +179,7 @@ resource privatelink_ods_opinsights_azure_com_privatelink_ods_opinsights_azure_c
   }
   dependsOn: [
     privatelink_ods_opinsights_azure_com
-    privatelink_oms_opinsights_azure_com_privatelink_oms_opinsights_azure_com_link
+    //privatelink_oms_opinsights_azure_com_privatelink_oms_opinsights_azure_com_link
   ]
 }
 
