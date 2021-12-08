@@ -61,7 +61,6 @@ param agentSubscriptionId string = subscription().subscriptionId
 param imageSubscriptionId string = subscription().subscriptionId
 param imageBuilderSubscriptionId string = subscription().subscriptionId
 param operationsSubscriptionId string = subscription().subscriptionId
-param identitySubscriptionId string = subscription().subscriptionId
 
 // locations. They could all potentially be different
 param hubLocation string = deployment().location
@@ -69,7 +68,6 @@ param agentLocation string = deployment().location
 param imageBuilderLocation string = deployment().location
 param imageLocation string = deployment().location
 param operationsLocation string = deployment().location
-param identityLocation string = deployment().location
 
 // resource group names
 var hubResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-hub'
@@ -77,7 +75,6 @@ var agentResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterp
 var imageBuilderResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-imagebuilder'
 var imageResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-image'
 var operationsResourceGroupName = 'rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-operations'
-var identityResourceGroupName ='rg-${replace(resourceNamePlaceholder, '[delimiterplaceholder]', '-')}-identity'
 
 // Tags the the various components and resources
 var defaultTags = {
@@ -99,9 +96,6 @@ param imageTags object = {
 }
 param operationsTags object = {
   'component': 'operations'
-}
-param identityTags object = {
-  'component': 'identity'
 }
 
 module hubResourceGroup './modules/resourceGroup.bicep' = {
@@ -199,27 +193,6 @@ var spokes = [
     tags: union(imageBuilderTags,defaultTags)
     deployRouteTable: false
   }
-  {
-    name: 'identity'
-    subscriptionId: identitySubscriptionId
-    resourceGroupName: identityResourceGroupName
-    location: identityLocation
-    logStorageAccountName: identityLogStorageAccountName
-    logStorageSkuName: identityLogStorageSkuName
-    virtualNetworkName: identityVirtualNetworkName
-    virtualNetworkAddressPrefix: identityVirtualNetworkAddressPrefix
-    virtualNetworkDiagnosticsLogs: identityVirtualNetworkDiagnosticsLogs
-    virtualNetworkDiagnosticsMetrics: identityVirtualNetworkDiagnosticsMetrics
-    networkSecurityGroupName: identityNetworkSecurityGroupName
-    networkSecurityGroupRules: identityNetworkSecurityGroupRules
-    networkSecurityGroupDiagnosticsLogs: identityNetworkSecurityGroupDiagnosticsLogs
-    networkSecurityGroupDiagnosticsMetrics: identityNetworkSecurityGroupDiagnosticsMetrics
-    subnetName: identitySubnetName
-    subnetAddressPrefix: identitySubnetAddressPrefix
-    subnetServiceEndpoints: identitySubnetServiceEndpoints
-    tags: union(identityTags,defaultTags)
-    deployRouteTable: true
-  }
 ]
 
 module spokeResourceGroups './modules/resourceGroup.bicep' = [for spoke in spokes: {
@@ -237,14 +210,12 @@ var logAnalyticsWorkspaceName = take('log-operations-${replace(resourceNamePlace
 param logAnalyticsWorkspaceRetentionInDays int = 30
 param logAnalyticsWorkspaceSkuName string = 'PerGB2018'
 param logAnalyticsWorkspaceCappingDailyQuotaGb int = -1
-@description('When set to "True", enables Microsoft Sentinel within the ADO Agent pipelines Log Analytics workspace.')
-param deploySentinel bool = false
 
 // hub networking
 var hubLogStorageAccountName = take('sthublogs${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param hubLogStorageSkuName string = 'Standard_GRS'
 param hubVirtualNetworkName string = 'vnet-hub'
-param hubVirtualNetworkAddressPrefix string = '10.0.100.0/24'
+param hubVirtualNetworkAddressPrefix string = '10.0.0.0/22'
 param hubVirtualNetworkDiagnosticsLogs array = []
 param hubVirtualNetworkDiagnosticsMetrics array = []
 param hubNetworkSecurityGroupName string = 'nsg-hub'
@@ -261,12 +232,12 @@ param hubNetworkSecurityGroupDiagnosticsLogs array = [
 ] 
 param hubNetworkSecurityGroupDiagnosticsMetrics array = []
 param hubSubnetName string = 'snet-hub'
-param hubSubnetAddressPrefix string = '10.0.100.128/27'
+param hubSubnetAddressPrefix string = '10.0.1.0/24'
 param hubSubnetServiceEndpoints array = []
 param firewallSkuTier string = 'Premium'
 param firewallName string = 'firewall'
-param firewallManagementSubnetAddressPrefix string = '10.0.100.64/26'
-param firewallClientSubnetAddressPrefix string = '10.0.100.0/26'
+param firewallManagementSubnetAddressPrefix string = '10.0.0.64/26'
+param firewallClientSubnetAddressPrefix string = '10.0.0.0/26'
 param firewallPolicyName string = 'firewall-policy'
 param firewallThreatIntelMode string = 'Alert'
 param firewallDiagnosticsLogs array = [
@@ -328,7 +299,7 @@ param publicIPAddressDiagnosticsMetrics array = [
 var operationsLogStorageAccountName = take('stops${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param operationsLogStorageSkuName string = hubLogStorageSkuName
 param operationsVirtualNetworkName string = 'vnet-operations'
-param operationsVirtualNetworkAddressPrefix string = '10.0.115.0/26'
+param operationsVirtualNetworkAddressPrefix string = '10.0.32.0/22'
 param operationsVirtualNetworkDiagnosticsLogs array = []
 param operationsVirtualNetworkDiagnosticsMetrics array = []
 param operationsNetworkSecurityGroupName string = 'nsg-operations'
@@ -336,14 +307,14 @@ param operationsNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGr
 param operationsNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param operationsNetworkSecurityGroupRules array = []
 param operationsSubnetName string = 'snet-operations'
-param operationsSubnetAddressPrefix string = '10.0.115.0/27'
+param operationsSubnetAddressPrefix string = '10.0.32.0/23'
 param operationsSubnetServiceEndpoints array = []
 
 // image spoke networking
 var imageLogStorageAccountName = take('stimg${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param imageLogStorageSkuName string = hubLogStorageSkuName
 param imageVirtualNetworkName string = 'vnet-image'
-param imageVirtualNetworkAddressPrefix string = '10.0.120.0/26'
+param imageVirtualNetworkAddressPrefix string = '10.0.8.0/22'
 param imageVirtualNetworkDiagnosticsLogs array = []
 param imageVirtualNetworkDiagnosticsMetrics array = []
 param imageNetworkSecurityGroupName string = 'nsg-image'
@@ -351,14 +322,14 @@ param imageNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDi
 param imageNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param imageNetworkSecurityGroupRules array = []
 param imageSubnetName string = 'snet-image'
-param imageSubnetAddressPrefix string = '10.0.120.0/28'
+param imageSubnetAddressPrefix string = '10.0.8.0/25'
 param imageSubnetServiceEndpoints array = []
 
 // agent spoke networking
 var agentLogStorageAccountName = take('stagnt${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param agentLogStorageSkuName string = hubLogStorageSkuName
 param agentVirtualNetworkName string = 'vnet-agent'
-param agentVirtualNetworkAddressPrefix string = '10.1.0.0/16'
+param agentVirtualNetworkAddressPrefix string = '10.0.16.0/20'
 param agentVirtualNetworkDiagnosticsLogs array = []
 param agentVirtualNetworkDiagnosticsMetrics array = []
 param agentNetworkSecurityGroupName string = 'nsg-agent'
@@ -366,14 +337,14 @@ param agentNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDi
 param agentNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
 param agentNetworkSecurityGroupRules array = []
 param agentSubnetName string = 'snet-agent'
-param agentSubnetAddressPrefix string = '10.1.100.0/24'
+param agentSubnetAddressPrefix string = '10.0.16.0/22'
 param agentSubnetServiceEndpoints array = []
 
 // imagebuilding spoke networking
 var imageBuilderLogStorageAccountName = take('stimgbldr${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
 param imageBuilderLogStorageSkuName string = hubLogStorageSkuName
 param imageBuilderVirtualNetworkName string = 'vnet-imagebuilder'
-param imageBuilderVirtualNetworkAddressPrefix string = '10.0.130.0/24'
+param imageBuilderVirtualNetworkAddressPrefix string = '10.0.4.0/22'
 param imageBuilderVirtualNetworkDiagnosticsLogs array = []
 param imageBuilderVirtualNetworkDiagnosticsMetrics array = []
 param imageBuilderNetworkSecurityGroupName string = 'nsg-imagebuilder'
@@ -385,7 +356,7 @@ param imageBuilderNetworkSecurityGroupRules array = [
     properties: {
       access: 'Allow'
       description: 'Allows Packer to SSH into ephemerial VM resources to create disk images.'
-      destinationAddressPrefix: '10.0.130.0/25'
+      destinationAddressPrefix: '10.0.4.0/25'
       destinationAddressPrefixes: []
       destinationPortRange: '22'
       destinationPortRanges: []
@@ -401,24 +372,8 @@ param imageBuilderNetworkSecurityGroupRules array = [
   }
 ]
 param imageBuilderSubnetName string = 'snet-imagebuilder'
-param imageBuilderSubnetAddressPrefix string = '10.0.130.0/25'
+param imageBuilderSubnetAddressPrefix string = '10.0.4.0/25'
 param imageBuilderSubnetServiceEndpoints array = []
-
-// identity spoke networking
-var identityLogStorageAccountName = take('stid${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '')}', 24)
-param identityLogStorageSkuName string = hubLogStorageSkuName
-param identityVirtualNetworkName string = 'vnet-identity'
-param identityVirtualNetworkAddressPrefix string = '10.0.140.0/24'
-param identityVirtualNetworkDiagnosticsLogs array = []
-param identityVirtualNetworkDiagnosticsMetrics array = []
-param identityNetworkSecurityGroupName string = 'nsg-identity'
-param identityNetworkSecurityGroupDiagnosticsLogs array = hubNetworkSecurityGroupDiagnosticsLogs
-param identityNetworkSecurityGroupDiagnosticsMetrics array = hubNetworkSecurityGroupDiagnosticsMetrics
-param identityNetworkSecurityGroupRules array = []
-param identitySubnetName string = 'snet-identity'
-param identitySubnetAddressPrefix string = '10.0.140.0/25'
-param identitySubnetServiceEndpoints array = []
-
 
 @allowed([
   'NIST'
@@ -430,24 +385,17 @@ param policy string = 'NIST'
 
 param deployPolicy bool = false
 
-@description('Email address of the contact, in the form of john@doe.com')
-param emailSecurityContact string = ''
-
-param deployASC bool = false
-
-
 // Key vault deployment not currently working
 param deployAgentKeyVault bool = false
 var agentKeyVaultName = take('kv-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 24)
 
 param bastionHostName string = 'bastionHost'
-param bastionHostSubnetAddressPrefix string = '10.0.100.160/27'
+param bastionHostSubnetAddressPrefix string = '10.0.0.128/26'
 var bastionHostPublicIPAddressName = take('pip-bastion-${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '-')}', 80)
 param bastionHostPublicIPAddressSkuName string = 'Standard'
 param bastionHostPublicIPAddressAllocationMethod string = 'Static'
 param bastionHostPublicIPAddressAvailabilityZones array = []
 param bastionHostIPConfigurationName string = 'bastionHostIPConfiguration'
-
 
 module logAnalyticsWorkspace './modules/logAnalyticsWorkspace.bicep' = {
   name: 'deploy-laws-${nowUtc}'
@@ -456,7 +404,6 @@ module logAnalyticsWorkspace './modules/logAnalyticsWorkspace.bicep' = {
     name: logAnalyticsWorkspaceName
     location: operationsLocation
     tags: union(operationsTags,defaultTags)
-    deploySentinel: deploySentinel
     retentionInDays: logAnalyticsWorkspaceRetentionInDays
     skuName: logAnalyticsWorkspaceSkuName
     workspaceCappingDailyQuotaGb: logAnalyticsWorkspaceCappingDailyQuotaGb
@@ -644,26 +591,6 @@ module logAnalyticsDiagnosticLogging './modules/logAnalyticsDiagnosticLogging.bi
     spokeNetworks
   ]
 }
-
-// security center per subscription if different per hub/spoke
-
-module hubSecurityCenter './modules/securityCenter.bicep' = if(deployASC) {
-  name: 'set-hub-sub-security-center'
-  scope: subscription(hubSubscriptionId)
-  params: {
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-    emailSecurityContact: emailSecurityContact
-  }
-}
-
-module spokeSecurityCenter './modules/securityCenter.bicep' = [ for spoke in spokes: if( (deployASC) && (spoke.subscriptionId != hubSubscriptionId) ) {
-  name: 'set-${spoke.name}-sub-security-center'
-  scope: subscription(operationsSubscriptionId)
-  params: {
-    logAnalyticsWorkspaceId: logAnalyticsWorkspace.outputs.id
-    emailSecurityContact: emailSecurityContact
-  }
-}]
 
 var computeGalleryName = take('cg.${replace(resourceNamePlaceholderShort, '[delimiterplaceholder]', '.')}', 80)
 
