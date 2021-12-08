@@ -1,7 +1,7 @@
 param location string = resourceGroup().location
 param tags object = {}
 
-param deployPrivateLink bool = true
+param deployPrivateLink bool = false
 
 param logStorageAccountName string
 param logStorageSkuName string
@@ -165,8 +165,8 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-02-01' = {
       id: routeTable.outputs.id
     }
     serviceEndpoints: subnetServiceEndpoints
-    privateEndpointNetworkPolicies: 'Enabled'
-    privateLinkServiceNetworkPolicies: 'Enabled'
+    privateEndpointNetworkPolicies: 'Disabled'
+    privateLinkServiceNetworkPolicies: 'Disabled'
   }
   dependsOn: [
     virtualNetwork
