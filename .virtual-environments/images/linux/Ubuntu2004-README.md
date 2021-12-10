@@ -1,13 +1,17 @@
+| Announcements |
+|-|
+| [[all OSs] Default Nodejs version will be set to 16 on November, 29](https://github.com/actions/virtual-environments/issues/4446) |
+***
 # Ubuntu 20.04.3 LTS
-- Linux kernel version: 5.11.0-1022-azure
-- Image Version: dev
+- Linux kernel version: 5.11.0-1021-azure
+- Image Version: 20211129.1
 
 ## Installed Software
 ### Language and Runtime
 - Bash 5.0.17(1)-release
 - Clang 10.0.0, 11.0.0, 12.0.0
 - Clang-format 10.0.0, 11.0.0, 12.0.0
-- Erlang 24.1.7 (Eshell 12.1.5)
+- Erlang 24.1.6 (Eshell 12.1.5)
 - Erlang rebar3 3.17.0
 - GNU C++ 9.3.0, 10.3.0
 - GNU Fortran 9.3.0, 10.3.0
@@ -15,7 +19,7 @@
 - Kotlin 1.5.32-release-577
 - Mono 6.12.0.122 (apt source repository: https://download.mono-project.com/repo/ubuntu stable-focal main)
 - MSBuild 16.6.0.15201 (from /usr/lib/mono/msbuild/15.0/bin/MSBuild.dll)
-- Node 16.13.1
+- Node 16.13.0
 - Perl 5.30.0
 - Python 3.8.10
 - Python3 3.8.10
@@ -25,14 +29,14 @@
 ### Package Management
 - cpan 1.64
 - Helm 3.7.1
-- Homebrew 3.3.6
+- Homebrew 3.3.5
 - Miniconda 4.10.3
-- Npm 8.1.2
+- Npm 8.1.0
 - Pip 20.0.2
 - Pip3 20.0.2
 - Pipx 0.16.4
 - RubyGems 3.1.2
-- Vcpkg  (build from master \<63e935d96>)
+- Vcpkg  (build from master \<3a68454af>)
 - Yarn 1.22.17
 
 #### Environment variables
@@ -69,7 +73,7 @@
 - Git-ftp 1.6.0
 - Haveged 1.9.1
 - Heroku 7.59.2
-- HHVM (HipHop VM) 4.138.0
+- HHVM (HipHop VM) 4.137.0
 - jq 1.6
 - Kind 0.11.1
 - Kubectl 1.22.4
@@ -85,7 +89,7 @@
 - Packer 1.7.8
 - PhantomJS 2.1.1
 - Podman 3.4.2 (apt source repository: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable)
-- Pulumi 3.19.0
+- Pulumi 3.18.1
 - R 4.1.2
 - Skopeo 1.3.0 (apt source repository: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable)
 - Sphinx Open Source Search Server 2.2.11
@@ -96,17 +100,17 @@
 - zstd 1.5.0 (homebrew)
 
 ### CLI Tools
-- Alibaba Cloud CLI 3.0.100
-- AWS CLI 2.4.4
+- Alibaba Cloud CLI 3.0.99
+- AWS CLI 2.4.2
 - AWS CLI Session manager plugin 1.2.279.0
 - AWS SAM CLI 1.36.0
 - Azure CLI (azure-cli) 2.30.0 (installation method: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt)
 - Azure CLI (azure-devops) 0.22.0
-- GitHub CLI 2.3.0
+- GitHub CLI 2.2.0
 - Google Cloud SDK 365.0.1 (apt source repository: https://packages.cloud.google.com/apt)
 - Hub CLI 2.14.2
-- Netlify CLI 8.0.15
-- OpenShift CLI 4.9.9
+- Netlify CLI 8.0.3
+- OpenShift CLI 4.9.8
 - ORAS CLI 0.12.0
 - Vercel CLI 23.1.2
 
