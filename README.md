@@ -46,6 +46,4 @@ Some tasks require some bootstrapping actions to be setup for items that are run
 
 ## Subtree
 
-There is currently one Git Subtree in this repo.
-
-- [.virtual-environments](./.virtual-environments)
+This repo used the [actions/virtual-environments](https://github.com/actions/virtual-environments) repo that's maintained by the Azure DevOps and Github product teams. A subtree is pulled in (see [tips](.docs/../docs/tips.md#git-subtree)) to compare and and update changes. The taret directory is [vm-images](vm-images). This directory aligns with the repo [images](https://github.com/actions/virtual-environments/tree/main/images) directory.
