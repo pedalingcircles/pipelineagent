@@ -190,6 +190,7 @@
             "Microsoft.VisualStudio.Component.VC.CLI.Support",
             "Microsoft.VisualStudio.Component.VC.CMake.Project",
             "Microsoft.VisualStudio.Component.VC.DiagnosticTools",
+            "Microsoft.VisualStudio.Component.VC.Llvm.Clang",
             "Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset",
             "Microsoft.VisualStudio.Component.VC.Runtimes.ARM64.Spectre",
             "Microsoft.VisualStudio.Component.VC.Runtimes.x86.x64.Spectre",
@@ -265,7 +266,8 @@
             { "name": "yarn", "test": "yarn --version" },
             { "name": "newman", "test": "newman --version" },
             { "name": "lerna", "test": "lerna --version" },
-            { "name": "gulp-cli", "test": "gulp --version" }
+            { "name": "gulp-cli", "test": "gulp --version" },
+            { "name": "grunt-cli", "test": "grunt --version" }
         ]
     },
     "dotnet": {
@@ -307,16 +309,19 @@
         "default": "16"
     },
     "mysql": {
-        "major_version": "8.0",
-        "full_version": "8.0.26"
+        "version": "8.0.26"
     },
     "mongodb": {
         "version": "5.0"
     },
     "php": {
-        "version": "8.0"
+        "version": "8.1"
     },
     "postgresql": {
         "version": "14"
+    },
+    "kotlin": {
+        "version": "latest",
+        "binary_name": "kotlin-compiler"
     }
 }

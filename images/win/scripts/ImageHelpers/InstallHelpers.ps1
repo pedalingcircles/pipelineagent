@@ -519,7 +519,7 @@ function Get-WindowsUpdatesHistory {
             43 {
                 $status = "InProgress"
                 $title = $event.Properties[0].Value
-                break 
+                break
             }
         }
 
@@ -538,7 +538,7 @@ function Invoke-SBWithRetry {
     param (
         [scriptblock] $Command,
         [int] $RetryCount = 10,
-        [int] $TimeoutInSecs = 5
+        [int] $RetryIntervalSeconds = 5
     )
 
     while ($RetryCount -gt 0) {
@@ -547,15 +547,42 @@ function Invoke-SBWithRetry {
             return
         }
         catch {
-            Write-Host "There is an error encounterd:`n $_"
+            Write-Host "There is an error encountered:`n $_"
             $RetryCount--
 
             if ($RetryCount -eq 0) {
                 exit 1
             }
 
-            Write-Host "Waiting $TimeoutInSecs seconds before retrying. Retries left: $RetryCount"
-            Start-Sleep -Seconds $TimeoutInSecs
+            Write-Host "Waiting $RetryIntervalSeconds seconds before retrying. Retries left: $RetryCount"
+            Start-Sleep -Seconds $RetryIntervalSeconds
         }
     }
+}
+
+function Get-GitHubPackageDownloadUrl {
+    param (
+        [string]$RepoOwner,
+        [string]$RepoName,
+        [string]$BinaryName,
+        [string]$Version,
+        [string]$UrlFilter,
+        [boolean]$IsPrerelease = $false,
+        [int]$SearchInCount = 100
+    )
+
+    if ($Version -eq "latest") { 
+        $Version = "*" 
+    }
+    $json = Invoke-RestMethod -Uri "https://api.github.com/repos/${RepoOwner}/${RepoName}/releases?per_page=${SearchInCount}"
+    $versionToDownload = ($json.Where{ $_.prerelease -eq $IsPrerelease }.tag_name |
+        Select-String -Pattern "\d+.\d+.\d+").Matches.Value |
+            Where-Object {$_ -Like "${Version}.*" -or $_ -eq ${Version}} |
+            Sort-Object {[version]$_} |
+            Select-Object -Last 1
+
+    $UrlFilter = $UrlFilter -replace "{BinaryName}",$BinaryName -replace "{Version}",$versionToDownload
+    $downloadUrl = $json.assets.browser_download_url -like $UrlFilter
+
+    return $downloadUrl
 }

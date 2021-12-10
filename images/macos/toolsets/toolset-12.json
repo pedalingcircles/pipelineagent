@@ -84,8 +84,10 @@
             "aria2",
             "azure-cli",
             "bazelisk",
+            "carthage",
             "cmake",
             "gh",
+            "gnupg",
             "gnu-tar",
             "kotlin",
             "libpq",
@@ -100,6 +102,11 @@
         ],
         "cask_packages": [
             "julia"
+        ]
+    },
+    "gcc": {
+        "versions": [
+            "11"
         ]
     },
     "toolcache": [
@@ -190,6 +197,9 @@
             "14",
             "16"
         ]
+    },
+    "llvm": {
+        "version": "13"
     },
     "php": {
         "version": "8.1"
