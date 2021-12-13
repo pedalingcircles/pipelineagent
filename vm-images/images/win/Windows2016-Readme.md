@@ -80,6 +80,7 @@
 - Swig 4.0.2
 - VSWhere 2.8.4
 - WinAppDriver 1.2.2009.02003
+- WiX Toolset v3.11.2.4516
 - yamllint 1.26.3
 - zstd 1.5.0
 
