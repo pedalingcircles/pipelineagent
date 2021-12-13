@@ -1,6 +1,6 @@
 ## Contributing
 
-Hello there! Thanks for wanting to contribute to this project. Your help is essential for keeping it great.
+Hello there! Thanks for wanting to contribute to this repository. Your help is essential for keeping it great.
 
 ## Submitting a pull request
 
@@ -21,7 +21,9 @@ Here are a few things you can do that will increase the likelihood of your pull 
   - Create an issue and get an approval from us to add this tool to the image before creating the pull request.
 
 ## How to add new tool
+
 ### General rules
+
 - For every new tool add validation scripts and update software report script to make sure that it is included to documentation
 - If the tool is available in other platforms (macOS, Windows, Linux), make sure you include it in as many as possible.
 - If installing a few versions of the tool, consider putting the list of versions in the corresponding `toolset.json` file. It will help other customers to configure their builds flexibly. See [toolset-windows-2016.json](images/win/toolsets/toolset-2019.json) as example.
