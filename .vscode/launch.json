@@ -44,12 +44,12 @@
             "args": ["-ResourceGroupName rg-contoso-agents", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/iac/templates/agents-vmimage.bicep", "-TemplateParameterFilePath ${workspaceFolder}/iac/templates/agents-vmimage.parameters.sbx.json"]
         },
         {
-            "name": "New-PackerImage.ps1",
+            "name": "Interactive New-PackerImage.ps1",
             "type": "PowerShell",
             "request": "launch",
             "script": "${workspaceFolder}/scripts/New-PackerImage.ps1",
             "cwd": "${workspaceFolder}",
-            "args": ["-SubscriptionId $SubscriptionId", "-BuildResourceGroupName $BuildResourceGroupName", "-ResourceGroupName $ResourceGroupName", "-ImageGenerationRepositoryRoot ${workspaceFolder}/.virtual-environments", "-ImageType $ImageType", "-ServicePrincipalClientId $ServicePrincipalClientId", "-ServicePrincipalClientSecret $ServicePrincipalClientSecret", "-TenantId $TenantId", "-StorageAccountName $StorageAccountName", "-VnetName $VnetName", "-VnetResourceGroupName $VnetResourceGroupName", "-VnetSubnetName $VnetSubnetName"]
+            "args": ["-BuildResourceGroupName $BuildResourceGroupName", "-ResourceGroupName $ResourceGroupName", "-ImageGenerationRepositoryRoot ${workspaceFolder}/vm-images", "-ImageType $ImageType", "-CaptureNamePrefix $CaptureNamePrefix", "-TenantId $TenantId", "-StorageAccountName $StorageAccountName", "-VnetName $VnetName", "-VnetResourceGroupName $VnetResourceGroupName", "-VnetSubnetName $VnetSubnetName", "-PublicIp", "-UseAzureCliAuth"]
         },
         {
             "name": "ConvertTo-ManagedImage.ps1",

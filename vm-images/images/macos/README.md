@@ -1,0 +1,1 @@
+macOS is not yet supported

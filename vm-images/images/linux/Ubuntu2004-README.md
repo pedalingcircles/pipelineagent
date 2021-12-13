@@ -1,25 +1,21 @@
-| Announcements |
-|-|
-| [[all OSs] Default Nodejs version will be set to 16 on November, 29](https://github.com/actions/virtual-environments/issues/4446) |
-***
 # Ubuntu 20.04.3 LTS
-- Linux kernel version: 5.11.0-1021-azure
-- Image Version: 20211129.1
+- Linux kernel version: 5.11.0-1022-azure
+- Image Version: dev
 
 ## Installed Software
 ### Language and Runtime
 - Bash 5.0.17(1)-release
 - Clang 10.0.0, 11.0.0, 12.0.0
 - Clang-format 10.0.0, 11.0.0, 12.0.0
-- Erlang 24.1.6 (Eshell 12.1.5)
+- Erlang 24.1.7 (Eshell 12.1.5)
 - Erlang rebar3 3.17.0
 - GNU C++ 9.3.0, 10.3.0
 - GNU Fortran 9.3.0, 10.3.0
 - Julia 1.7.0
-- Kotlin 1.5.32-release-577
+- Kotlin 1.6.0-release-798
 - Mono 6.12.0.122 (apt source repository: https://download.mono-project.com/repo/ubuntu stable-focal main)
 - MSBuild 16.6.0.15201 (from /usr/lib/mono/msbuild/15.0/bin/MSBuild.dll)
-- Node 16.13.0
+- Node 16.13.1
 - Perl 5.30.0
 - Python 3.8.10
 - Python3 3.8.10
@@ -28,15 +24,15 @@
 
 ### Package Management
 - cpan 1.64
-- Helm 3.7.1
-- Homebrew 3.3.5
+- Helm 3.7.2
+- Homebrew 3.3.7
 - Miniconda 4.10.3
-- Npm 8.1.0
+- Npm 8.1.2
 - Pip 20.0.2
 - Pip3 20.0.2
 - Pipx 0.16.4
 - RubyGems 3.1.2
-- Vcpkg  (build from master \<3a68454af>)
+- Vcpkg  (build from master \<48bba4f9c>)
 - Yarn 1.22.17
 
 #### Environment variables
@@ -50,67 +46,67 @@
 - Gradle 7.3.1
 - Lerna 4.0.0
 - Maven 3.8.4
-- Sbt 1.5.5
+- Sbt 1.5.6
 
 ### Tools
-- Ansible 2.12.0
+- Ansible 2.12.1
 - apt-fast 1.9.11
 - AzCopy 10.13.0 (available by `azcopy` and `azcopy10` aliases)
 - Bazel 4.2.2
-- Bazelisk 1.10.1
+- Bazelisk 1.11.0
 - Bicep 0.4.1008
 - Buildah 1.21.3 (apt source repository: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable)
-- CMake 3.22.0
-- CodeQL Action Bundle 2.7.2
+- CMake 3.22.1
+- CodeQL Action Bundle 2.7.3
 - Docker Compose v1 1.29.2
-- Docker Compose v2 2.1.1+azure-2
+- Docker Compose v2 2.2.2+azure-1
 - Docker-Buildx 0.7.1
-- Docker-Moby Client 20.10.11+azure-2
-- Docker-Moby Server 20.10.11+azure-2
-- Fastlane 2.198.1
+- Docker-Moby Client 20.10.11+azure-3
+- Docker-Moby Server 20.10.11+azure-3
+- Fastlane 2.199.0
 - Git 2.34.1 (apt source repository: ppa:git-core/ppa)
 - Git LFS 3.0.2 (apt source repository: https://packagecloud.io/install/repositories/github/git-lfs)
 - Git-ftp 1.6.0
 - Haveged 1.9.1
 - Heroku 7.59.2
-- HHVM (HipHop VM) 4.137.0
+- HHVM (HipHop VM) 4.139.0
 - jq 1.6
 - Kind 0.11.1
-- Kubectl 1.22.4
+- Kubectl 1.23.0
 - Kustomize 4.4.1
 - Leiningen 2.9.8
 - MediaInfo 19.09
 - Mercurial 5.3.1
 - Minikube 1.24.0
-- n 8.0.0
+- n 8.0.1
 - Newman 5.3.0
 - nvm 0.39.0
 - OpenSSL 1.1.1f  31 Mar 2020
 - Packer 1.7.8
 - PhantomJS 2.1.1
 - Podman 3.4.2 (apt source repository: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable)
-- Pulumi 3.18.1
+- Pulumi 3.19.0
 - R 4.1.2
 - Skopeo 1.3.0 (apt source repository: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable)
 - Sphinx Open Source Search Server 2.2.11
 - SVN 1.13.0
-- Terraform 1.0.11
+- Terraform 1.1.0
 - yamllint 1.26.3
-- yq 4.15.1
+- yq 4.16.1
 - zstd 1.5.0 (homebrew)
 
 ### CLI Tools
-- Alibaba Cloud CLI 3.0.99
-- AWS CLI 2.4.2
+- Alibaba Cloud CLI 3.0.100
+- AWS CLI 2.4.6
 - AWS CLI Session manager plugin 1.2.279.0
 - AWS SAM CLI 1.36.0
-- Azure CLI (azure-cli) 2.30.0 (installation method: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt)
+- Azure CLI (azure-cli) 2.31.0 (installation method: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt)
 - Azure CLI (azure-devops) 0.22.0
-- GitHub CLI 2.2.0
-- Google Cloud SDK 365.0.1 (apt source repository: https://packages.cloud.google.com/apt)
+- GitHub CLI 2.3.0
+- Google Cloud SDK 366.0.0 (apt source repository: https://packages.cloud.google.com/apt)
 - Hub CLI 2.14.2
-- Netlify CLI 8.0.3
-- OpenShift CLI 4.9.8
+- Netlify CLI 8.0.20
+- OpenShift CLI 4.9.10
 - ORAS CLI 0.12.0
 - Vercel CLI 23.1.2
 
@@ -126,11 +122,11 @@
 | CE 21.3.0 | GRAALVM_11_ROOT       |
 
 ### PHP
-| Tool     | Version       |
-| -------- | ------------- |
-| PHP      | 7.4.26 8.0.13 |
-| Composer | 2.1.14        |
-| PHPUnit  | 8.5.21        |
+| Tool     | Version             |
+| -------- | ------------------- |
+| PHP      | 7.4.26 8.0.13 8.1.0 |
+| Composer | 2.1.14              |
+| PHPUnit  | 8.5.21              |
 ```
     Both Xdebug and PCOV extensions are installed, but only Xdebug is enabled.
 ```
@@ -155,9 +151,9 @@
 - Rustfmt 1.4.37
 
 ### Browsers and Drivers
-- Google Chrome 96.0.4664.45
+- Google Chrome 96.0.4664.93
 - ChromeDriver 96.0.4664.45
-- Mozilla Firefox 94.0
+- Mozilla Firefox 95.0
 - Geckodriver 0.30.0
 - Chromium 96.0.4664.0
 - Selenium server 4.1.0
@@ -173,12 +169,12 @@
 - 2.1.302 2.1.403 2.1.526 2.1.617 2.1.701 2.1.818 3.1.120 3.1.202 3.1.302 3.1.415 5.0.104 5.0.209 5.0.303 5.0.403
 
 ### Databases
-- MongoDB 5.0.4 (apt source repository: https://repo.mongodb.org/apt/ubuntu)
+- MongoDB 5.0.5 (apt source repository: https://repo.mongodb.org/apt/ubuntu)
 - PostgreSQL 14.1 (apt source repository: https://apt.postgresql.org/pub/repos/apt/)
 - sqlite3 3.31.1
 
 #### MySQL
-- MySQL 8.0.27
+- MySQL 8.0.26
 - MySQL Server (user:root password:root)
 
 ```
@@ -191,8 +187,8 @@
 ### Cached Tools
 #### Go
 - 1.15.15
-- 1.16.11
-- 1.17.4
+- 1.16.12
+- 1.17.5
 
 #### Node.js
 - 12.22.7
@@ -224,8 +220,8 @@
 | Name            | Value                               | Architecture |
 | --------------- | ----------------------------------- | ------------ |
 | GOROOT_1_15_X64 | /opt/hostedtoolcache/go/1.15.15/x64 | x64          |
-| GOROOT_1_16_X64 | /opt/hostedtoolcache/go/1.16.11/x64 | x64          |
-| GOROOT_1_17_X64 | /opt/hostedtoolcache/go/1.17.4/x64  | x64          |
+| GOROOT_1_16_X64 | /opt/hostedtoolcache/go/1.16.12/x64 | x64          |
+| GOROOT_1_17_X64 | /opt/hostedtoolcache/go/1.17.5/x64  | x64          |
 
 ### PowerShell Tools
 - PowerShell 7.2.0
@@ -248,20 +244,20 @@
 | nginx     | 1.18.0  | /etc/nginx/nginx.conf     | inactive      | 80         |
 
 ### Android
-| Package Name               | Version                                                                                                                            |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Android Command Line Tools | 4.0                                                                                                                                |
-| Android Emulator           | 31.1.4                                                                                                                             |
-| Android SDK Build-tools    | 31.0.0<br>30.0.0 30.0.1 30.0.2 30.0.3<br>29.0.0 29.0.1 29.0.2 29.0.3<br>28.0.0 28.0.1 28.0.2 28.0.3<br>27.0.0 27.0.1 27.0.2 27.0.3 |
-| Android SDK Platform-Tools | 31.0.3                                                                                                                             |
-| Android SDK Platforms      | android-31 (rev 1)<br>android-30 (rev 3)<br>android-29 (rev 5)<br>android-28 (rev 6)<br>android-27 (rev 3)                         |
-| Android SDK Tools          | 26.1.1                                                                                                                             |
-| Android Support Repository | 47.0.0                                                                                                                             |
-| CMake                      | 3.10.2<br>3.18.1                                                                                                                   |
-| Google Play services       | 49                                                                                                                                 |
-| Google Repository          | 58                                                                                                                                 |
-| NDK                        | 21.4.7075529 (default)<br>22.1.7171670<br>23.1.7779620                                                                             |
-| SDK Patch Applier v4       | 1                                                                                                                                  |
+| Package Name               | Version                                                                                                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Android Command Line Tools | 4.0                                                                                                                                          |
+| Android Emulator           | 31.1.4                                                                                                                                       |
+| Android SDK Build-tools    | 32.0.0<br>31.0.0<br>30.0.0 30.0.1 30.0.2 30.0.3<br>29.0.0 29.0.1 29.0.2 29.0.3<br>28.0.0 28.0.1 28.0.2 28.0.3<br>27.0.0 27.0.1 27.0.2 27.0.3 |
+| Android SDK Platform-Tools | 31.0.3                                                                                                                                       |
+| Android SDK Platforms      | android-32 (rev 1)<br>android-31 (rev 1)<br>android-30 (rev 3)<br>android-29 (rev 5)<br>android-28 (rev 6)<br>android-27 (rev 3)             |
+| Android SDK Tools          | 26.1.1                                                                                                                                       |
+| Android Support Repository | 47.0.0                                                                                                                                       |
+| CMake                      | 3.10.2<br>3.18.1                                                                                                                             |
+| Google Play services       | 49                                                                                                                                           |
+| Google Repository          | 58                                                                                                                                           |
+| NDK                        | 21.4.7075529 (default)<br>22.1.7171670<br>23.1.7779620                                                                                       |
+| SDK Patch Applier v4       | 1                                                                                                                                            |
 
 #### Environment variables
 | Name                    | Value                                                                                |
@@ -285,11 +281,11 @@
 | debian:11               | sha256:45ee40a844048c2f6d0105899c1a17733530b56d481612608aab5e2e4048570b  | 2021-12-02 |
 | debian:9                | sha256:aa78ddaa7f8a14bad8f940ebff5542377f91843f6dcc168e41a8628c6007e815  | 2021-12-02 |
 | moby/buildkit:latest    | sha256:d6c89b7085b106301645ddcc77cf64eb7b705ab507b72d52d130ac33f1300417  | 2021-11-18 |
-| node:12                 | sha256:6782d61064287ab58cc6fc0f529005fb861df93357161971bbdd8bacc1919b1b  | 2021-12-02 |
+| node:12                 | sha256:eb92ed2473762b6d11736a4b4345aa3ef68f773999fe633bc4d9c91fa5d8f9d6  | 2021-12-02 |
 | node:12-alpine          | sha256:0eca266c5fe38ba93aebac00e45c9ac1bb7328b0702a6dc10e1a6ea543d49301  | 2021-11-13 |
-| node:14                 | sha256:02a545b5844f3ce3ae202b87afcdb8ee925b476804f0505d2b3eaf80c803c900  | 2021-12-02 |
+| node:14                 | sha256:52c884d7cf8509c27def168415a1ff23a0bd95d358dd5787ca77b60474dcb3db  | 2021-12-02 |
 | node:14-alpine          | sha256:7bcf853eeb97a25465cb385b015606c22e926f548cbd117f85b7196df8aa0d29  | 2021-12-02 |
-| node:16                 | sha256:c2a7504b9d89184d0275169483e772b23d629dc8df7a1545f441d2db05ade4dc  | 2021-12-02 |
+| node:16                 | sha256:89b59ce49929d8a8e230946bdb1b58c14cdbbb86c9a7397610afcecfce1be035  | 2021-12-02 |
 | node:16-alpine          | sha256:a9b9cb880fa429b0bea899cd3b1bc081ab7277cc97e6d2dcd84bd9753b2027e1  | 2021-12-02 |
 | ubuntu:16.04            | sha256:0f71fa8d4d2d4292c3c617fda2b36f6dabe5c8b6e34c3dc5b0d17d4e704bd39c  | 2021-08-31 |
 | ubuntu:18.04            | sha256:0fedbd5bd9fb72089c7bbca476949e10593cebed9b1fb9edf5b79dbbacddd7d6  | 2021-10-01 |

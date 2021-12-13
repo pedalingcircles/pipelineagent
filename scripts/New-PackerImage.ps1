@@ -43,7 +43,7 @@
     The resource group for the pre-existing virtual network for the virtual machine (VM) image building.
 
 .PARAMETER VnetSubnetName
-    The sbunet name in the pre-existing virtual network for the virtual machine (VM).
+    The subnet name in the pre-existing virtual network for the virtual machine (VM).
 
 .PARAMETER UseAzureCliAuth
     A switch when if set, sets the value of "use_azure_cli_auth" to true, false otherwise.
@@ -83,7 +83,16 @@ param(
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet("windows2016", "test-windows2016", "windows2019", "test-windows2019", "windows2022", "test-windows2022", "ubuntu1804","test-ubuntu1804","ubuntu2004", "test-ubuntu2004")]
+    [ValidateSet("windows2016", `
+                 "test-windows2016", `
+                 "windows2019", `
+                 "test-windows2019", `
+                 "windows2022", `
+                 "test-windows2022", `
+                 "ubuntu1804", `
+                 "test-ubuntu1804", `
+                 "ubuntu2004", `
+                 "test-ubuntu2004")]
     [string]$ImageType,
 
     [Parameter(Mandatory=$true)]
@@ -116,57 +125,7 @@ param(
 )
 
 $relativeTemplatePath = Join-Path $OsType ($ImageType + ".json")
-
-
-
-switch ($ImageType) {
-    ("windows2016") {
-        $relativeTemplatePath = Join-Path "win" "windows2016.json"
-    }
-    ("test-windows2016") {
-        $relativeTemplatePath = Join-Path "win" "test-windows2016.json"
-    }
-    ("windows2019") {
-        $relativeTemplatePath = Join-Path "win" "windows2019.json"
-    }
-    ("test-windows2019") {
-        $relativeTemplatePath = Join-Path "win" "test-windows2019.json"
-    }
-    ("windows2022") {
-        $relativeTemplatePath = Join-Path "win" "windows2022.json"
-    }
-    ("test-windows2022") {
-        $relativeTemplatePath = Join-Path "win" "test-windows2022.json"
-    }
-    ("ubuntu1804") {
-        $relativeTemplatePath = Join-Path "linux" "ubuntu1804.json"
-    }
-    ("test-ubuntu1804") {
-        $relativeTemplatePath = Join-Path "linux" "test-ubuntu1804.json"
-    }
-    ("ubuntu2004") {
-        $relativeTemplatePath = Join-Path "linux" "ubuntu2004.json"
-    }
-    ("test-ubuntu2004") {
-        $relativeTemplatePath = Join-Path "linux" "test-ubuntu2004.json"
-    }
-    default {
-        Write-Host "##vso[task.logissue type=error]Unknown type of image"
-    }
-}
-
-# OS Type based on first part of 
-# path where images are located
-$delimiter = $IsWindows ? "\\" : "/"
-$osType = ($relativeTemplatePath -split $delimiter)[0]
-
 $imageTemplatePath = [IO.Path]::Combine($ImageGenerationRepositoryRoot, "images", $relativeTemplatePath)
-
-$publicIpPackerSettings = "false"
-if ($PublicIp) {
-    $publicIpPackerSettings = "true"
-}
-
 if (-not (Test-Path $imageTemplatePath)) {
     Write-Host "##vso[task.logissue type=error]Template for image '$ImageType' doesn't exist on path '$imageTemplatePath'"
 }
@@ -182,15 +141,20 @@ $env:PACKER_LOG=1
 $dateStamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssK")
 $env:PACKER_LOG_PATH="packer-$($dateStamp).log"
 
+$publicIpPackerSettings = $PublicIp ? "true" : "false"
 $azureCliAuth = $UseAzureCliAuth ? "true" : "false"
 
 $startPackerMeasure = (Get-Date)
 switch ($osType ) {
     ("win") {
-        $InstallPassword = $env:UserName + [System.GUID]::NewGuid().ToString().ToUpper()
+
+        # Password used on Windows image build used while building the image to install
+        # dependencies. This is a temporary password and is only valid during image 
+        # generation process. It's no longer valid after an image is created.
+        $installPassword = $env:UserName + [System.GUID]::NewGuid().ToString().ToUpper()
 
         & $packerBinary build -on-error=cleanup `
-        -var "install_password=$($InstallPassword)" `
+        -var "install_password=$($installPassword)" `
         -var "tenant_id=$($TenantId)" `
         -var "resource_group=$($ResourceGroupName)" `
         -var "storage_account=$($StorageAccountName)" `
@@ -203,7 +167,7 @@ switch ($osType ) {
         -var "use_azure_cli_auth=$($azureCliAuth)" `
         $imageTemplatePath
 
-        $InstallPassword = $null
+        $installPassword = $null
     }
     ("linux") {
         & $packerBinary build -on-error=cleanup `
