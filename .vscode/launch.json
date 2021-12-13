@@ -49,7 +49,7 @@
             "request": "launch",
             "script": "${workspaceFolder}/scripts/New-PackerImage.ps1",
             "cwd": "${workspaceFolder}",
-            "args": ["-BuildResourceGroupName $BuildResourceGroupName", "-ResourceGroupName $ResourceGroupName", "-ImageGenerationRepositoryRoot ${workspaceFolder}/vm-images", "-ImageType $ImageType", "-CaptureNamePrefix $CaptureNamePrefix", "-TenantId $TenantId", "-StorageAccountName $StorageAccountName", "-VnetName $VnetName", "-VnetResourceGroupName $VnetResourceGroupName", "-VnetSubnetName $VnetSubnetName", "-PublicIp", "-UseAzureCliAuth"]
+            "args": ["-BuildResourceGroupName $BuildResourceGroupName", "-OsType $OsType", "-ResourceGroupName $ResourceGroupName", "-ImageGenerationRepositoryRoot ${workspaceFolder}/vm-images", "-ImageType $ImageType", "-CaptureNamePrefix $CaptureNamePrefix", "-TenantId $TenantId", "-StorageAccountName $StorageAccountName", "-VnetName $VnetName", "-VnetResourceGroupName $VnetResourceGroupName", "-VnetSubnetName $VnetSubnetName", "-PublicIp", "-UseAzureCliAuth"]
         },
         {
             "name": "ConvertTo-ManagedImage.ps1",
