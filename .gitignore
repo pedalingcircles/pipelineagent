@@ -1,4 +1,6 @@
-*.user
-**.log
+*.log
+*.tmp
 [Ll]og/
-local/**
+[lL]ocal/
+**[dD]ebug**
+
