@@ -66,12 +66,11 @@ An [Issue](https://github.com/microsoft/azure-pipelines-agent/issues/1423#issuec
 
 ``` bash
 curl -s https://api.github.com/repos/Microsoft/vsts-agent/releases/latest | jq -r .assets[].browser_download_url
-
-
-
-
-
 ```
 
+## Remote timeouts
 
+If you're getting timeouts during Packer builds for SSH and WinRM then make sure you add access from sourt to target. This happens during interactive login while on user's machine. A public IP can be created and network security group rules can be added as well as firewall access. 
 
+- SSH: Open port 22 from target to destination
+- WinRM: Open port 5986 from target to destination
