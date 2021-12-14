@@ -32,7 +32,7 @@
 - Pip3 9.0.1
 - Pipx 0.16.4
 - RubyGems 2.7.6
-- Vcpkg  (build from master \<a9ff505c5>)
+- Vcpkg  (build from master \<40a560655>)
 - Yarn 1.22.17
 
 #### Environment variables
@@ -103,7 +103,7 @@
 - GitHub CLI 2.3.0
 - Google Cloud SDK 367.0.0 (apt source repository: https://packages.cloud.google.com/apt)
 - Hub CLI 2.14.2
-- Netlify CLI 8.1.1
+- Netlify CLI 8.1.3
 - OpenShift CLI 4.9.11
 - ORAS CLI 0.12.0
 - Vercel CLI 23.1.2
@@ -160,7 +160,7 @@
 | SELENIUM_JAR_PATH | /usr/share/java/selenium-server.jar |
 
 ### .NET Core SDK
-- 2.1.302 2.1.403 2.1.526 2.1.617 2.1.701 2.1.818 3.1.120 3.1.202 3.1.302 3.1.415 5.0.104 5.0.209 5.0.303 5.0.403
+- 2.1.302 2.1.403 2.1.526 2.1.617 2.1.701 2.1.818 3.1.120 3.1.202 3.1.302 3.1.416 5.0.104 5.0.210 5.0.303 5.0.404
 
 ### Databases
 - MongoDB 5.0.5 (apt source repository: https://repo.mongodb.org/apt/ubuntu)
@@ -217,7 +217,7 @@
 | GOROOT_1_17_X64 | /opt/hostedtoolcache/go/1.17.5/x64  | x64          |
 
 ### PowerShell Tools
-- PowerShell 7.2.0
+- PowerShell 7.2.1
 
 #### PowerShell Modules
 | Module     | Version |
@@ -357,7 +357,7 @@
 | upx               | 3.94-4                            |
 | wget              | 1.19.4-1ubuntu2.2                 |
 | xorriso           | 1.4.8-3                           |
-| xvfb              | 2:1.19.6-1ubuntu4.9               |
+| xvfb              | 2:1.19.6-1ubuntu4.10              |
 | xz-utils          | 5.2.2-1.3                         |
 | zip               | 3.0-11build1                      |
 | zsync             | 0.6.2-3ubuntu1                    |

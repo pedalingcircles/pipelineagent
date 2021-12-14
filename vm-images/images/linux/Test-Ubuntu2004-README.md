@@ -32,7 +32,7 @@
 - Pip3 20.0.2
 - Pipx 0.16.4
 - RubyGems 3.1.2
-- Vcpkg  (build from master \<a9ff505c5>)
+- Vcpkg  (build from master \<40a560655>)
 - Yarn 1.22.17
 
 #### Environment variables
@@ -103,9 +103,9 @@
 - Azure CLI (azure-cli) 2.31.0 (installation method: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt)
 - Azure CLI (azure-devops) 0.22.0
 - GitHub CLI 2.3.0
-- Google Cloud SDK 366.0.0 (apt source repository: https://packages.cloud.google.com/apt)
+- Google Cloud SDK 367.0.0 (apt source repository: https://packages.cloud.google.com/apt)
 - Hub CLI 2.14.2
-- Netlify CLI 8.1.1
+- Netlify CLI 8.1.3
 - OpenShift CLI 4.9.11
 - ORAS CLI 0.12.0
 - Vercel CLI 23.1.2
@@ -166,7 +166,7 @@
 | SELENIUM_JAR_PATH | /usr/share/java/selenium-server.jar |
 
 ### .NET Core SDK
-- 2.1.302 2.1.403 2.1.526 2.1.617 2.1.701 2.1.818 3.1.120 3.1.202 3.1.302 3.1.415 5.0.104 5.0.209 5.0.303 5.0.403
+- 2.1.302 2.1.403 2.1.526 2.1.617 2.1.701 2.1.818 3.1.120 3.1.202 3.1.302 3.1.416 5.0.104 5.0.210 5.0.303 5.0.404
 
 ### Databases
 - MongoDB 5.0.5 (apt source repository: https://repo.mongodb.org/apt/ubuntu)
@@ -208,7 +208,7 @@
 - 3.7.12
 - 3.8.12
 - 3.9.9
-- 3.10.0
+- 3.10.1
 
 #### Ruby
 - 2.5.9
@@ -224,7 +224,7 @@
 | GOROOT_1_17_X64 | /opt/hostedtoolcache/go/1.17.5/x64  | x64          |
 
 ### PowerShell Tools
-- PowerShell 7.2.0
+- PowerShell 7.2.1
 
 #### PowerShell Modules
 | Module           | Version |
@@ -367,7 +367,7 @@
 | upx                    | 3.95-2build1                      |
 | wget                   | 1.20.3-1ubuntu2                   |
 | xorriso                | 1.5.2-1                           |
-| xvfb                   | 2:1.20.11-1ubuntu1\~20.04.2       |
+| xvfb                   | 2:1.20.13-1ubuntu1\~20.04.2       |
 | xz-utils               | 5.2.4-1ubuntu1                    |
 | zip                    | 3.0-11build1                      |
 | zsync                  | 0.6.2-3ubuntu1                    |

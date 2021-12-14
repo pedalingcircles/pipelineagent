@@ -16,6 +16,13 @@
 .PARAMETER BuildResourceGroupName
     An existing resource group to run the Packer Image build in.
 
+.PARAMETER IncludedSoftwareUrl
+    The URL to a markdown file that includes all the 
+    dependencies that's going to be installed on the image.
+
+.PARAMETER ImageReleaseUrl
+    The URL to the image release release. 
+
 .PARAMETER ResourceGroupName
     An existing resource group under which the final artifact will be stored.
 
@@ -72,6 +79,14 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]$BuildResourceGroupName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$IncludedSoftwareUrl,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$ImageReleaseUrl,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -159,6 +174,8 @@ switch ($osType ) {
         -var "resource_group=$($ResourceGroupName)" `
         -var "storage_account=$($StorageAccountName)" `
         -var "build_resource_group_name=$($BuildResourceGroupName)" `
+        -var "software_url=$($IncludedSoftwareUrl)" `
+        -var "release_url=$($ImageReleaseUrl)" `
         -var "capture_name_prefix=$($CaptureNamePrefix)" `
         -var "virtual_network_name=$($VnetName)" `
         -var "virtual_network_resource_group_name=$($VnetResourceGroupName)" `
@@ -175,6 +192,8 @@ switch ($osType ) {
         -var "resource_group=$($ResourceGroupName)" `
         -var "storage_account=$($StorageAccountName)" `
         -var "build_resource_group_name=$($BuildResourceGroupName)" `
+        -var "software_url=$($IncludedSoftwareUrl)" `
+        -var "release_url=$($ImageReleaseUrl)" `
         -var "capture_name_prefix=$($CaptureNamePrefix)" `
         -var "virtual_network_name=$($VnetName)" `
         -var "virtual_network_resource_group_name=$($VnetResourceGroupName)" `

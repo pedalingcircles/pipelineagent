@@ -13,6 +13,9 @@
         "allowed_inbound_ip_addresses": "{{env `AGENT_IP`}}",
         "image_folder": "/imagegeneration",
         "imagedata_file": "/imagegeneration/imagedata.json",
+        "imagedata_label": "test-ubuntu-18.04",
+        "software_url": "{{env `SOFTWARE_URL`}}",
+        "release_url": "{{env `RELEASE_URL`}}",
         "installer_script_folder": "/imagegeneration/installers",
         "helper_script_folder": "/imagegeneration/helpers",
         "vm_size": "Standard_D4s_v4",
@@ -120,11 +123,14 @@
         {
             "type": "shell",
             "scripts": [
-                "{{template_dir}}/scripts/installers/preimagedata.sh"
+                "{{template_dir}}/scripts/installers/preimagedata-updated.sh"
             ],
             "environment_vars": [
                 "IMAGE_VERSION={{user `image_version`}}",
-                "IMAGEDATA_FILE={{user `imagedata_file`}}"
+                "IMAGEDATA_FILE={{user `imagedata_file`}}",
+                "IMAGE_LABEL={{user `imagedata_label`}}",
+                "SOFTWARE_URL={{user `software_url`}}",
+                "RELEASE_URL={{user `release_url`}}"
             ],
             "execute_command": "sudo sh -c '{{ .Vars }} {{ .Path }}'"
         },
@@ -325,7 +331,7 @@
         {
             "type": "file",
             "source": "{{user `image_folder`}}/Ubuntu-Readme.md",
-            "destination": "{{template_dir}}/Ubuntu2004-README.md",
+            "destination": "{{template_dir}}/Test-Ubuntu2004-README.md",
             "direction": "download"
         },
         {

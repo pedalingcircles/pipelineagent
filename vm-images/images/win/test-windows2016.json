@@ -15,6 +15,9 @@
         "vm_size": "Standard_D8s_v4",
         "image_folder": "C:\\image",
         "imagedata_file": "C:\\imagedata.json",
+        "imagedata_label": "test-windows-2016",
+        "software_url": "{{env `SOFTWARE_URL`}}",
+        "release_url": "{{env `RELEASE_URL`}}",
         "helper_script_folder": "C:\\Program Files\\WindowsPowerShell\\Modules\\",
         "psmodules_root_folder": "C:\\Modules",
         "agent_tools_directory": "C:\\hostedtoolcache\\windows",
@@ -112,7 +115,9 @@
                 "IMAGE_VERSION={{user `image_version`}}",
                 "IMAGE_OS={{user `image_os`}}",
                 "AGENT_TOOLSDIRECTORY={{user `agent_tools_directory`}}",
-                "IMAGEDATA_FILE={{user `imagedata_file`}}"
+                "IMAGEDATA_FILE={{user `imagedata_file`}}",
+                "SOFTWARE_URL={{user `software_url`}}",
+                "RELEASE_URL={{user `release_url`}}"
             ],
             "scripts": [
                 "{{ template_dir }}/scripts/Installers/Configure-Antivirus.ps1",
@@ -120,7 +125,7 @@
                 "{{ template_dir }}/scripts/Installers/Install-WindowsFeatures.ps1",
                 "{{ template_dir }}/scripts/Installers/Install-Choco.ps1",
                 "{{ template_dir }}/scripts/Installers/Initialize-VM.ps1",
-                "{{ template_dir }}/scripts/Installers/Update-ImageData.ps1",
+                "{{ template_dir }}/scripts/Installers/Update-ImageData-Updated.ps1",
                 "{{ template_dir }}/scripts/Installers/Update-DotnetTLS.ps1"
             ],
             "execution_policy": "unrestricted"
@@ -285,7 +290,7 @@
         {
             "type": "file",
             "source": "C:\\InstalledSoftware.md",
-            "destination": "{{ template_dir }}/Windows2016-Readme.md",
+            "destination": "{{ template_dir }}/Test-Windows2016-Readme.md",
             "direction": "download"
         },
         {

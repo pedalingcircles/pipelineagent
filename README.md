@@ -40,16 +40,16 @@ Agent provisioning involves taking the built images and provisioning both self-h
 5. Setup agent provisioning (CD) for ADO agent deployments
 6. Setup VM Scale set provisioning
 
-> More details will come on getting started.
+> Coming soon...more details :smiley:
 
 ## Updates from [actions/virtual-environments](https://github.com/actions/virtual-environments)
 
 This repository uses the [actions/virtual-environments](https://github.com/actions/virtual-environments) repository to help with the Packer image builds. It's maintained by the Azure DevOps (ADO) product team to build the [hosted agents](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted) provided by Azure DevOps (ADO). This is extremely useful since they automate the install and creation of many dependencies as well as configure the "baseline" images.
 
-Updates from the [actions/virtual-environments](https://github.com/actions/virtual-environments) repository are needed in order to keep internal images from this repository up to date. General guidance is to create a temporary [git-subtree](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt) and compare that against current images in the [vm-images](vm-images/) directory.
+Updates from the [actions/virtual-environments](https://github.com/actions/virtual-environments) repository are needed in order to keep internal images up to date. General guidance is to create a temporary [git-subtree](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt) and compare that against current images in the [vm-images](vm-images/) directory.
 
 > see: [actions/virtual-environments Updates](docs/virtual-environments-updates.md) for guidance on how to keep this repository updated.
 
+## Software and image guidelines
 
-
-
+To learn more about tools and images support policy, see the [guidelines](docs/software-and-images-guidelines.md).
