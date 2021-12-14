@@ -13,3 +13,14 @@ Basic steps:
 > See [tips](./docs/tips.md#git-subtree) to get the common Git CLI commands
 
 The taret directory is [vm-images](vm-images). This directory aligns with the repo [images](https://github.com/actions/virtual-environments/tree/main/images) directory.
+
+## Pre image updates
+
+### [preimagedata](vm-images/images/linux/scripts/preimagedata.sh)
+
+This script addes meta data to the image so the agent runner can output it during the `Initialize job` step in a Job. This is available for hosted images, but is also very useful for self-hosted images. The following is an example of the output that's in the metadata file and how it's shown during a run.
+
+![Initialize job meta data](resources/ss-initjob-metadata-0.png)
+
+
+
