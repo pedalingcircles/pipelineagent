@@ -20,22 +20,6 @@
             "args": ["-Subscription $subscription", "-Tenant $tenant", "-DisplayName agent-contoso-agentmgmt-sbx", "-DistinguishedName $distinguishedName", "-KeyFriendlyName agent-contoso-agentmgmt-sbx-key", "-ResourceGroup $resourceGroup"]
         },
         {
-            "name": "New-ImagesInfrastructure.ps1",
-            "type": "PowerShell",
-            "request": "launch",
-            "script": "${workspaceFolder}/scripts/New-ImagesInfrastructure.ps1",
-            "cwd": "${workspaceFolder}/scripts/New-ImagesInfrastructure.ps1",
-            "args": ["-ResourceGroupName rg-contoso-images", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/templates/images.bicep", "-TemplateParameterFilePath ${workspaceFolder}/templates/images.parameters.sbx.json"]
-        },
-        {
-            "name": "New-AgentInfrastructure.ps1",
-            "type": "PowerShell",
-            "request": "launch",
-            "script": "${workspaceFolder}/scripts/New-AgentInfrastructure.ps1",
-            "cwd": "${workspaceFolder}/scripts/New-AgentInfrastructure.ps1",
-            "args": ["-ResourceGroupName rg-contoso-agents", "-Location eastus2", "-TemplateFilePath ${workspaceFolder}/templates/agents.bicep", "-TemplateParameterFilePath ${workspaceFolder}/templates/agents.parameters.sbx.json"]
-        },
-        {
             "name": "New-VMImageDeploy.ps1",
             "type": "PowerShell",
             "request": "launch",
