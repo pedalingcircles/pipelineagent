@@ -17,10 +17,10 @@
             "request": "launch",
             "script": "${workspaceFolder}/helpers/New-ServicePrincipal.ps1",
             "cwd": "${workspaceFolder}/helpers/New-ServicePrincipal.ps1",
-            "args": ["-Subscription $subscription", "-Tenant $tenant", "-DisplayName agent-contoso-agentmgmt-sbx", "-DistinguishedName $distinguishedName", "-KeyFriendlyName agent-contoso-agentmgmt-sbx-key", "-ResourceGroup $resourceGroup"]
+            "args": ["-Subscription $Subscription", "-Tenant $Tenant", "-DisplayName $DisplayName", "-DistinguishedName $DistinguishedName", "-KeyFriendlyName $KeyFriendlyName", "-ResourceGroup $ResourceGroup"]
         },
         {
-            "name": "Interactive New-PackerImage.ps1",
+            "name": "New-PackerImage.ps1",
             "type": "PowerShell",
             "request": "launch",
             "script": "${workspaceFolder}/scripts/New-PackerImage.ps1",
@@ -33,7 +33,7 @@
             "request": "launch",
             "script": "${workspaceFolder}/scripts/ConvertTo-ManagedImage.ps1",
             "cwd": "${file}",
-            "args": ["-ContainerName system", "-DateVersion 20210811", "-DateVersionCounter 01", "-Location eastus2", "-ImageType ubuntu2004", "-Tags @(\"a=b\",\"c=d\")", "-Prefix Microsoft.Compute/Images/images/24000", "-ResourceGroupName rg-mijohns-images-sbx-eastus2-001", "-StorageAccountName stmijohnsimages001", "-Clean"]
+            "args": ["-ContainerName $ContainerName", "-DateVersion $DateVersion", "-DateVersionCounter $DateVersionCounter", "-Location $Location", "-ImageType $ImageType", "-Tags $Tags", "-Prefix $Prefix", "-ResourceGroupName $ResourceGroupName", "-StorageAccountName $StorageAccountName", "-Clean"]
         },
         {
             "name": "Publish-ImageToSharedGallery.ps1",
@@ -41,7 +41,7 @@
             "request": "launch",
             "script": "${workspaceFolder}/scripts/Publish-ImageToSharedGallery.ps1",
             "cwd": "${file}",
-            "args": ["-ResourceGroupName rg-mijohns-images-sbx-eastus2-001", "-ImageDefinitionDescription 'foobar'", "-SharedImageGalleryName sig.agentimages", "-ImageDefinitionName Ubuntu2004", "-Location eastus2", "-ImagePublisher Contoso", "-ImageOffer preview", "-ImageSku baseline", "-OsType Linux", "-ImageVersion 1.0.0", "-ImageName packer-ubuntu2004-20210811.01", "-EndOfLifeDate '1/1/2020'", "-ImageVersionTags @(\"a=b\",\"c=d\")", "-ImageDefinitionTags @(\"e=f\",\"g=h\")", "-Clean"]
+            "args": ["-ResourceGroupName $ResourceGroupName", "-ImageDefinitionDescription $ImageDefinitionDescription", "-SharedImageGalleryName $SharedImageGalleryName", "-ImageDefinitionName $ImageDefinitionName", "-Location $Location", "-ImagePublisher $ImagePublisher", "-ImageOffer $ImageOffer", "-ImageSku baseline", "-OsType $OsType", "-ImageVersion $ImageVersion", "-ImageName $ImageName", "-EndOfLifeDate $EndOfLifeDate", "-ImageVersionTags $ImageVersionTags", "-ImageDefinitionTags $ImageDefinitionTags", "-Clean"]
         },
         {
             "name": "Remove-IntermediateImageResources.ps1",
@@ -49,7 +49,7 @@
             "request": "launch",
             "script": "${workspaceFolder}/scripts/Remove-IntermediateImageResources.ps1",
             "cwd": "${file}",
-            "args": ["-DestinationContainerName system", "-WorkingContainerName images", "-Prefix Microsoft.Compute/Images/images/23792", "-StorageAccountName contosopackerbuilder001"]
+            "args": ["-DestinationContainerName $DestinationContainerName", "-WorkingContainerName $WorkingContainerName", "-Prefix $Prefix", "-StorageAccountName $StorageAccountName"]
         }
     ]
 }
