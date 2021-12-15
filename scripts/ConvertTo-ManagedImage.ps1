@@ -72,51 +72,88 @@
         "Storage Queue Data Contributor"
         "Storage Queue Data Reader"
 
+
+    Packer generated vhd blobs and uses a system generated value
+    for the partial naming of blobs. However, prefix values are used 
+    and therefore that's used for identifying blobs. 
+
+
+    A managed disk must be created from the VHD. After the managed disk is created
+    then we can create a managed image. Note: Packer in it's current state and implementation
+    does not create a managed disk or imaged. Just a VHD file. Packer is capabile of directly creating
+    managed disks, however, we are leveraging what the ADO team has done to create VM images.
+
+    This is an intermediate resource (Azure Managed Disk) that's used
+    to ultimatly create an Azure Managed Image. This resource will therefore
+    be deleted after the Azure Managed Image is created.
+    Wrapping both disk and image creation in try block so 
+    we can clean up if one or both fail in finally.
+
 .LINK
     https://docs.microsoft.com/en-us/azure/virtual-machines/windows/capture-image-resource
 
 .LINK
     https://docs.microsoft.com/en-us/azure/virtual-machines/managed-disks-overview
-
+    https://www.packer.io/docs/builders/azure/chroot
 #>
 
 [CmdletBinding()]
 param(
-  [string][Parameter(Mandatory=$true)]$ContainerName,
-  [string][Parameter(Mandatory=$true)]$DateVersion,
-  [string][Parameter(Mandatory=$true)]$DateVersionCounter,
-  [string][Parameter(Mandatory=$true)]$Location,
-  [string][Parameter(Mandatory=$true)]$Prefix,
-  [string][Parameter(Mandatory=$true)]$ResourceGroupName,
-  [string][Parameter(Mandatory=$true)]$StorageAccountName,
-  [string][Parameter(Mandatory=$true)]$ImageType,
-  [array][Parameter(Mandatory=$true)]$Tags,
-  [int][Parameter(Mandatory=$false)]$CleanBlobsDaysOld = 7,
-  [switch]$Clean
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$ContainerName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$DateVersion,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$DateVersionCounter,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$Location,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$Prefix,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$ResourceGroupName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$StorageAccountName,
+
+    [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [string]$ImageType,
+
+    [array][Parameter(Mandatory=$true)]$Tags
 )
 
-# Finding the specific blob (.vhd file) in storage based on prefix. 
+# Finding the specific blob (.vhd file) in storage based on prefix.
+# Specifically using an array type becuase of the check of more 
+# than one blob name which could occur becuase it's only the 
+# prefix that's being checked and not the full blob name.
 [array]$vhdName = $(az storage blob list --auth-mode login --container-name $ContainerName --account-name $StorageAccountName --prefix $Prefix --query "[?contains(name, '.vhd')].name"  -o tsv)
 if ($vhdName.length -ne 1) {
-    Write-Host "##vso[task.logissue type=error]VHD blob with prefix:'$Prefix' not found in container:'$ContainerName' or more than one blob exists with the same prefix."
+    Write-Host "##vso[task.logissue type=error]Could not find exactly one VHD blob with prefix:'$Prefix' in container:'$ContainerName'."
     exit 1 
 }
 Write-Host "Found existing vhd file blob..."
 Write-Host "vhdName=$vhdName"
 
 # Getting the blob details
-try {
-    $blobInfo = $(az storage blob show --auth-mode login --container-name $ContainerName --name $vhdName --account-name $StorageAccountName) | ConvertFrom-Json
-    if ($null -eq $blobInfo) {
-        throw "Blob info result was null when retieving information from container:$ContainerName name:$vhdName and account name:$StorageAccountName"
-    }
-} catch {
-    Write-Host $_
-    Write-Host "##vso[task.logissue type=error]Error in retrieving blob information"
+$blobInfo = $(az storage blob show --auth-mode login --container-name $ContainerName --name $vhdName --account-name $StorageAccountName) | ConvertFrom-Json
+if ([string]::IsNullOrEmpty($blobInfo)) {
+    Write-Host "##vso[task.logissue type=error]Blob info result was null when retrieving information from container:'$ContainerName' name:'$vhdName' and account name:'$StorageAccountName'"
     exit 1
 }
 Write-Host "Retrieved blob information..."
-Write-Host $blobInfo
+Write-Host "blobInfo=$blobInfo"
 
 # Creating a URL for the blob. This is needed for creating a managed disk
 $blobUrl = $(az storage blob url --auth-mode login --container-name $ContainerName --name $vhdName --account-name $StorageAccountName --output tsv)
@@ -128,7 +165,7 @@ Write-Host "Created URL for existing vhd blob..."
 Write-Host "blobUrl=$blobUrl"
 Write-Host "##vso[task.setvariable variable=blobUrl]$blobUrl"
 
-# Set metadata
+# capture metadata associated with the blob
 $blobMetadataCapturedVmKey = $blobInfo.metadata.MicrosoftAzureCompute_CapturedVMKey
 Write-Host "##vso[task.setvariable variable=blobMetadataCapturedVmKey]$blobMetadataCapturedVmKey"
 $blobMetadataImageType = $blobInfo.metadata.MicrosoftAzureCompute_ImageType
@@ -138,17 +175,12 @@ Write-Host "##vso[task.setvariable variable=blobMetadataoOState]$blobMetadataoOS
 $blobMetadataOSType = $blobInfo.metadata.MicrosoftAzureCompute_OSType
 Write-Host "##vso[task.setvariable variable=blobMetadataOSType]$blobMetadataOSType"
 
-# A managed disk must be created from the VHD. After the managed disk is created
-# then we can create a managed image. Note: Packer in it's current state and implementation
-# does not create a managed disk or imaged. Just a VHD file. Packer is capabile of directly creating
-# managed disk, however, we are leveraging what the ADO team has done to create VM images.
-$imageName = "{0}-{1}-{2}-{3}.{4}" -f "packer", $blobMetadataOSType, $ImageType, "$DateVersion", "$DateVersionCounter"
 
-# This is an intermediate resource (Azure Managed Disk) that's used
-# to ultimatly create an Azure Managed Image. This resource will therefore
-# be deleted after the Azure Managed Image is created.
-# Wrapping both disk and image creation in try block so 
-# we can clean up if one or both fail in finally.
+$createdDateTime = $blobInfo.createdTime
+$imageNamePrefix = "packer"
+
+$imageName = "{0}-{1}-{2}-{3}.{4}" -f $imageNamePrefix, $blobMetadataOSType, $ImageType, "$DateVersion", "$DateVersionCounter"
+exit 1
 try {
     Write-Host "Creating new Azure managed disk with image name:$imageName"
     $diskCreateResult = $(az disk create `
