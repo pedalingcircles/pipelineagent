@@ -33,7 +33,7 @@
             "request": "launch",
             "script": "${workspaceFolder}/scripts/ConvertTo-ManagedImage.ps1",
             "cwd": "${file}",
-            "args": ["-ContainerName $ContainerName", "-DateVersion $DateVersion", "-DateVersionCounter $DateVersionCounter", "-Location $Location", "-ImageType $ImageType", "-Tags $Tags", "-Prefix $Prefix", "-ResourceGroupName $ResourceGroupName", "-StorageAccountName $StorageAccountName", "-Clean"]
+            "args": ["-ContainerName $ContainerName", "-Location $Location", "-PrefixFilter $PrefixFilter", "-ResourceGroupName $ResourceGroupName", "-StorageAccountName $StorageAccountName", "-ImageType $ImageType", "-ImageNamePrefix $ImageNamePrefix"]
         },
         {
             "name": "Publish-ImageToSharedGallery.ps1",
