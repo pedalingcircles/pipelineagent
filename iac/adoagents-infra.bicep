@@ -618,7 +618,7 @@ module packerRoleAssignments './modules/packerRoleAssignments.bicep' = {
     imageBuilderResourceGroupName: imageBuilderResourceGroupName
     imageStorageAccountResourceId: spokeNetworks[2].outputs.storageAccountResourceId
     imageBuilderResourceGroupResourceId: spokeResourceGroups[3].outputs.id
-    principleId: '3becc050-82f2-4516-8c8e-7be9ff74623a'
+    principalId: '3becc050-82f2-4516-8c8e-7be9ff74623a'
   }
   dependsOn: [
     spokeNetworks
