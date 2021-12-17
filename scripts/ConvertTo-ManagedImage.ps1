@@ -12,7 +12,7 @@
 
 .PARAMETER Location
     The Azure region that the VHD blob is located in. This is a requirement and the 
-    Azure managed disk and image will be in the same region. 
+    Azure managed disk and image must be in the same region. 
 
 .PARAMETER PrefixFilter
     This is a blob prefix filter to identitfy the VHD blob inside the container. 
@@ -32,52 +32,49 @@
 .PARAMETER ImageNamePrefix
     The prefix for the managed image that will be created. This is used
     for naming the managed image resource. 
-    e.g. "<ImageNamePrefix>-sampleimagename"
+    e.g. "$ImageNamePrefix-sampleimagename"
 
 .PARAMETER Tags
     The tags to apply to managed image. 
 
     Recommended tags should include the following categories:
     - Buid Id
-    - Build run
     - Git ref
     - Git repo
     - Environment type (e.g. dev, sbx, prod, nonprod)
-    - prefix
     - Environment use (e.g. agent)
-    - targeted pool name if known
-    - Team name if applicable
-
-    In this PowerShell script we pass tags in as an array of strings
-    ex: $Tags=@("a=b","c=d")
+    - Agent pool name
+    - Team name
+    - Workload
 
 .NOTES
-    This script uses Azure CLI.
+    This script uses Azure CLI and supports being run interactively 
+    as well as from an Azure DevOps pipeline.
 
     This script leverages the --auth-mode login flag on some of the az commands, therefore
-    the user or service principles running this script must be added to the following role assignments: 
+    the Azure AD identities running this script must be added to the following role assignments: 
     
         "Storage Blob Data Reader" for the storage account
 
     A managed disk must be created from the VHD. After the managed disk is created,
-    then we can create a managed image. Note: Packer in it's current state and implementation
-    does not create a managed disk or imaged, just a VHD blob. Packer is capable of directly creating
-    managed disks, however, we are leveraging what the ADO team has done to create VM images. Also
-    Packer mentions creating direct managed images are for advanced users are is not recommended. 
+    then we can create a managed image. Packer in it's current state and implementation
+    does not create a managed disk or image, just a VHD blob. Packer is capable of directly creating
+    managed disks, however, we are leveraging what the GitHub product team has done to create VM images. Also,
+    Packer mentions creating direct managed images are for advanced users and is not recommended. 
 
 .EXAMPLE
 
-PS> .\ConvertTo-ManagedImage.ps1 -ContainerName system -Location eastus2 `
--PrefixFilter Microsoft.Compute/Images/test-ubuntu1804/packer-12345 `
--ResourceGroupName rg-contoso -StorageAccountName stcontoso -ImageType ubuntu1804 `
--ImageNamePrefix contosoadoagent
+    PS> .\ConvertTo-ManagedImage.ps1 -ContainerName system -Location eastus2 `
+    -PrefixFilter Microsoft.Compute/Images/test-ubuntu1804/packer-12345 `
+    -ResourceGroupName rg-contoso -StorageAccountName stcontoso -ImageType ubuntu1804 `
+    -ImageNamePrefix contosoadoagent -Tags @(\"env=dev\",\"workload=ado agent\")
 
 .EXAMPLE
 
-PS> .\ConvertTo-ManagedImage.ps1 -ContainerName system -Location eastus2 `
--PrefixFilter Microsoft.Compute/Images/test-windows2019/packer-56789 `
--ResourceGroupName rg-contoso -StorageAccountName stcontoso -ImageType windows2019 `
--ImageNamePrefix contosoadoagent
+    PS> .\ConvertTo-ManagedImage.ps1 -ContainerName system -Location eastus2 `
+    -PrefixFilter Microsoft.Compute/Images/test-windows2019/packer-56789 `
+    -ResourceGroupName rg-contoso -StorageAccountName stcontoso -ImageType windows2019 `
+    -ImageNamePrefix contosoadoagent -Tags @(\"env=prod\",\"workload=ado agent\")
 
 .LINK
     https://docs.microsoft.com/en-us/azure/virtual-machines/managed-disks-overview
@@ -93,7 +90,7 @@ PS> .\ConvertTo-ManagedImage.ps1 -ContainerName system -Location eastus2 `
 
 #>
 
-#Requires -Version 6.0
+#Requires -Version 7.0
 [CmdletBinding()]
 param(
     [Parameter(Mandatory=$true)]
@@ -103,7 +100,6 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]$Location,
-
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -181,9 +177,8 @@ try {
         --name $imageName `
         --source $blobUrl `
         --hyper-v-generation V2 `
-        --os-type $blobMetadataOSType `
-        --tags ${Tags}) `
-        | ConvertFrom-Json
+        --os-type $blobMetadataOSType) `
+        | ConvertFrom-Json -Depth 10
     Write-Host ($diskCreateResult | Format-List | Out-String)
 
     Write-Host "Creating new Azure managed image with image name:$imageName"
@@ -202,16 +197,12 @@ try {
     Write-Host "##vso[task.setvariable variable=imageName]$imageName"
     Write-Host "Setting managedImageResouceId variable to: '$($imageCreateResult.id)'"
     Write-Host "##vso[task.setvariable variable=managedImageResouceId]$($imageCreateResult.id)"
-
     Write-Host "Setting blobMetadataCapturedVmKey variable to: '$blobMetadataCapturedVmKey'"
     Write-Host "##vso[task.setvariable variable=blobMetadataCapturedVmKey]$blobMetadataCapturedVmKey"
-
     Write-Host "Setting blobMetadataImageType variable to: '$blobMetadataImageType'"
     Write-Host "##vso[task.setvariable variable=blobMetadataImageType]$blobMetadataImageType"
-
     Write-Host "Setting blobMetadataoOState variable to: '$blobMetadataoOState'"
     Write-Host "##vso[task.setvariable variable=blobMetadataoOState]$blobMetadataoOState"
-
     Write-Host "Setting blobMetadataOSType variable to: '$blobMetadataOSType'"
     Write-Host "##vso[task.setvariable variable=blobMetadataOSType]$blobMetadataOSType"
 } catch {
@@ -223,6 +214,6 @@ try {
     if (($diskCreateResult.provisioningState) -eq "Succeeded") {
         az disk delete --ids $diskCreateResult.id --yes
     } else {
-        Write-Host "##vso[task.logissue type=warning]Could not clean up the managed disk. This could be due to errors during creation."
+        Write-Host "##vso[task.logissue type=warning]Delete will not be performed due to errors during creation. Provisioning state was not 'Succeeded'."
     }
 }
