@@ -33,7 +33,7 @@
             "request": "launch",
             "script": "${workspaceFolder}/scripts/ConvertTo-ManagedImage.ps1",
             "cwd": "${file}",
-            "args": ["-ContainerName $ContainerName", "-Location $Location", "-PrefixFilter $PrefixFilter", "-ResourceGroupName $ResourceGroupName", "-StorageAccountName $StorageAccountName", "-ImageType $ImageType", "-ImageNamePrefix $ImageNamePrefix"]
+            "args": ["-ContainerName $ContainerName", "-Location $Location", "-PrefixFilter $PrefixFilter", "-ResourceGroupName $ResourceGroupName", "-StorageAccountName $StorageAccountName", "-ImageType $ImageType", "-ImageNamePrefix $ImageNamePrefix", "-Tags $Tags"]
         },
         {
             "name": "Publish-ImageToSharedGallery.ps1",
@@ -41,7 +41,7 @@
             "request": "launch",
             "script": "${workspaceFolder}/scripts/Publish-ImageToSharedGallery.ps1",
             "cwd": "${file}",
-            "args": ["-ResourceGroupName $ResourceGroupName", "-ImageDefinitionDescription $ImageDefinitionDescription", "-SharedImageGalleryName $SharedImageGalleryName", "-ImageDefinitionName $ImageDefinitionName", "-Location $Location", "-ImagePublisher $ImagePublisher", "-ImageOffer $ImageOffer", "-ImageSku baseline", "-OsType $OsType", "-ImageVersion $ImageVersion", "-ImageName $ImageName", "-EndOfLifeDate $EndOfLifeDate", "-ImageVersionTags $ImageVersionTags", "-ImageDefinitionTags $ImageDefinitionTags", "-Clean"]
+            "args": ["-ResourceGroupName $ResourceGroupName", "-SharedImageGalleryName $SharedImageGalleryName", "-ImageDefinitionName $ImageDefinitionName", "-ImageDefinitionDescription $ImageDefinitionDescription", "-Location $Location", "-ImagePublisher $ImagePublisher", "-ImageOffer $ImageOffer", "-ImageSku $ImageSku", "-OsType $OsType", "-ImageVersion $ImageVersion", "-ImageName $ImageName", "-ReleaseNoteUri $ReleaseNoteUri", "-EndOfLifeDate $EndOfLifeDate", "-ImageVersionTags $ImageVersionTags", "-ImageDefinitionTags $ImageDefinitionTags"]
         },
         {
             "name": "Remove-IntermediateImageResources.ps1",
