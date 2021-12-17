@@ -8,7 +8,7 @@
     Azure VM images for both Windows and Linux. This script doesn't support custom baseline images
     that are not available in Azure.
 
-    This script assumes the resource group and a service principle have already been setup based
+    This script assumes the resource group and a service principal have already been setup based
     on best practices of limited scope.
 
     It's assumed that this script is run from an Azure DevOps Pipeline, but can also
@@ -85,7 +85,7 @@ $keyValue = [System.Convert]::ToBase64String($cert.GetRawCertData())
 # and associates the self-signed certificate with it. It uses the default start and end dates from the certificate.
 $sp = New-AzADServicePrincipal -DisplayName $DisplayName -CertValue $keyValue -EndDate $cert.NotAfter -StartDate $cert.NotBefore
 
-Write-Host "Service principle and app registration created"
+Write-Host "Service principal and app registration created"
 Write-Host ($sp | Format-Table | Out-String)
 
 # It may take several moments for the service principal and app registration to be created in the tenant.
