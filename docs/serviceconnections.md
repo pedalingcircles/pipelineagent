@@ -1,11 +1,11 @@
 
-# Setting up Service Principles and Service Connections
+# Setting up Service Principals and Service Connections
 
 Setting up and configuring a service connection with the corresponding App Registration / Service Principal along with the proper RBAC and Groups is critical to managing and governing Azure Pipelines at scale.
 
 # Role Based Access Control (RBAC)
 
-Determine what role you want to assign the service principal. Use the [principle of least priviledge](https://en.m.wikipedia.org/wiki/Principle_of_least_privilege). These roles depend on what the pipeline will be allowed to perform since they are associated and managed by the underling Service Connections. Leverage Groups to manage various identities including Service Principles at scale.
+Determine what role you want to assign the service principal. Use the [principle of least priviledge](https://en.m.wikipedia.org/wiki/Principle_of_least_privilege). These roles depend on what the pipeline will be allowed to perform since they are associated and managed by the underling Service Connections. Leverage Groups to manage various identities including Service Principals at scale.
 
 under a specific application pool. The following are some common things to consider:
 
