@@ -221,7 +221,7 @@ try {
         --managed-image $imageId `
         --end-of-life-date $endOfLifeDateIso `
         --tags ${ImageVersionTags}) `
-        | ConvertFrom-Json
+        | ConvertFrom-Json -Depth 10
     if ($imageVersionResult.provisioningState -ne "Succeeded") {
         throw "Error while creating the image version. Provisioning did not succeed:" + ($imageDefinitionResult | Format-List | Out-String)
     }
