@@ -1,5 +1,5 @@
 #!/bin/bash
-# Create a service principle and a certificate 
+# Create a service principal and a certificate 
 # to be used in ADO as a service connection.
 
 # This script uses openssl, Azure CLI, the Azure DevOps extension, and jq
@@ -10,7 +10,7 @@
 #
 # https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli
 
-# Create a service principle with a certificate. You have three options:
+# Create a service principal with a certificate. You have three options:
 #   1. Create with an existing certificate (PEM): 
 #       az ad sp create-for-rbac --name ServicePrincipalName --cert "-----BEGIN CERTIFICATE-----...-----END CERTIFICATE-----"
 #       or
@@ -40,7 +40,7 @@ certPath=$(echo $spResult | jq -r ".fileWithCertAndPrivateKey")
 displayName=$(echo $spResult | jq -r ".displayName")
 sleep 5
 
-# get service principle object id
+# get service principal object id
 spObjectId=$(az ad sp list --display-name $serviceConnectionName --query "[].objectId" --output tsv)
 
 # Adding the service principal to a group
@@ -55,7 +55,7 @@ az login --tenant $adoTenantId
 az devops configure --defaults organization=$adoOrganizationUrl project=$adoProject
 
 # Notes: 
-# The azure-rm-service-principal-id is the appId of the App Registration and not the service principle Object ID
+# The azure-rm-service-principal-id is the appId of the App Registration and not the service principal Object ID
 # The tenant ID is the home tenant of where the app id is created
 az devops service-endpoint azurerm create \
     --azure-rm-service-principal-id $appId \
