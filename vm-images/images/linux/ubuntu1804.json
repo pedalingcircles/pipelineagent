@@ -318,6 +318,11 @@
         },
         {
             "type": "shell",
+            "script": "{{template_dir}}/scripts/base/snap.sh",
+            "execute_command": "sudo sh -c '{{ .Vars }} {{ .Path }}'"
+        },
+        {
+            "type": "shell",
             "inline": [
                 "pwsh -File {{user `image_folder`}}/SoftwareReport/SoftwareReport.Generator.ps1 -OutputDirectory {{user `image_folder`}}",
                 "pwsh -File {{user `image_folder`}}/tests/RunAll-Tests.ps1 -OutputDirectory {{user `image_folder`}}"
@@ -330,7 +335,7 @@
         {
             "type": "file",
             "source": "{{user `image_folder`}}/Ubuntu-Readme.md",
-            "destination": "{{template_dir}}/Ubuntu1804-README.md",
+            "destination": "{{template_dir}}/Ubuntu1804-Readme.md",
             "direction": "download"
         },
         {

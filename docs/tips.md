@@ -23,11 +23,20 @@ During Packer VM Image generation you have two options:
 
 ## Git Subtree
 
-Use sub trees instead of Git Modules to pull in dependent repos under this repo. 
+Use sub trees instead of Git Modules to pull in dependent repos under this repo.
 
 ```azurecli
+# Addinga  new sub tree
 git subtree add --prefix .virtual-environments https://github.com/actions/virtual-environments.git main --squash
+
+# Optionally update existing subtree
 git subtree pull --prefix .virtual-environments https://github.com/actions/virtual-environments.git main --squash
+
+# Remove subtree but will have a commit with deletes
+git rm .virtual-environments -r
+
+# Remove subtree and also removes history of subtree
+git filter-branch --index-filter 'git rm --cached --ignore-unmatch -rf .virtual-environments' --prune-empty -f HEAD
 ```
 
 ## Bicep what-if
