@@ -32,10 +32,10 @@ git subtree add --prefix .virtual-environments https://github.com/actions/virtua
 # Optionally update existing subtree
 git subtree pull --prefix .virtual-environments https://github.com/actions/virtual-environments.git main --squash
 
-# Remove subtree but will have a commit with deletes
+# Remove subtree but will have a commit with deletes (this is preferred)
 git rm .virtual-environments -r
 
-# Remove subtree and also removes history of subtree
+# Remove subtree and also removes history of subtree (this is not preferred but will not record history)
 git filter-branch --index-filter 'git rm --cached --ignore-unmatch -rf .virtual-environments' --prune-empty -f HEAD
 ```
 
