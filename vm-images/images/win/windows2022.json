@@ -147,7 +147,8 @@
             "type": "powershell",
             "scripts": [
                 "{{ template_dir }}/scripts/Installers/Install-Docker.ps1",
-                "{{ template_dir }}/scripts/Installers/Install-PowershellCore.ps1"
+                "{{ template_dir }}/scripts/Installers/Install-PowershellCore.ps1",
+                "{{ template_dir }}/scripts/Installers/Install-WebPlatformInstaller.ps1"
             ]
         },
         {
@@ -179,6 +180,13 @@
                 "{{ template_dir }}/scripts/Installers/Install-JavaTools.ps1",
                 "{{ template_dir }}/scripts/Installers/Install-Kotlin.ps1"
             ]
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "{{ template_dir }}/scripts/Installers/Install-ServiceFabricSDK.ps1"
+            ],
+            "execution_policy": "remotesigned"
         },
         {
             "type": "windows-restart",
@@ -294,6 +302,7 @@
         },
         {
             "type": "powershell",
+            "skip_clean": true,
             "scripts": [
                 "{{ template_dir }}/scripts/Installers/Run-NGen.ps1",
                 "{{ template_dir }}/scripts/Installers/Finalize-VM.ps1"
