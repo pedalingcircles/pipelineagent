@@ -27,6 +27,8 @@ Use sub trees instead of Git Modules to pull in dependent repos under this repo.
 
 ```azurecli
 git subtree add --prefix .virtual-environments https://github.com/actions/virtual-environments.git main --squash
+
+# Optionally update existing subtree
 git subtree pull --prefix .virtual-environments https://github.com/actions/virtual-environments.git main --squash
 
 git rm .virtual-environments -r
