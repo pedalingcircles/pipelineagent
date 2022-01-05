@@ -193,6 +193,8 @@ resource agentextension 'Microsoft.Compute/virtualMachines/extensions@2021-04-01
     autoUpgradeMinorVersion: true
     settings: {
       fileUris: scriptExtensionScriptUris
+    }
+    protectedSettings: {
       commandToExecute: 'sudo ./installer-agent-extension.sh ${adminUsername} ${agentPool} ${pat} ${orgUrl} ${agentVersionTag}'
     }
   }
