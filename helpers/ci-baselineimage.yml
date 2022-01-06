@@ -1,7 +1,9 @@
-  # https://docs.microsoft.com/en-us/azure/virtual-machines/windows/upload-generalized-managed
-  # https://docs.microsoft.com/en-us/azure/virtual-machines/windows/disks-upload-vhd-to-managed-disk-powershell
-  # https://docs.microsoft.com/en-us/previous-versions/azure/virtual-machines/scripts/virtual-machines-windows-powershell-upload-generalized-script
-  # Legacy pipeline used as a reference
+# Only used for reference
+#
+# https://docs.microsoft.com/en-us/azure/virtual-machines/windows/upload-generalized-managed
+# https://docs.microsoft.com/en-us/azure/virtual-machines/windows/disks-upload-vhd-to-managed-disk-powershell
+# https://docs.microsoft.com/en-us/previous-versions/azure/virtual-machines/scripts/virtual-machines-windows-powershell-upload-generalized-script
+# Legacy pipeline used as a reference
   
 name: $(BuildDefinitionName)-${{ parameters.imageType }}-$(Date:yyyyMMdd)$(Rev:.r)
 trigger: none
