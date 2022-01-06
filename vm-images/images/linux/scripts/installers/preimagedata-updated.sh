@@ -11,10 +11,6 @@
 # This scripts replaces that script when building 
 # custom Packer images.
 
-    This file is based on the Update-ImageData.ps1 script which comes from
-    the actions/virtual-environments repository. This script replaces that script
-    when building custom Packer images. 
-
 imagedata_file=$IMAGEDATA_FILE
 image_version=$IMAGE_VERSION
 os_name=$(lsb_release -ds | sed "s/ /\\\n/g")
