@@ -123,7 +123,7 @@
         {
             "type": "shell",
             "scripts": [
-                "{{template_dir}}/scripts/installers/preimagedata-updated.sh"
+                "{{template_dir}}/scripts/installers/_preimagedata.sh"
             ],
             "environment_vars": [
                 "IMAGE_VERSION={{user `image_version`}}",
