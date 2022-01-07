@@ -12,6 +12,16 @@ There are two major components to the Self-hosted pipeline agents. *Image buildi
 
 Image building involves building and automating virtual machine (VM) images from scratch. The produced artifact is an [Azure managed disk](https://docs.microsoft.com/en-us/azure/virtual-machines/managed-disks-overview) that is generalized and published to an [Azure Compute Gallery](https://docs.microsoft.com/en-us/azure/virtual-machines/shared-image-galleries) (formally known as Shared Image Gallery). These images will include all dependencies needed on Azure DevOps (ADO) agents and include any predefined security and configuration settings. These images are leveraging the [HashiCorp Packer](https://www.packer.io/) tool for building the images.
 
+### Operating Systems
+
+The following operating systems are supported for VM image builds:
+
+- Windows 2016 Server
+- Windows 2019 Server
+- Windows 2022 Server
+- Ubuntu 1804
+- Ubuntu 2004
+
 ### Agent Provisioning
 
 Agent provisioning involves taking the built images and provisioning both self-hosted agents and scale set agents and then associating them to various [Agent pools](https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/pools-queues?view=azure-devops&tabs=yaml%2Cbrowser) in the Azure DevOps (ADO) organization.

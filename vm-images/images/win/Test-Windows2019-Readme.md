@@ -28,7 +28,7 @@
 - pip 21.3.1 (python 3.7)
 - Pipx 1.0.0
 - RubyGems 2.7.6.3
-- Vcpkg (build from master \<98b9ea03f>)
+- Vcpkg (build from master \<3c3cce612>)
 - Yarn 1.22.17
 
 #### Environment variables
@@ -85,7 +85,7 @@
 
 ### CLI Tools
 - Alibaba Cloud CLI 3.0.102
-- AWS CLI 2.4.7
+- AWS CLI 2.4.9
 - AWS SAM CLI 1.37.0
 - AWS Session Manager CLI 1.2.279.0
 - Azure CLI 2.32.0
@@ -111,8 +111,8 @@
 ### Browsers and webdrivers
 - Google Chrome 97.0.4692.71
 - Chrome Driver 97.0.4692.71
-- Microsoft Edge 96.0.1054.62
-- Microsoft Edge Driver 96.0.1054.62
+- Microsoft Edge 97.0.1072.55
+- Microsoft Edge Driver 97.0.1072.55
 - Mozilla Firefox 95.0.2
 - Gecko Driver 0.30.0
 - IE Driver 3.150.1.1

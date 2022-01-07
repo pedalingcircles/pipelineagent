@@ -32,7 +32,7 @@
 - Pip3 9.0.1
 - Pipx 1.0.0
 - RubyGems 2.7.6
-- Vcpkg  (build from master \<408ffb232>)
+- Vcpkg  (build from master \<3c3cce612>)
 - Yarn 1.22.17
 
 #### Environment variables
@@ -67,7 +67,7 @@
 - Git-ftp 1.3.1
 - Haveged 1.9.1
 - Heroku 7.59.2
-- HHVM (HipHop VM) 4.140.1
+- HHVM (HipHop VM) 4.143.0
 - jq 1.5
 - Kind 0.11.1
 - Kubectl 1.23.1
@@ -81,6 +81,7 @@
 - nvm 0.39.1
 - OpenSSL 1.1.1  11 Sep 2018
 - Packer 1.7.8
+- Parcel 2.1.1
 - PhantomJS 2.1.1
 - Podman 3.0.1 (apt source repository: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable)
 - Pulumi 3.21.0
@@ -88,14 +89,14 @@
 - Skopeo 1.2.2 (apt source repository: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable)
 - Sphinx Open Source Search Server 2.2.11
 - SVN 1.9.7
-- Terraform 1.1.2
+- Terraform 1.1.3
 - yamllint 1.26.3
 - yq 4.16.2
 - zstd 1.5.1 (homebrew)
 
 ### CLI Tools
 - Alibaba Cloud CLI 3.0.102
-- AWS CLI 1.22.29
+- AWS CLI 1.22.30
 - AWS CLI Session manager plugin 1.2.279.0
 - AWS SAM CLI 1.37.0
 - Azure CLI (azure-cli) 2.32.0 (installation method: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-linux?pivots=apt)
@@ -103,7 +104,7 @@
 - GitHub CLI 2.4.0
 - Google Cloud SDK 367.0.0 (apt source repository: https://packages.cloud.google.com/apt)
 - Hub CLI 2.14.2
-- Netlify CLI 8.6.8
+- Netlify CLI 8.6.12
 - OpenShift CLI 4.9.12
 - ORAS CLI 0.12.0
 - Vercel CLI 23.1.2
@@ -280,8 +281,8 @@
 | node:16                 | sha256:32605ead97ed57bd39a8a7b0e919240e1a3218974dfc6965e61b54a801753131  | 2021-12-21 |
 | node:16-alpine          | sha256:0e071f3c5c84cffa6b1035023e1956cf28d48f4b36e229cef328772da81ec0c5  | 2022-01-03 |
 | ubuntu:16.04            | sha256:0f71fa8d4d2d4292c3c617fda2b36f6dabe5c8b6e34c3dc5b0d17d4e704bd39c  | 2021-08-31 |
-| ubuntu:18.04            | sha256:0fedbd5bd9fb72089c7bbca476949e10593cebed9b1fb9edf5b79dbbacddd7d6  | 2021-10-01 |
-| ubuntu:20.04            | sha256:626ffe58f6e7566e00254b638eb7e0f3b11d4da9675088f4781a50ae288f3322  | 2021-10-16 |
+| ubuntu:18.04            | sha256:37b7471c1945a2a12e5a57488ee4e3e216a8369d0b9ee1ec2e41db9c2c1e3d22  | 2022-01-07 |
+| ubuntu:20.04            | sha256:b5a61709a9a44284d88fb12e5c48db0409cfad5b69d4ff8224077c57302df9cf  | 2022-01-07 |
 
 ### Installed apt packages
 | Name              | Version                           |
