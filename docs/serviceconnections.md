@@ -28,6 +28,8 @@ You will need to have the correct priveledge in both the Azure AD tenant and the
 the [createserviceprincipal.sh](../helpers/createserviceprincipal.sh) script for an example on creating
 the app registration, service principal, certificate, and service connection.
 
+> If possible, it's best to use [managed identities](https://docs.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/overview)
+
 ## Create a self signed certificate
 
 ``` bash
