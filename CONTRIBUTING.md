@@ -7,7 +7,7 @@ Hello there! Thanks for wanting to contribute to this repository. Your help is e
 1. Clone the repository
 2. Create a new branch: `git checkout -b my-branch-name`
 3. Make your changes, ensure that they include steps to install, validate post-install and update software report (please see [How to add new tool](CONTRIBUTING.md#how-to-add-new-tool) for details).
-4. Test your changes by [interactively build an image](docs/create-image-interactive.md).
+4. Test your changes by [interactively build an image](docs/virtual-environments-updates.md).
 5. Submit a pull request
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:
@@ -18,7 +18,6 @@ Here are a few things you can do that will increase the likelihood of your pull 
 - Write [good commit messages](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 - For new tools:
   - Make sure that the tool satisfies [Software Guidelines](README.md#software-and-image-guidelines).
-  - Create an issue and get an approval from us to add this tool to the image before creating the pull request.
 
 ## How to add new tool
 
@@ -26,9 +25,10 @@ Here are a few things you can do that will increase the likelihood of your pull 
 
 - For every new tool add validation scripts and update software report script to make sure that it is included to documentation
 - If the tool is available in other platforms (macOS, Windows, Linux), make sure you include it in as many as possible.
-- If installing a few versions of the tool, consider putting the list of versions in the corresponding `toolset.json` file. It will help other customers to configure their builds flexibly. See [toolset-windows-2016.json](vm-images/images/win/toolsets/toolset-2019.json) as example.
+- If installing a few versions of the tool, consider putting the list of versions in the corresponding `toolset.json` file. It will help others to configure their builds flexibly. See [toolset-windows-2016.json](vm-images/images/win/toolsets/toolset-2019.json) as example.
 - Use consistent naming across all files
 - Validation scripts should be simple and shouldn't change image content
+- Following naming convention guidance on various files associated with the new tool (coming soon)
 
 ### Windows
 
