@@ -103,7 +103,7 @@
 - GitHub CLI 2.4.0
 - Google Cloud SDK 367.0.0 (apt source repository: https://packages.cloud.google.com/apt)
 - Hub CLI 2.14.2
-- Netlify CLI 8.6.5
+- Netlify CLI 8.6.8
 - OpenShift CLI 4.9.12
 - ORAS CLI 0.12.0
 - Vercel CLI 23.1.2
