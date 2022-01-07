@@ -18,7 +18,7 @@ Here are a few things you can do that will increase the likelihood of your pull 
 - Write [good commit messages](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 - For new tools:
   - Make sure that the tool satisfies [Software Guidelines](README.md#software-and-image-guidelines).
-  - 
+
 ## How to add new tool
 
 ### General rules
