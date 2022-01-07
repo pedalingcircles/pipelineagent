@@ -154,7 +154,7 @@ if (-not ($packerBinary)) {
 # Set up Packer to log
 $env:PACKER_LOG=1
 $dateStamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssK")
-$env:PACKER_LOG_PATH="packer-$($dateStamp).log"
+$env:PACKER_LOG_PATH="packer-$ImageType-$($dateStamp).log"
 
 $publicIpPackerSettings = $PublicIp ? "true" : "false"
 $azureCliAuth = $UseAzureCliAuth ? "true" : "false"
