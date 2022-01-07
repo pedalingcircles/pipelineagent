@@ -7,7 +7,7 @@ Hello there! Thanks for wanting to contribute to this repository. Your help is e
 1. Clone the repository
 2. Create a new branch: `git checkout -b my-branch-name`
 3. Make your changes, ensure that they include steps to install, validate post-install and update software report (please see [How to add new tool](CONTRIBUTING.md#how-to-add-new-tool) for details).
-4. Test your changes by [interactively build an image](docs/virtual-environments-update.md).
+4. Test your changes by [interactively build an image](docs/virtual-environments-updates.md).
 5. Submit a pull request
 
 Here are a few things you can do that will increase the likelihood of your pull request being accepted:
