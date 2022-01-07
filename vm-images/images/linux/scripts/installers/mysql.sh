@@ -33,8 +33,10 @@ if isUbuntu20 ; then
     mysql_debs=(
         mysql-common*
         mysql-community-client-plugins*
+        mysql-community-client-core*
         mysql-community-client*
         mysql-client*
+        mysql-community-server-core*
         mysql-community-server*
         mysql-server*
         libmysqlclient21*
@@ -44,6 +46,11 @@ if isUbuntu20 ; then
     for package in ${mysql_debs[@]}; do
         dpkg -i $package
     done
+
+    # Install the /etc/init.d/mysql script for backward compatibility with sysVinit
+    cp $HELPER_SCRIPTS/mysql-service-helper.sh /etc/init.d/mysql
+    # Fix permission
+    chmod 755 /etc/init.d/mysql
 
     # Start mysql to change its settings
     systemctl start mysql.service

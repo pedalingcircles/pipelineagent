@@ -16,34 +16,40 @@ Guidelines:
 
 ## Steps to update
 
-1. Create topic branch
+### 1. Create topic branch
 
 ```console
 user@machine:~/pipelineagent$ git checkout -b new-topic-branch
 ```
 
-2. Create Git subtree
+### 2. Create Git subtree
 
 ```console
 user@machine:~/pipelineagent$ git subtree add --prefix .virtual-environments https://github.com/actions/virtual-environments.git main --squash
 ```
 
-3. Compare `.virtual-environments/images` (subtree) directory to `vm-images/images` directory
+### 3. Compare `.virtual-environments/images` (subtree) directory to `vm-images/images` directory
 
 Add new files and directories that exist in `.virtual-environments/images` and not `vm-images/images`. Then look for files and directories that no longer exist in `.virtual-environments/images` and still exist in `vm-images/images` and remove them (with the exception of files with an underscore prefix). Then review changed files which in most cases you can simply overwrite with updates.
 
 Review all changes and determin if any updates need to be make to Packer templates and make those changes.
 
+> Compare changes between os folders one at a time for easier management. Compare corresponding `linux` directories and then compare the corresponding `win` directories.
 
 
 
 
 
 
-4. Use a [file comparison](https://en.wikipedia.org/wiki/File_comparison) tool to compare artifacts between the two directories to find updates and make changes
-5. Run image builds from local machine to test fix on all updated images
-6. Delete `.virtual-environments` directory
-7. Open Pull Request to verify image builds and changes work
-8. Make sure to **squash** changes to avoid unwanted history from the subtree (mainly deletes)
-9.  Monitory pull reqest as it make take over a day to complete depending on changes
-10. After pull request completes, monitor image builds success on trunk and verify they have been built
+
+
+
+
+
+1. Use a [file comparison](https://en.wikipedia.org/wiki/File_comparison) tool to compare artifacts between the two directories to find updates and make changes
+2. Run image builds from local machine to test fix on all updated images
+3. Delete `.virtual-environments` directory
+4. Open Pull Request to verify image builds and changes work
+5. Make sure to **squash** changes to avoid unwanted history from the subtree (mainly deletes)
+6.  Monitory pull reqest as it make take over a day to complete depending on changes
+7.  After pull request completes, monitor image builds success on trunk and verify they have been built
