@@ -62,4 +62,4 @@ openssl.exe req -x509 -nodes -sha256 -days 3650 -subj "/CN=Local" -newkey rsa:20
 
 [Wikipedia : PKCS 12](https://en.wikipedia.org/wiki/PKCS_12)
 
-[https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli]
+[Create an Azure service principal with the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli)
