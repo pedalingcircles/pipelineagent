@@ -8,4 +8,4 @@ An example of existing pipeline run showing meta data
 There are two scripts that make this change:
 
 - [_preimagedata.sh](/vm-images/images/linux/scripts/installers/_preimagedata.sh) for Linux agents
-- [_Update-ImageData.ps1](/vm-images/images/win/scripts/installers/_Update-ImageData.ps1) for Windows agents
+- [_Update-ImageData.ps1](/vm-images/images/win/scripts/Installers/_Update-ImageData.ps1) for Windows agents
