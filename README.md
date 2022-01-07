@@ -31,15 +31,15 @@ Agent provisioning involves taking the built images and provisioning both self-h
 | Definition | Included Software | Notes |
 | --------------------|--------------------|--------------------|
 | Ubuntu 20.04 | [ubuntu2004](vm-images/images/linux/Ubuntu2004-README.md) | **Do not use in production**. Product team developed image. Used as a reference to manage updates.
-| Test Ubuntu 20.04 | [test-ubuntu2004](vm-images/images/linux/Ubuntu2004-README.md) | **Do not use in production**. Test image used to compare against ubuntu2004 to take updates.
+| Test Ubuntu 20.04 | [test-ubuntu2004](vm-images/images/linux/Test-Ubuntu2004-README.md) | **Do not use in production**. Test image used to compare against ubuntu2004 to take updates.
 | Ubuntu 18.04 | [ubuntu1804](vm-images/images/linux/Ubuntu1804-README.md) | **Do not use in production**. Product team developed image. Used as a reference to manage updated.
-| Test Ubuntu 18.04 | [test-ubuntu1804](vm-images/images/linux/Ubuntu1804-README.md) | **Do not use in production**. Test image used to compare against ubuntu1804 to take updates.
+| Test Ubuntu 18.04 | [test-ubuntu1804](vm-images/images/linux/Test-Ubuntu1804-README.md) | **Do not use in production**. Test image used to compare against ubuntu1804 to take updates.
 | Windows Server 2022<sup>[beta]</sup> | [windows2022](.virtual-environments/images/win/Windows2022-Readme.md) | **Do not use in production**. Product team developed image. Used as a reference to manage updates.
-| Test Windows Server 2022<sup>[beta]</sup> | [test-windows2022](vm-images/images/win/Windows2022-Readme.md) | **Do not use in production**. Test image used to compare against windows2022 to take updates.
+| Test Windows Server 2022<sup>[beta]</sup> | [test-windows2022](vm-images/images/win/Test-Windows2022-Readme.md) | **Do not use in production**. Test image used to compare against windows2022 to take updates.
 | Windows Server 2019 | [windows2019](.virtual-environments/images/win/Windows2019-Readme.md) | **Do not use in production**. Product team developed image. Used as a reference to manage updates.
-| Test Windows Server 2019 | [test-windowss2019](vm-images/images/win/Windows2019-Readme.md) | **Do not use in production**. Test image used to compare against windows2019 to take updates.
+| Test Windows Server 2019 | [test-windowss2019](vm-images/images/win/Test-Windows2019-Readme.md) | **Do not use in production**. Test image used to compare against windows2019 to take updates.
 | Windows Server 2016 | [windows2016](.virtual-environments/images/win/Windows2016-Readme.md) | **Do not use in production**. Product team developed image. Used as a reference to manage updates.
-| Test Windows Server 2016 | [test-windowss2016](vm-images/images/win/Windows2016-Readme.md) | **Do not use in production**. Test image used to compare against windows2016 to take updates.
+| Test Windows Server 2016 | [test-windowss2016](vm-images/images/win/Test-Windows2016-Readme.md) | **Do not use in production**. Test image used to compare against windows2016 to take updates.
 
 ## Getting Started
 
